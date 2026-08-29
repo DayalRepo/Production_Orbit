@@ -1,0 +1,40 @@
+name: iOS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    # Kotlin/Native iOS targets can only be compiled on macOS.
+    runs-on: macos-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Shared framework
+        run: ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64 --stacktrace
+
+      - name: iOS unit tests
+        run: ./gradlew :core:model:iosSimulatorArm64Test :core:designsystem:iosSimulatorArm64Test --stacktrace
+
+      - name: iOS debug build
+        run: |
+          cd iosApp
+          xcodebuild -scheme iosApp -configuration Debug -sdk iphonesimulator -arch arm64 CODE_SIGNING_ALLOWED='NO'

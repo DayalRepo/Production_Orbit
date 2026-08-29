@@ -1,0 +1,42 @@
+name: Android
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # commonTest is wired to run on the JVM, so this covers the shared code too.
+      - name: Unit tests
+        run: ./gradlew testAndroidHostTest --stacktrace
+
+      - name: Android debug build
+        run: ./gradlew :androidApp:assembleDebug --stacktrace
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: '**/build/reports/tests/**'
