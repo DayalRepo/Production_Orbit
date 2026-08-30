@@ -46,6 +46,12 @@ kotlin {
     }
 }
 
+// Without this the package is derived from the module path and comes out as
+// `orbitai.core.designsystem.generated.resources`. Pin it instead.
+compose.resources {
+    packageOfResClass = "com.orbitai.erp.core.designsystem.resources"
+}
+
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
 }

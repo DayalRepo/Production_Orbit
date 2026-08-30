@@ -20,9 +20,18 @@ internal val OrbitShapes = Shapes(
 data class OrbitShapeTokens(
     val card: CornerBasedShape = RoundedCornerShape(12.dp),
     val cardCompact: CornerBasedShape = RoundedCornerShape(8.dp),
-    val button: CornerBasedShape = RoundedCornerShape(10.dp),
+    /**
+     * Buttons are full pills, matching badges, chips and avatars.
+     *
+     * `percent = 50` rather than a fixed radius, so the shape stays a true pill as the button grows
+     * — which it does whenever the user scales text up. The trade-off is that the silhouette tracks
+     * the height rather than being constant, which is why buttons carry a generous minimum width:
+     * without one, a short label makes the pill collapse toward a circle.
+     */
+    val button: CornerBasedShape = RoundedCornerShape(percent = 50),
     val field: CornerBasedShape = RoundedCornerShape(10.dp),
-    val chip: CornerBasedShape = RoundedCornerShape(8.dp),
+
+    val chip: CornerBasedShape = RoundedCornerShape(percent = 50),
     val badge: CornerBasedShape = RoundedCornerShape(percent = 50),
     val avatar: CornerBasedShape = RoundedCornerShape(percent = 50),
     val sheet: CornerBasedShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),

@@ -40,6 +40,28 @@ internal object OrbitPalette {
     val Amber80 = Color(0xFFFFC46B)
     val Amber90 = Color(0xFFFFE3B8)
 
+    /*
+     * Surface ramps.
+     *
+     * True neutral greys, not the blue-tinted ones used elsewhere in this palette: the dark base is
+     * #121212, and tinting the elevated containers away from it makes the tonal steps read as a
+     * colour cast rather than as elevation. Neither ramp reaches #000000 or, for text, #FFFFFF.
+     */
+    val LightSurface = Color(0xFFFFFFFF)
+    val LightSurfaceLow = Color(0xFFFAFAFA)
+    val LightSurfaceContainer = Color(0xFFF5F5F5)
+    val LightSurfaceHigh = Color(0xFFEFEFEF)
+    val LightSurfaceHighest = Color(0xFFE8E8E8)
+    val LightSurfaceDim = Color(0xFFDEDEDE)
+
+    val DarkSurfaceLowest = Color(0xFF0D0D0D)
+    val DarkSurface = Color(0xFF121212)
+    val DarkSurfaceLow = Color(0xFF171717)
+    val DarkSurfaceContainer = Color(0xFF1D1D1D)
+    val DarkSurfaceHigh = Color(0xFF232323)
+    val DarkSurfaceHighest = Color(0xFF2A2A2A)
+    val DarkSurfaceBright = Color(0xFF333333)
+
     // Neutrals.
     val Neutral0 = Color(0xFF000000)
     val Neutral6 = Color(0xFF0E1114)
@@ -88,7 +110,11 @@ internal object OrbitPalette {
     val Teal90 = Color(0xFFCCFBF1)
 }
 
-internal val OrbitLightColorScheme = lightColorScheme(
+/**
+ * Text and surface roles come from [content] so the platform's charcoal or off-white primary text
+ * is the single source of truth. Brand and feedback roles are shared across platforms.
+ */
+internal fun orbitLightColorScheme(content: OrbitContentColors) = lightColorScheme(
     primary = OrbitPalette.Blue40,
     onPrimary = OrbitPalette.Neutral100,
     primaryContainer = OrbitPalette.Blue90,
@@ -105,24 +131,24 @@ internal val OrbitLightColorScheme = lightColorScheme(
     tertiaryContainer = OrbitPalette.Amber90,
     onTertiaryContainer = OrbitPalette.Amber10,
 
-    background = OrbitPalette.Neutral98,
-    onBackground = OrbitPalette.Neutral10,
-    surface = OrbitPalette.Neutral100,
-    onSurface = OrbitPalette.Neutral10,
-    surfaceVariant = OrbitPalette.Neutral94,
-    onSurfaceVariant = OrbitPalette.Neutral30,
+    background = OrbitPalette.LightSurface,
+    onBackground = content.textPrimary,
+    surface = OrbitPalette.LightSurface,
+    onSurface = content.textPrimary,
+    surfaceVariant = OrbitPalette.LightSurfaceHigh,
+    onSurfaceVariant = content.textSecondary,
     surfaceTint = OrbitPalette.Blue40,
 
-    surfaceDim = OrbitPalette.Neutral87,
-    surfaceBright = OrbitPalette.Neutral100,
-    surfaceContainerLowest = OrbitPalette.Neutral100,
-    surfaceContainerLow = OrbitPalette.Neutral98,
-    surfaceContainer = OrbitPalette.Neutral96,
-    surfaceContainerHigh = OrbitPalette.Neutral94,
-    surfaceContainerHighest = OrbitPalette.Neutral90,
+    surfaceDim = OrbitPalette.LightSurfaceDim,
+    surfaceBright = OrbitPalette.LightSurface,
+    surfaceContainerLowest = OrbitPalette.LightSurface,
+    surfaceContainerLow = OrbitPalette.LightSurfaceLow,
+    surfaceContainer = OrbitPalette.LightSurfaceContainer,
+    surfaceContainerHigh = OrbitPalette.LightSurfaceHigh,
+    surfaceContainerHighest = OrbitPalette.LightSurfaceHighest,
 
-    inverseSurface = OrbitPalette.Neutral20,
-    inverseOnSurface = OrbitPalette.Neutral96,
+    inverseSurface = OrbitPalette.DarkSurfaceHigh,
+    inverseOnSurface = OrbitPalette.LightSurfaceContainer,
 
     error = OrbitPalette.Red40,
     onError = OrbitPalette.Neutral100,
@@ -134,7 +160,7 @@ internal val OrbitLightColorScheme = lightColorScheme(
     scrim = OrbitPalette.Neutral0,
 )
 
-internal val OrbitDarkColorScheme = darkColorScheme(
+internal fun orbitDarkColorScheme(content: OrbitContentColors) = darkColorScheme(
     primary = OrbitPalette.Blue80,
     onPrimary = OrbitPalette.Blue20,
     primaryContainer = OrbitPalette.Blue30,
@@ -151,24 +177,24 @@ internal val OrbitDarkColorScheme = darkColorScheme(
     tertiaryContainer = OrbitPalette.Amber30,
     onTertiaryContainer = OrbitPalette.Amber90,
 
-    background = OrbitPalette.Neutral6,
-    onBackground = OrbitPalette.Neutral90,
-    surface = OrbitPalette.Neutral10,
-    onSurface = OrbitPalette.Neutral90,
-    surfaceVariant = OrbitPalette.Neutral22,
-    onSurfaceVariant = OrbitPalette.Neutral80,
+    background = OrbitPalette.DarkSurface,
+    onBackground = content.textPrimary,
+    surface = OrbitPalette.DarkSurface,
+    onSurface = content.textPrimary,
+    surfaceVariant = OrbitPalette.DarkSurfaceHighest,
+    onSurfaceVariant = content.textSecondary,
     surfaceTint = OrbitPalette.Blue80,
 
-    surfaceDim = OrbitPalette.Neutral6,
-    surfaceBright = OrbitPalette.Neutral30,
-    surfaceContainerLowest = OrbitPalette.Neutral0,
-    surfaceContainerLow = OrbitPalette.Neutral10,
-    surfaceContainer = OrbitPalette.Neutral12,
-    surfaceContainerHigh = OrbitPalette.Neutral17,
-    surfaceContainerHighest = OrbitPalette.Neutral22,
+    surfaceDim = OrbitPalette.DarkSurfaceLowest,
+    surfaceBright = OrbitPalette.DarkSurfaceBright,
+    surfaceContainerLowest = OrbitPalette.DarkSurfaceLowest,
+    surfaceContainerLow = OrbitPalette.DarkSurfaceLow,
+    surfaceContainer = OrbitPalette.DarkSurfaceContainer,
+    surfaceContainerHigh = OrbitPalette.DarkSurfaceHigh,
+    surfaceContainerHighest = OrbitPalette.DarkSurfaceHighest,
 
-    inverseSurface = OrbitPalette.Neutral90,
-    inverseOnSurface = OrbitPalette.Neutral20,
+    inverseSurface = OrbitPalette.LightSurfaceHighest,
+    inverseOnSurface = OrbitPalette.DarkSurfaceHigh,
 
     error = OrbitPalette.Red80,
     onError = OrbitPalette.Red30,
