@@ -76,6 +76,13 @@ fun ComponentGalleryScreen(
             )
         }
 
+        DateTimeGalleryPage()
+        ProgressGalleryPage()
+        AvatarGalleryPage()
+        DisplayGalleryPage()
+        StateGalleryPage()
+        InputGalleryPage()
+        ComposerGalleryPage()
         ButtonGalleryPage()
         BadgeGalleryPage()
 

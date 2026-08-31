@@ -189,10 +189,11 @@ class OrbitButtonTest {
     @Test
     fun `disabled alpha is shared rather than redefined per component`() {
         // OrbitChip previously carried its own private copy of this constant.
+        //
+        // The second half of this test compared Disabled against Inactive; that constant went with
+        // `OrbitButtonState.Inactive`, and with one faded state there is no longer an ordering to
+        // assert. What is left is the range check, which still catches the way this actually breaks
+        // in practice: someone reaching for 38 instead of 0.38 when reading the Material spec.
         assertTrue(OrbitAlpha.Disabled > 0f && OrbitAlpha.Disabled < 1f)
-        assertTrue(
-            OrbitAlpha.Disabled < OrbitAlpha.Inactive,
-            "disabled content must be dimmer than merely inactive content",
-        )
     }
 }

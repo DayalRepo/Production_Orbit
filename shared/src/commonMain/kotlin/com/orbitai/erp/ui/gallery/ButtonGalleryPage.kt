@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.orbitai.erp.core.designsystem.component.button.OrbitButtonSize
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
@@ -31,14 +32,21 @@ internal fun ButtonGalleryPage() {
     val spacing = OrbitTheme.spacing
 
     Column(verticalArrangement = Arrangement.spacedBy(spacing.xxl)) {
-        GallerySection("Decision pairs") {
+        // Every family is shown at all three sizes rather than at one representative size. The
+        // sizes are not a scale factor — type, glyph, padding and tracking each move on their own
+        // curve — so the only way to see whether Small still reads as the same component as Large
+        // is to put them under each other.
+        GallerySection("Decision pairs · Large, Medium, Small") {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
-                ActionButtonRow(
-                    dismiss = ActionKind.Reject,
-                    confirm = ActionKind.Approve,
-                    onDismiss = {},
-                    onConfirm = {},
-                )
+                OrbitButtonSize.entries.reversed().forEach { size ->
+                    ActionButtonRow(
+                        dismiss = ActionKind.Reject,
+                        confirm = ActionKind.Approve,
+                        onDismiss = {},
+                        onConfirm = {},
+                        size = size,
+                    )
+                }
                 ActionButtonRow(
                     dismiss = ActionKind.Cancel,
                     confirm = ActionKind.Send,
@@ -50,11 +58,12 @@ internal fun ButtonGalleryPage() {
                     confirm = ActionKind.Create,
                     onDismiss = {},
                     onConfirm = {},
+                    size = OrbitButtonSize.Small,
                 )
             }
         }
 
-        GallerySection("Single actions") {
+        GallerySection("Single actions · full width, then intrinsic") {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
                 ActionButton(
                     action = ActionKind.Login,
@@ -65,16 +74,31 @@ internal fun ButtonGalleryPage() {
                     action = ActionKind.Open,
                     onClick = {},
                     modifier = Modifier.fillMaxWidth(),
+                    size = OrbitButtonSize.Small,
                 )
+                // Unconstrained, so each sizes to its own label. This is the check that the minimum
+                // widths are doing their job: a short label must not collapse the pill to a circle.
+                GalleryControlFlow {
+                    OrbitButtonSize.entries.reversed().forEach { size ->
+                        ActionButton(action = ActionKind.Open, onClick = {}, size = size)
+                    }
+                }
             }
         }
 
-        GallerySection("In flight · ${BusyKind.entries.size} states") {
+        GallerySection("In flight · ${BusyKind.entries.size} states, three sizes") {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
                 // Left permanently spinning so the animation can actually be watched, which is the
                 // only reason a busy sample belongs in a static gallery.
                 BusyKind.entries.forEach { kind ->
                     BusyButton(kind = kind, modifier = Modifier.fillMaxWidth())
+                }
+                // The spinner has to keep pace with the type, or a Small busy button looks like a
+                // Medium one that has been squashed.
+                GalleryControlFlow {
+                    OrbitButtonSize.entries.reversed().forEach { size ->
+                        BusyButton(kind = BusyKind.Sending, size = size)
+                    }
                 }
             }
         }
@@ -82,15 +106,14 @@ internal fun ButtonGalleryPage() {
         GallerySection("Button state and size") {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
                 GalleryControlFlow {
-                    com.orbitai.erp.core.designsystem.component.button.OrbitButtonSize.entries
-                        .forEach { size ->
-                            ActionButton(
-                                action = ActionKind.Approve,
-                                onClick = {},
-                                label = size.name,
-                                size = size,
-                            )
-                        }
+                    OrbitButtonSize.entries.forEach { size ->
+                        ActionButton(
+                            action = ActionKind.Approve,
+                            onClick = {},
+                            label = size.name,
+                            size = size,
+                        )
+                    }
                 }
                 GalleryControlFlow {
                     OrbitButtonState.entries.forEach { state ->

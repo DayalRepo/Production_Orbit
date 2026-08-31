@@ -1,78 +1,86 @@
 package com.orbitai.erp.core.designsystem.component.input
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
-import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
-import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
-import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
-import com.orbitai.erp.core.designsystem.foundation.orbitGlassScrollbar
-import com.orbitai.erp.core.designsystem.icon.OrbitIcons
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
- * The general-purpose text field: one line or many, in a glass container.
+ * A single-line text field.
  *
- * ### Type size
+ * ### The placeholder is a hint, not a label
  *
- * The input uses `bodyLarge`, a step above where a form label sits, and the placeholder uses the
- * identical style so nothing shifts at the moment the first character lands. That size is not a
- * preference: these forms get filled in on site, one-handed, on a bright screen, and a field that
- * renders what you typed smaller than the body copy around it is the field people mistype into. It
- * is an `sp`-based style like every other, so it still tracks the system font setting.
+ * [placeholder] disappears the moment anyone types, which makes it useless as the field's name — a
+ * user who tabs away and back has no way to recall what the box was for, and neither does a screen
+ * reader user who arrives at a filled field. So [label] exists separately and is required. It is
+ * the accessible name whether or not a screen chooses to render it visibly.
  *
- * ### Long text
+ * This is the mistake placeholder-only forms make, and it is worth being blunt about: a form built
+ * entirely from placeholders is legible exactly once, before it is filled in.
  *
- * With [singleLine] false the field grows to [maxLines] and then scrolls rather than growing
- * further, which is what stops one pasted paragraph from pushing a Save button off a form. Once it
- * scrolls, two affordances appear:
+ * ### Typed text outweighs the hint it replaced
  *
- * - a `Modifier.orbitGlassScrollbar` thumb, because without it a scrolled field looks exactly like
- *   an unscrolled one and the user gets no signal that their own text is hidden above the fold;
- * - an expand button, if [onExpand] is supplied — for the case scrolling cannot solve. Scrolling a
- *   five-line window is fine for writing and poor for reading back, so the field offers a way out to
- *   a full-height view rather than pretending a peephole is enough.
+ * The value is set a step heavier than the placeholder — [FontWeight.Medium] against the hint's
+ * regular — and in the primary ink rather than the secondary. The two are the same size and sit on
+ * the same baseline, so they occupy identical space and nothing shifts as the hint gives way.
  *
- * Both are conditional on there actually being overflow, tested against the scroll range rather than
- * by counting lines, which cannot account for wrapping or for the current font scale. A field whose
- * content fits shows neither.
+ * Weight rather than size for the difference, because size would move the baseline and make the
+ * swap visible as a jump. What it buys is that a filled field and an empty one are distinguishable
+ * from across the form at a glance, which is what you want when checking whether you have finished
+ * one — and it stops the user's own input reading as placeholder text, which is the specific
+ * confusion a same-weight value creates.
  *
- * ### Accessibility
+ * ### Overflow
  *
- * [label] is the accessible name and is required. [placeholder] is not a substitute: a placeholder
- * disappears on the first keystroke, so a field labelled only by its placeholder is unlabelled for a
- * screen-reader user and unlabelled for everyone else as soon as they start typing. Passing both is
- * the normal case — the label outside the field, the placeholder inside it.
+ * The placeholder ellipsises rather than wrapping. A hint is expendable — the point of it is
+ * recognisable in the first few words — and letting it wrap makes an empty field taller than the
+ * same field once it has been typed into, so a form visibly shrinks as it is completed.
  *
- * @param placeholder the greyed prompt shown while the field is empty.
- * @param supportingText helper or error text below the field. Say what to do, not just what is
- *   wrong: "Use dd/mm/yyyy" beats "Invalid date".
- * @param maxLines the growth cap for a multi-line field, in lines. Ignored when [singleLine].
- * @param onExpand opens a full-height view. Only offered once the text overflows.
+ * The *value* does not ellipsise. It scrolls horizontally, and when it has scrolled the field draws
+ * a short fade at the leading edge: the one thing worse than text running out of the box is text
+ * running out of the box with no sign that it has. See [OrbitFieldOverflowFade].
+ *
+ * ### Sizing and scaling
+ *
+ * Three sizes, each a minimum height rather than a fixed one, so the field grows with the system
+ * font scale instead of clipping (WCAG 1.4.4). All three clear the 48dp touch minimum — unlike
+ * buttons, where Small goes under it deliberately, since a mistappable button can be tapped again
+ * but an unhittable field cannot be typed into at all.
+ *
+ * @param label the accessible name. Required, and not rendered by this component — a screen that
+ *   wants a visible label puts one above the field, where it stays after typing begins.
+ * @param placeholder the in-field hint. Keep it an example ("e.g. Tower B, level 4") rather than a
+ *   restatement of the label, which is wasted space.
+ * @param state [OrbitFieldState.Error] or [OrbitFieldState.Success] to colour the rim. Independent
+ *   of focus, because the usual moment for an error to exist is while the user stands in the field
+ *   fixing it.
  */
 @Composable
 fun OrbitTextField(
@@ -81,125 +89,122 @@ fun OrbitTextField(
     label: String,
     modifier: Modifier = Modifier,
     placeholder: String? = null,
+    size: OrbitFieldSize = OrbitFieldSize.Medium,
+    state: OrbitFieldState = OrbitFieldState.Default,
     enabled: Boolean = true,
-    error: Boolean = false,
-    supportingText: String? = null,
+    readOnly: Boolean = false,
     singleLine: Boolean = true,
-    maxLines: Int = 5,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = if (singleLine) ImeAction.Done else ImeAction.Default,
-    onExpand: (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    leading: (@Composable () -> Unit)? = null,
+    trailing: (@Composable () -> Unit)? = null,
 ) {
+    val sizing = OrbitTheme.sizing
+    val content = OrbitTheme.contentColors
     val control = OrbitTheme.controlColors
-    val contentColors = OrbitTheme.contentColors
-    val spacing = OrbitTheme.spacing
-
     val interactionSource = remember { MutableInteractionSource() }
+
+    val minHeight = size.pick(sizing.fieldHeightSm, sizing.fieldHeightMd, sizing.fieldHeightLg)
+    val padding = size.pick(sizing.fieldPaddingSm, sizing.fieldPaddingMd, sizing.fieldPaddingLg)
+
+    // Body sizes, not label sizes. What is typed here is content rather than chrome, and setting it
+    // in a label style makes a filled form read as a list of captions.
+    val base: TextStyle = size.pick(
+        OrbitTheme.typography.bodyMedium,
+        OrbitTheme.typography.bodyLarge,
+        OrbitTheme.extendedTypography.fieldLarge,
+    )
+
+    val ink = if (enabled) content.textPrimary else content.textPrimary.copy(OrbitAlpha.Disabled)
+    val hint = if (enabled) content.textSecondary else content.textSecondary.copy(OrbitAlpha.Disabled)
+
+    // Overflow has to be measured, not inferred from the value being non-empty — see the note on
+    // OrbitFieldOverflowFade for what happens when it is guessed. `getLineRight` reports the line's
+    // true width even past the constraint, which is what makes the comparison meaningful; the
+    // reported `size` is already clamped and would always say it fits.
+    var slotWidth by remember { mutableIntStateOf(0) }
+    var lineWidth by remember { mutableFloatStateOf(0f) }
     val focused by interactionSource.collectIsFocusedAsState()
-    val focusRequester = remember { FocusRequester() }
-    val scrollState = rememberScrollState()
+    val overflowed = singleLine && slotWidth > 0 && lineWidth > slotWidth
 
-    val textStyle = OrbitTheme.typography.bodyLarge
-    val ink = if (enabled) contentColors.textPrimary else contentColors.textDisabled
-    val hint = if (enabled) contentColors.textTertiary else contentColors.textDisabled
+    OrbitFieldShell(
+        interactionSource = interactionSource,
+        shape = OrbitTheme.shapeTokens.field,
+        minHeight = minHeight,
+        horizontalPadding = padding,
+        enabled = enabled,
+        state = state,
+        modifier = modifier,
+    ) {
+        leading?.invoke()
 
-    val overflowing = !singleLine && scrollState.maxValue > 0
-
-    // Derived from the style's own line height through the current density, so the cap follows both
-    // the platform type scale and the user's font setting. A hardcoded dp value would clip the fifth
-    // line the moment someone turned text size up.
-    val lineCap = with(LocalDensity.current) { textStyle.lineHeight.toDp() } * maxLines
-
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-        OrbitFieldShell(
-            focused = focused,
-            shape = OrbitTheme.shapeTokens.field,
-            minHeight = OrbitTheme.sizing.fieldHeight,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            error = error,
-            // Top-aligned when multi-line, so the expand button stays level with the first line
-            // rather than drifting down the field as it fills.
-            verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top,
-            verticalPadding = if (singleLine) spacing.sm else spacing.md,
-            onRequestFocus = { focusRequester.requestFocus() },
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .onSizeChanged { slotWidth = it.width },
+            contentAlignment = Alignment.CenterStart,
         ) {
-            Box(modifier = Modifier.weight(1f)) {
-                // The scroll goes on a wrapper, never on the text field itself. Putting
-                // `verticalScroll` directly on a `BasicTextField` hands it an unbounded height
-                // constraint, and the field then measures out of the layout entirely — it renders,
-                // but it takes no focus and never reaches the accessibility tree, so the box looks
-                // like a working field and cannot be typed into by anyone, mouse or screen reader.
-                Box(
-                    modifier = if (singleLine) {
-                        Modifier.fillMaxWidth()
-                    } else {
-                        Modifier
-                            .fillMaxWidth()
-                            // The cap is here rather than on the shell so the container still grows
-                            // with the font scale while the text is what actually scrolls.
-                            .heightIn(max = lineCap)
-                            // Before verticalScroll, so the thumb is measured against the viewport
-                            // and stays put. After it, the thumb sizes to the content and scrolls
-                            // away with the text.
-                            .orbitGlassScrollbar(
-                                scrollState = scrollState,
-                                color = control.controlContent,
-                                visible = overflowing,
-                            )
-                            .verticalScroll(scrollState)
-                    },
-                ) {
+            // The selection handles and highlight default to Material's primary, which is not this
+            // product's accent and shows up as a stray purple the first time anyone selects text.
+            CompositionLocalProvider(
+                LocalTextSelectionColors provides TextSelectionColors(
+                    handleColor = control.actionContainer,
+                    backgroundColor = control.actionContainer.copy(alpha = SelectionAlpha),
+                ),
+            ) {
+                // While focused the caret is kept in view, so the text has scrolled left and the
+                // hidden part is behind the caret; at rest the field shows the start of its value
+                // and the hidden part is ahead.
+                OrbitFieldOverflowFade(overflowed = overflowed, atStart = focused) {
                     BasicTextField(
                         value = value,
                         onValueChange = onValueChange,
-                        enabled = enabled,
-                        textStyle = textStyle.copy(color = ink),
-                        cursorBrush = SolidColor(control.controlContent),
-                        singleLine = singleLine,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = keyboardType,
-                            imeAction = imeAction,
-                        ),
-                        interactionSource = interactionSource,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .focusRequester(focusRequester)
-                            // Only inset once the thumb is there, so a short note is not
-                            // permanently indented to reserve room for a bar it never gets.
-                            .padding(end = if (overflowing) spacing.sm else 0.dp),
+                            .orbitReleaseFocusWithKeyboard()
+                            .semantics { contentDescription = label },
+                        enabled = enabled,
+                        readOnly = readOnly,
+                        textStyle = base.copy(color = ink, fontWeight = FontWeight.Medium),
+                        keyboardOptions = keyboardOptions,
+                        keyboardActions = keyboardActions,
+                        singleLine = singleLine,
+                        visualTransformation = visualTransformation,
+                        interactionSource = interactionSource,
+                        cursorBrush = SolidColor(control.actionContainer),
+                        onTextLayout = { result ->
+                            lineWidth = if (result.lineCount > 0) result.getLineRight(0) else 0f
+                        },
                     )
-                }
-                if (value.isEmpty() && placeholder != null) {
-                    Text(text = placeholder, style = textStyle, color = hint)
                 }
             }
 
-            if (onExpand != null && overflowing) {
-                OrbitIconButton(
-                    contentDescription = "Expand $label to full view",
-                    onClick = onExpand,
-                    icon = OrbitIcons.Expand,
-                    style = OrbitIconButtonStyle.Neutral,
-                    size = OrbitIconButtonSize.Small,
-                    state = if (enabled) OrbitButtonState.Active else OrbitButtonState.Disabled,
-                    // Bottom, against the shell's Top alignment for everything else. At the top the
-                    // button sits beside the first line and steals width from every line below it,
-                    // which is the widest part of a paragraph; at the bottom it sits beside the last
-                    // line, which is usually the short one, so the text keeps the full column and
-                    // the button costs nothing.
-                    modifier = Modifier.align(Alignment.Bottom),
+            if (value.isEmpty() && placeholder != null) {
+                Text(
+                    text = placeholder,
+                    // Same size and baseline as the value, one weight lighter. Matching the metrics
+                    // is what stops the hint's disappearance from nudging the layout.
+                    style = base,
+                    color = hint,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    // The field already announces its label; a screen reader reading the hint on
+                    // top of it says the same box twice.
+                    modifier = Modifier.clearAndSetSemantics {},
                 )
             }
         }
 
-        if (supportingText != null) {
-            Text(
-                text = supportingText,
-                style = OrbitTheme.typography.bodySmall,
-                color = if (error) OrbitTheme.colorScheme.error else contentColors.textSecondary,
-                modifier = Modifier.padding(horizontal = spacing.md),
-            )
-        }
+        trailing?.invoke()
     }
 }
+
+internal fun <T> OrbitFieldSize.pick(small: T, medium: T, large: T): T = when (this) {
+    OrbitFieldSize.Small -> small
+    OrbitFieldSize.Medium -> medium
+    OrbitFieldSize.Large -> large
+}
+
+/** Selection highlight opacity — visible behind text without washing it out. */
+private const val SelectionAlpha = 0.28f

@@ -26,16 +26,18 @@ class PlatformTokensTest {
 
     @Test
     fun `icon sizes match the system icon sheet`() {
-        assertEquals(12.dp, android.sizing.iconXs)
-        assertEquals(16.dp, android.sizing.iconSm)
-        assertEquals(24.dp, android.sizing.iconMd)
-        assertEquals(32.dp, android.sizing.iconXl)
-
-        // iOS standard is 20–24pt and featured 28–32pt, so it steps where Android plateaus.
-        assertEquals(20.dp, ios.sizing.iconMd)
-        assertEquals(24.dp, ios.sizing.iconLg)
-        assertEquals(28.dp, ios.sizing.iconXl)
-        assertEquals(32.dp, ios.sizing.iconXxl)
+        // The icon spec gives one ladder for both platforms: 16 inline, 24 standard, 32 action,
+        // 48 hero. iOS used to step at 20 and 28 where Android plateaued; that divergence is gone,
+        // and what remains platform-specific is the touch target rather than the glyph.
+        listOf("Android" to android, "iOS" to ios).forEach { (name, tokens) ->
+            assertEquals(12.dp, tokens.sizing.iconXs, "$name iconXs")
+            assertEquals(16.dp, tokens.sizing.iconSm, "$name iconSm")
+            assertEquals(24.dp, tokens.sizing.iconMd, "$name iconMd")
+            assertEquals(24.dp, tokens.sizing.iconLg, "$name iconLg")
+            assertEquals(32.dp, tokens.sizing.iconXl, "$name iconXl")
+            assertEquals(32.dp, tokens.sizing.iconXxl, "$name iconXxl")
+            assertEquals(48.dp, tokens.sizing.iconHero, "$name iconHero")
+        }
     }
 
     @Test

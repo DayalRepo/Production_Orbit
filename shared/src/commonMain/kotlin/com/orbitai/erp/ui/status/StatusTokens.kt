@@ -54,14 +54,6 @@ val Severity.colors: ColorPair
         }
     }
 
-/** Filled segment count for `OrbitSeverityIndicator`. */
-val Severity.indicatorLevel: Int
-    get() = when (this) {
-        Severity.Low -> 1
-        Severity.Medium -> 2
-        Severity.High -> 3
-        Severity.Critical -> 4
-    }
 
 /** Priority reuses the severity ramp — four ascending steps of the same visual language. */
 val Priority.colors: ColorPair
@@ -74,13 +66,6 @@ val Priority.colors: ColorPair
         }
     }
 
-val Priority.indicatorLevel: Int
-    get() = when (this) {
-        Priority.Low -> 1
-        Priority.Medium -> 2
-        Priority.High -> 3
-        Priority.Urgent -> 4
-    }
 
 val ProjectHealth.colors: ColorPair
     @Composable @ReadOnlyComposable get() = with(OrbitTheme.semanticColors) {

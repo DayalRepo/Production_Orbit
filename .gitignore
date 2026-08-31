@@ -8,10 +8,14 @@ local.properties
 .idea
 .DS_Store
 captures
-# Scratch screenshots taken while reviewing the design system on-device. Never source; regenerate
-# them by rerunning the review rather than committing any.
-.review
-.diag
+# Working directory for on-device design reviews: screenshots, UI-hierarchy dumps and the one-off
+# scripts used to drive them. Never source. Everything in here is reproducible by rerunning the
+# review, and screenshots in particular go stale the moment a token changes, so a committed one is
+# worse than none — it documents a version of the UI that no longer exists.
+#
+# Kept as a single directory rather than a scattering of ignored names so that clearing it is one
+# deletion and nothing accumulates unnoticed at the repo root.
+.scratch
 .externalNativeBuild
 .cxx
 *.xcodeproj/*

@@ -45,12 +45,25 @@ ICONS = {
     "Mail": "Mail02Icon",
     "Upload": "Upload01Icon",
     "Calendar": "Calendar04Icon",
+    # Two more calendars, which is not redundancy. `Calendar` (04) is the generic one used for a date
+    # in running content; `CalendarDate` (01) is the grid-faced glyph that reads as an input field's
+    # affordance at 16dp; `CalendarSchedule` (03) carries a clock and so means "commit this to a
+    # schedule" rather than "here is a date", which is what the Schedule button needs to say.
+    "CalendarDate": "Calendar01Icon",
+    "CalendarSchedule": "Calendar03Icon",
     "Puzzle": "PuzzleIcon",
     "NotepadDashed": "NotepadTextDashedIcon",
     "Play": "PlayIcon",
     "Pause": "PauseIcon",
     "Bookmark": "Bookmark02Icon",
     "Add": "Add01Icon",
+    # The stepper pair for the quantity field. `Add` (add-01) is already a plus, but it is the *action*
+    # plus used on "add stage" and "attach file" rows, where it reads as "create a new thing". A
+    # stepper's plus means "one more of the thing already here", and the pair only reads as a pair if
+    # both halves come from the same drawing — so plus-sign and minus-sign are taken together rather
+    # than pairing minus-sign with add-01 and hoping the strokes match.
+    "PlusSign": "PlusSignIcon",
+    "MinusSign": "MinusSignIcon",
     "Tick": "Tick02Icon",
     "BadgeAlert": "BadgeAlertIcon",
     "TimeQuarter": "TimeQuarter02Icon",
@@ -65,9 +78,25 @@ ICONS = {
     "Sent": "SentIcon",
     "Note": "Note01Icon",
     # Input-field glyphs.
-    "Search": "Search01Icon",
     "Attachment": "Attachment01Icon",
     "Mic": "Mic02Icon",
+    # The composer's own mic, and it is `mic-01` rather than the `mic-02` above. 02 is drawn on a
+    # stand, which reads as studio equipment; 01 is the bare capsule, which is what a "hold to talk"
+    # control means. The two coexist because the older one is still what a settings row wants.
+    "MicRecord": "Mic01Icon",
+    # The waveform on a voice clip. Used for the attachment's leading mark and, tiled, as the
+    # resting shape of the live visualiser before any amplitude has arrived.
+    "AudioWave": "AudioWave01Icon",
+    # The two rows in the composer's attach menu. Both carry the small plus that marks them as
+    # *adding* something rather than browsing what is already there — the menu is a list of things
+    # you can do, and a bare picture frame beside a bare folder reads as a list of places instead.
+    "ImageUpload": "ImageAdd01Icon",
+    "FileUpload": "FileAddIcon",
+    # Send, and it is an arrow rather than the paper plane. A plane is idiomatic for *mail* and
+    # carries the sense of something dispatched and gone; an upward arrow is what a prompt box
+    # means — commit this, get an answer back. It also survives being small far better, since it is
+    # two strokes rather than a shape with an internal fold.
+    "ArrowUp": "ArrowUp02Icon",
     "Expand": "ExpandIcon",
     "BatteryLow": "BatteryLowIcon",
     "BatteryMedium": "BatteryMedium01Icon",
@@ -75,6 +104,39 @@ ICONS = {
     "BatteryFull": "BatteryFullIcon",
     "Sun": "Sun01Icon",
     "Moon": "Moon02Icon",
+    # Account-menu glyphs. `User` is the plain person rather than `UserCircleIcon`, because the menu
+    # row already sits beside a circular avatar and two concentric circles read as a duplicate.
+    "User": "UserIcon",
+    "Logout": "Logout01Icon",
+    # Delta arrows. Diagonal rather than vertical: a plain up arrow is also the "scroll to top" and
+    # "sort ascending" glyph, and the diagonal is unambiguously a trend line. They are named for the
+    # direction of the change rather than the direction the arrow points, since a falling metric is
+    # sometimes the good one and the call site should not have to translate.
+    "TrendUp": "ArrowUpRight01Icon",
+    "TrendDown": "ArrowDownRight01Icon",
+    # The document glyph on an attachment tile. `file-02` rather than the paperclip in "Attachment":
+    # a paperclip means "this has something attached to it" and belongs on the button that adds one,
+    # whereas the tile *is* the attachment and should depict the thing rather than the act.
+    "File": "File02Icon",
+    # The fallback on an attachment row, for formats with no artwork of their own. `attachment-02`
+    # rather than `pin-02`: a pin means "kept" or "stuck to the top", which is a different claim
+    # from "attached to this record", and the row is already a list of attachments.
+    "AttachmentFile": "Attachment02Icon",
+    # The trailing glyph on Open and Login — the two actions that take you somewhere else.
+    "ArrowRight": "ArrowRight01Icon",
+    # Copy to clipboard. Sits beside the phone number in the avatar cards, which is the one value in
+    # this product that exists to be pasted somewhere else.
+    "Copy": "Copy01Icon",
+    # The disclosure chevron on a dropdown. Its own name rather than a reuse of `ArrowUp` rotated,
+    # because a chevron and an arrow say different things -- an arrow moves you somewhere, a chevron
+    # opens something in place -- and the dropdown rotates this one between the two states itself.
+    "ChevronDown": "ArrowDown01Icon",
+    # `search-02` rather than `search-01`. The two differ in the angle of the handle; 02's sits
+    # closer to 45 degrees, which keeps the glass circle centred in a pill instead of riding high.
+    "Search": "Search02Icon",
+    # Rename an attachment. A capital A with a caret, which is the near-universal mark for "edit
+    # this text" and reads as such at 16dp where a pencil turns to mush.
+    "TextEdit": "TextIcon",
 }
 
 
@@ -565,6 +627,22 @@ BUTTON_SHEEN = 1.0
 # Multiplier applied to the highlight while a pointer is hovering.
 BUTTON_HOVER_LIFT = 1.35
 
+# The icon button's ring is achromatic, so its highlight is not spent against a contrast budget.
+# Dark is near zero because white over an already-pale fill lightens the fill instead of reading as
+# an edge, which showed up on device as a milky bloom rather than glass.
+# Zero on dark: a white wash over a ring on a near-black page lightens the ring rather than reading
+# as light on an edge, and no nonzero value was subtle rather than simply absent. See the doc on the
+# generated constant.
+RING_HIGHLIGHT_ALPHA = {"light": 0.16, "dark": 0.0}
+
+# Cards and attachment rows. Separate from the ring pair because a wash across a 32dp disc recolours
+# the object while the same wash along a wide panel's top edge reads correctly as a lit edge.
+SURFACE_HIGHLIGHT_ALPHA = {"light": 0.16, "dark": 0.05}
+
+# Contact shadow under any glass surface. Roughly triple on dark for the same visual weight, because
+# the dark surfaces start at #121212 and leave a shadow very little room to register.
+SHADOW_ALPHA = {"light": 0.16, "dark": 0.48}
+
 
 BADGE_COLORS_TEMPLATE = '''package com.orbitai.erp.core.designsystem.theme
 
@@ -657,6 +735,56 @@ object OrbitGlass {{
      */
     const val ButtonHoverLift = {button_hover_lift}f
 
+    /**
+     * Peak alpha of the white highlight on an icon button's ring.
+     *
+     * Modest on light, and **zero** on dark.
+     *
+     * Piling a white highlight onto the near-white fill of a light-theme ring buys little and risks
+     * blowing the top edge out, so it is kept small there. On dark it is not merely useless but
+     * actively wrong, and it took three attempts to accept that trimming it was not the answer.
+     *
+     * A highlight is meant to read as light glancing off a raised edge. That only works when it is
+     * brighter than the material *and* the material is brighter than what is behind it. On a
+     * near-black page neither holds: white added to the ring simply lightens the ring, and the
+     * result was a milky bloom across the top of every circle — an effect the eye reads as a
+     * rendering artefact, not as material. Any nonzero value produced a visible film; there was no
+     * amount that was subtle rather than absent.
+     *
+     * On dark the glass read is carried entirely by the rim and the contact shadow, which are
+     * position and material cues rather than a wash, and by the ring's fill now deepening rather
+     * than lightening — see `ringContainer`.
+     *
+     * Neither figure is spent against a contrast budget the way the badge and button values are,
+     * since the ring carries no text.
+     */
+    const val RingHighlightLight = {ring_highlight_light}f
+    const val RingHighlightDark = {ring_highlight_dark}f
+
+    /**
+     * Peak alpha of the white highlight on a large glass *surface* — cards and attachment rows.
+     *
+     * Split from the ring pair above, which it used to share. The two look like the same value and
+     * are not the same problem: a ring is a 32dp disc whose fill is most of its area, so a wash
+     * across it recolours the whole object, while a card is a wide panel where the same wash falls
+     * as a gradient along a long top edge and reads as the edge catching light. Sharing one constant
+     * meant that fixing the disc would have flattened every card on dark, which is a change nobody
+     * asked for and would have been made silently.
+     */
+    const val SurfaceHighlightLight = {surface_highlight_light}f
+    const val SurfaceHighlightDark = {surface_highlight_dark}f
+
+    /**
+     * Alpha of the black contact shadow under a glass surface, per theme.
+     *
+     * Roughly triple on dark for the same visual weight. The dark surfaces start at `#121212` rather
+     * than pure black, so there is headroom underneath them, but not much, and a shadow has to be far
+     * deeper in alpha to register across it. See `Modifier.orbitGlassShadow` for why the answer is
+     * never a lighter shadow.
+     */
+    const val ShadowLight = {shadow_light}f
+    const val ShadowDark = {shadow_dark}f
+
     /** How far the hairline edge fades from top to bottom, which is what gives the pill depth. */
     const val EdgeFade = {edge_fade}f
 }}
@@ -693,6 +821,12 @@ def emit_palette(palette: dict) -> None:
             button_highlight_light=BUTTON_HIGHLIGHT_ALPHA["light"],
             button_highlight_dark=BUTTON_HIGHLIGHT_ALPHA["dark"],
             button_hover_lift=BUTTON_HOVER_LIFT,
+            ring_highlight_light=RING_HIGHLIGHT_ALPHA["light"],
+            ring_highlight_dark=RING_HIGHLIGHT_ALPHA["dark"],
+            surface_highlight_light=SURFACE_HIGHLIGHT_ALPHA["light"],
+            surface_highlight_dark=SURFACE_HIGHLIGHT_ALPHA["dark"],
+            shadow_light=SHADOW_ALPHA["light"],
+            shadow_dark=SHADOW_ALPHA["dark"],
             edge_fade=EDGE_FADE,
         ),
         newline="\n",

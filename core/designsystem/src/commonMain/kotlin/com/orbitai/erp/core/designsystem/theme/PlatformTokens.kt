@@ -47,6 +47,14 @@ internal val AndroidPlatformTokens = OrbitPlatformTokens(
         avatarXl = 88.dp,
 
         minTouchTarget = 48.dp,
+
+        // Android's 48dp targets already carry their own air, so the explicit gap can be modest.
+        composerControlGap = 4.dp,
+        composerEdgeInset = 6.dp,
+
+        // Six 48dp rows and a sliver of the seventh. Android's taller rows mean fewer options fit,
+        // so the panel is given a little more room than iOS to land on a comparable option count.
+        dropdownMaxHeight = 296.dp,
     ),
     lightContentColors = AndroidLightContentColors,
     darkContentColors = AndroidDarkContentColors,
@@ -60,9 +68,14 @@ internal val IosPlatformTokens = OrbitPlatformTokens(
         // Inline 12–16pt, standard/toolbar 20–24pt, featured 28–32pt.
         iconXs = 12.dp,
         iconSm = 16.dp,
-        iconMd = 20.dp,
+        // Was 20dp, with iconLg at 24 and iconXl at 28 — an iOS-only ladder from the days when these
+        // were sized against SF Symbols' optical scale. The icon spec gives one column for both
+        // platforms (16 / 24 / 32), and a shared ladder is worth more here than the half-step: the
+        // per-platform difference that actually matters on iOS is the 44pt touch target below, which
+        // is unchanged.
+        iconMd = 24.dp,
         iconLg = 24.dp,
-        iconXl = 28.dp,
+        iconXl = 32.dp,
         iconXxl = 32.dp,
 
         avatarXs = 24.dp,
@@ -73,6 +86,18 @@ internal val IosPlatformTokens = OrbitPlatformTokens(
 
         // Apple's minimum is 44pt, Material's is 48dp. Neither is padded to match the other.
         minTouchTarget = 44.dp,
+
+        // More than Android, precisely because the targets are 4pt smaller. Matching the numbers
+        // would leave the iOS row visibly tighter than the Android one for the same reason the
+        // targets differ — the platform expects controls to sit a little further apart to make up
+        // for being a little smaller.
+        composerControlGap = 6.dp,
+        composerEdgeInset = 8.dp,
+
+        // Six 44pt rows and part of the seventh. Shorter than Android's cap and showing about the
+        // same number of options, which is the thing worth matching across platforms — an identical
+        // dp height would show iOS users an extra half row for no reason other than arithmetic.
+        dropdownMaxHeight = 272.dp,
     ),
     lightContentColors = IosLightContentColors,
     darkContentColors = IosDarkContentColors,

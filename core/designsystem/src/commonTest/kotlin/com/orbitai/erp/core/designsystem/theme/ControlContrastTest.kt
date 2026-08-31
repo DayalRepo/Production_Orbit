@@ -241,61 +241,17 @@ class ControlContrastTest {
         }
     }
 
-    @Test
-    fun `an inactive unfilled control meets AA on a faded label`() {
-        // Inactive is dimmed but still tappable, so it is live UI and owes the full 4.5:1 for text,
-        // not the 3:1 non-text floor. This is the assertion that fixes OrbitAlpha.Inactive at 0.65:
-        // the conventional 0.60 puts the light-theme label at 4.47:1 on white, which fails.
-        themes.forEach { (theme, control, isDark) ->
-            (if (isDark) darkSurfaces else lightSurfaces).forEach { (where, surface) ->
-                val faded = control.controlContent
-                    .copy(alpha = OrbitAlpha.Inactive)
-                    .over(surface)
-                val ratio = contrast(faded, surface)
-                assertTrue(
-                    ratio >= MINIMUM,
-                    "$theme inactive label on $where is $ratio:1, expected >= $MINIMUM:1",
-                )
-            }
-        }
-    }
-
-    @Test
-    fun `an inverted fill cannot survive being faded`() {
-        // Now only reachable through a selected `OrbitChip` — buttons became tinted chips and icon
-        // buttons lost their containers entirely — but kept, because the constraint is a property of
-        // the palette rather than of any one component, and the next control to reach for an inverted
-        // fill will hit it again.
-        //
-        // Records the two dead ends that shaped the inactive state, so nobody re-walks them.
-        //
-        // Both start from the same place: an inverted fill carries a near-white label, and anything
-        // that lightens the fill closes the gap. Fading the fill alone reaches about 3.8:1 at the
-        // top of the highlight; fading fill and label together reaches about 2.6:1. Inactive is
-        // still tappable and owes 4.5:1, so `OrbitButton` and `OrbitIconButton` step an inactive
-        // inverted control down to the tonal treatment — verified by the tonal test above — rather
-        // than fading it at all.
-        val control = OrbitLightControlColors
-        val surface = OrbitPalette.LightSurface
-        val fadedFill = control.actionContainer.copy(alpha = OrbitAlpha.Inactive).over(surface)
-        val lit = Color.White
-            .copy(
-                alpha = OrbitGlass.ButtonHighlightLight * OrbitGlass.ButtonHoverLift *
-                    OrbitAlpha.Inactive,
-            )
-            .over(fadedFill)
-
-        assertTrue(
-            contrast(control.onActionContainer, lit) < MINIMUM,
-            "a faded inverted fill now clears $MINIMUM:1, so the demotion in OrbitButton may be " +
-                "unnecessary — re-derive it before removing either",
-        )
-        assertTrue(
-            contrast(control.onActionContainer.copy(alpha = OrbitAlpha.Inactive).over(lit), lit) <
-                MINIMUM,
-            "fading fill and label together now clears $MINIMUM:1",
-        )
-    }
+    // Two tests stood here and went when `OrbitButtonState.Inactive` did.
+    //
+    // One pinned `OrbitAlpha.Inactive` at 0.65 by asserting a faded label still cleared 4.5:1 on
+    // every surface. That constant no longer exists, so the test was pinning nothing.
+    //
+    // The other recorded why an *inverted* fill could not survive being faded — fill alone reached
+    // about 3.8:1 at the top of the highlight, fill and label together about 2.6:1, both under what
+    // a still-tappable control owes. That finding is what pushed buttons from inverted slabs to
+    // tinted chips, and it is worth remembering; but with Disabled now the only faded state, and
+    // WCAG 1.4.3 exempting disabled controls from the minimum outright, there is no longer a code
+    // path it can guard.
 
     @Test
     fun `the action container inverts against its theme`() {
@@ -326,10 +282,18 @@ class ControlContrastTest {
     fun `the outline ring is stronger than the tonal rim`() {
         // On an Outline control the ring is the only thing bounding the target; on a tonal one the
         // fill already does that, so its rim is free to be a highlight rather than a border.
-        themes.forEach { (theme, control, _) ->
+        //
+        // Measured as contrast against the surface, not as alpha. Alpha was the original proxy and
+        // it stopped meaning anything the moment the shared `controlBorder` went opaque on light:
+        // a solid #E8E8E8 has alpha 1.0 and is *far* weaker on a white page than a dark ink at 28%.
+        // Two borders are only comparable by what they look like against something.
+        themes.forEach { (theme, control, isDark) ->
+            val surface = if (isDark) OrbitPalette.DarkSurface else OrbitPalette.LightSurface
+            val outline = contrast(control.outlineBorder.over(surface), surface)
+            val rim = contrast(control.controlBorder.over(surface), surface)
             assertTrue(
-                control.outlineBorder.alpha > control.controlBorder.alpha,
-                "$theme outline ring is not stronger than its tonal rim",
+                outline > rim,
+                "$theme outline ring ($outline:1) is not stronger than its tonal rim ($rim:1)",
             )
         }
     }

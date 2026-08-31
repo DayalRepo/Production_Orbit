@@ -2,7 +2,10 @@ package com.orbitai.erp.ui.component.button
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.component.button.OrbitButton
+import com.orbitai.erp.core.designsystem.component.button.OrbitButtonIconPosition
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonSize
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
@@ -16,21 +19,45 @@ import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
  * makes the destructive ones destructive everywhere, which is the part that actually matters: a
  * Reject styled as a neutral Secondary on one screen is how people reject things by accident.
  *
- * The buttons are text-only. A glyph beside a two-word label competes with it rather than helping —
- * nobody needs a picture to understand "Approve" — and dropping it lets the label centre in the pill,
- * which is what makes a pair of them read as a matched set.
+ * ### Every action carries a glyph
+ *
+ * These were text-only for a while, on the reasoning that nobody needs a picture to understand
+ * "Approve" and a glyph beside a two-word label competes with it. That is true of the glyph as
+ * *identification* and misses what it does here. A tinted chip with a mark in it is a recognisable
+ * object; a tinted chip with only a word in it is a coloured rectangle, and a form full of them
+ * reads as a form full of rectangles. The glyph is what makes the control look like a control.
+ *
+ * ### Which side it sits on depends on what it is saying
+ *
+ * Most sit **before** the label, because the glyph and the word are naming the same thing and the
+ * mark is the faster of the two to recognise — a red ✕ is identified before "Cancel" is read, so
+ * putting it first shortens the scan rather than interrupting it.
+ *
+ * [Login] and [Open] are the exception and sit **after**. Their arrow is not naming the action, it
+ * is pointing at where the action takes you, and a direction indicator belongs at the end of the
+ * phrase it applies to for the same reason "next →" reads correctly and "→ next" does not.
+ *
+ * Two glyphs are shared deliberately. Reject and Cancel both take `cancel-01`: same gesture,
+ * discard what is in front of you, and never offered together. Login and Open both take
+ * `arrow-right-01`: both take you somewhere else rather than changing anything where you are.
+ *
+ * Approve takes `checkmark-badge-02` rather than a bare tick. A bare tick is also the mark for
+ * "done" and "selected", and Approve is neither — it is a decision someone with authority is
+ * making. The badge around the tick is what distinguishes conferring approval from ticking a box.
  */
 enum class ActionKind(
     val label: String,
     val variant: OrbitButtonVariant,
+    val icon: ImageVector,
+    val iconPosition: OrbitButtonIconPosition = OrbitButtonIconPosition.Leading,
 ) {
-    Approve("Approve", OrbitButtonVariant.Primary),
+    Approve("Approve", OrbitButtonVariant.Primary, OrbitIcons.CheckmarkBadge),
 
     /**
      * The counterpart to Approve, and the reason Destructive exists as a variant: an error-coloured
      * label inside a neutral ring is the only thing separating the two at a glance.
      */
-    Reject("Reject", OrbitButtonVariant.Destructive),
+    Reject("Reject", OrbitButtonVariant.Destructive, OrbitIcons.Cancel),
 
     /**
      * Low-emphasis on purpose. Cancel abandons your own unsaved work, and styling an escape hatch as
@@ -40,12 +67,23 @@ enum class ActionKind(
     // Reject with Approve — so there is no screen on which the two are confusable, and both are the
     // half of a decision that discards what the user was doing. Giving Cancel a neutral outline
     // while Reject went red made the same gesture look like two different kinds of act.
-    Cancel("Cancel", OrbitButtonVariant.Destructive),
+    Cancel("Cancel", OrbitButtonVariant.Destructive, OrbitIcons.Cancel),
 
-    Send("Send", OrbitButtonVariant.Primary),
-    Login("Login", OrbitButtonVariant.Primary),
-    Create("Create", OrbitButtonVariant.Primary),
-    Open("Open", OrbitButtonVariant.Primary),
+    Send("Send", OrbitButtonVariant.Primary, OrbitIcons.Sent),
+    Create("Create", OrbitButtonVariant.Primary, OrbitIcons.Add),
+
+    Login(
+        "Login",
+        OrbitButtonVariant.Primary,
+        OrbitIcons.ArrowRight,
+        OrbitButtonIconPosition.Trailing,
+    ),
+    Open(
+        "Open",
+        OrbitButtonVariant.Primary,
+        OrbitIcons.ArrowRight,
+        OrbitButtonIconPosition.Trailing,
+    ),
     ;
 
     /** In-flight wording, so a button that is working says what it is doing. */
@@ -88,6 +126,10 @@ fun ActionButton(
         modifier = modifier,
         variant = action.variant,
         size = size,
+        // Skipped while loading: the spinner takes the glyph's slot, so passing both would be a
+        // mark and a spinner competing for one position.
+        icon = if (loading) null else action.icon,
+        iconPosition = action.iconPosition,
         state = state,
         loading = loading,
     )

@@ -15,6 +15,16 @@ internal object OrbitPalette {
     val Blue20 = Color(0xFF002F52)
     val Blue30 = Color(0xFF0B4472)
     val Blue40 = Color(0xFF0F4C81)
+
+    /**
+     * The step between 40 and 60, added for the light theme's progress slats.
+     *
+     * It exists because the gap between the two neighbours is unusually wide in the one place it
+     * matters: `Blue40` is a navy that reads as heavy on a white card, and `Blue60` cannot hold 3:1
+     * against a near-white track once the slat highlight is on it. This sits where a light blue is
+     * still readable, and `SegmentedProgressContrastTest` is what keeps it honest.
+     */
+    val Blue50 = Color(0xFF2E6DA8)
     val Blue60 = Color(0xFF4A87BE)
     val Blue80 = Color(0xFFA5C8E8)
     val Blue90 = Color(0xFFD3E4F6)
@@ -47,17 +57,38 @@ internal object OrbitPalette {
      * #121212, and tinting the elevated containers away from it makes the tonal steps read as a
      * colour cast rather than as elevation. Neither ramp reaches #000000 or, for text, #FFFFFF.
      */
+    // The surface matrix. Each role is a step, and the steps are small on purpose: a card has to be
+    // distinguishable from the page it sits on without the page looking dirty by comparison.
+    /** App background — the scrollable page root. */
+    val LightBackground = Color(0xFFF9F9FB)
+    /** Standard card and list-item container. Brighter than the page, which is what lifts it. */
     val LightSurface = Color(0xFFFFFFFF)
     val LightSurfaceLow = Color(0xFFFAFAFA)
+    /** Muted inset — text inputs, search bars, nested sub-boxes. Recessed below the card. */
+    val LightSurfaceInset = Color(0xFFF2F2F7)
     val LightSurfaceContainer = Color(0xFFF5F5F5)
+    /** Interactive container — secondary buttons, badge chips, toggles. */
+    val LightSurfaceInteractive = Color(0xFFEBEBEF)
     val LightSurfaceHigh = Color(0xFFEFEFEF)
     val LightSurfaceHighest = Color(0xFFE8E8E8)
     val LightSurfaceDim = Color(0xFFDEDEDE)
 
+    // The same matrix inverted. Dark themes lift rather than brighten: each step up in the hierarchy
+    // is a step *lighter*, because there is no shadow to read against a near-black page.
+    /** App background — the scrollable page root. */
+    val DarkBackground = Color(0xFF121214)
     val DarkSurfaceLowest = Color(0xFF0D0D0D)
+    /** Standard card and list-item container. */
+    val DarkSurfaceCard = Color(0xFF1C1C1E)
     val DarkSurface = Color(0xFF121212)
     val DarkSurfaceLow = Color(0xFF171717)
+    /** Muted inset — text inputs, search bars, nested sub-boxes. */
+    val DarkSurfaceInset = Color(0xFF2C2C2E)
     val DarkSurfaceContainer = Color(0xFF1D1D1D)
+    /** Elevated container — modals, sheets, floating dialogs, popovers. */
+    val DarkSurfaceElevated = Color(0xFF252528)
+    /** Interactive container — secondary buttons, badge chips, toggles. */
+    val DarkSurfaceInteractive = Color(0xFF3A3A3C)
     val DarkSurfaceHigh = Color(0xFF232323)
     val DarkSurfaceHighest = Color(0xFF2A2A2A)
     val DarkSurfaceBright = Color(0xFF333333)
@@ -82,6 +113,18 @@ internal object OrbitPalette {
     val Neutral100 = Color(0xFFFFFFFF)
 
     // Feedback ramps.
+    // Borders. Low-contrast greys sitting a few shades off the surface they enclose — a rim is meant
+    // to answer "where does this stop", and anything stronger reads as a state rather than an edge.
+    /** Standard border: cards, text inputs, sheets, modal outlines. 1.29:1 on a white card. */
+    val LightBorder = Color(0xFFE2E2E6)
+    /** Subtle divider: list separators, rules inside a card. Half the weight of a standard border. */
+    val LightDivider = Color(0xFFF2F2F7)
+    /** Active/focus border: selected cards, focused inputs. */
+    val LightBorderFocus = Color(0xFF007AFF)
+    val DarkBorder = Color(0xFF3F3F46)
+    val DarkDivider = Color(0xFF2C2C2E)
+    val DarkBorderFocus = Color(0xFF0A84FF)
+
     val Red30 = Color(0xFF7F1D1D)
     val Red40 = Color(0xFFB3261E)
     val Red70 = Color(0xFFEF4444)
@@ -131,7 +174,7 @@ internal fun orbitLightColorScheme(content: OrbitContentColors) = lightColorSche
     tertiaryContainer = OrbitPalette.Amber90,
     onTertiaryContainer = OrbitPalette.Amber10,
 
-    background = OrbitPalette.LightSurface,
+    background = OrbitPalette.LightBackground,
     onBackground = content.textPrimary,
     surface = OrbitPalette.LightSurface,
     onSurface = content.textPrimary,
@@ -177,7 +220,7 @@ internal fun orbitDarkColorScheme(content: OrbitContentColors) = darkColorScheme
     tertiaryContainer = OrbitPalette.Amber30,
     onTertiaryContainer = OrbitPalette.Amber90,
 
-    background = OrbitPalette.DarkSurface,
+    background = OrbitPalette.DarkBackground,
     onBackground = content.textPrimary,
     surface = OrbitPalette.DarkSurface,
     onSurface = content.textPrimary,

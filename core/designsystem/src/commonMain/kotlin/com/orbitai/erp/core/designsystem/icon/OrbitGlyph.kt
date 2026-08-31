@@ -2,6 +2,7 @@ package com.orbitai.erp.core.designsystem.icon
 
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,6 +44,9 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
  * @param contentDescription null when an enclosing control already carries the description, which is
  *   the usual case inside a button. A non-null value here on top of a labelled parent makes screen
  *   readers announce the control twice.
+ * @param minimumStroke the floor to clamp up to. Defaults to `sizing.iconStrokeWidth`, the weight an
+ *   icon needs when it sits beside a label; pass `sizing.iconStrokeLight` for a glyph standing alone,
+ *   which needs less.
  */
 @Composable
 fun OrbitGlyph(
@@ -51,8 +55,9 @@ fun OrbitGlyph(
     tint: Color,
     contentDescription: String?,
     modifier: Modifier = Modifier,
+    minimumStroke: Dp = orbitStrokeForTier(size),
 ) {
-    val stroke = orbitGlyphStroke(size)
+    val stroke = orbitGlyphStroke(size, minimumStroke)
     val corrected = remember(icon, stroke) { icon.orbitRestroked(stroke) }
 
     Icon(
@@ -82,23 +87,26 @@ fun OrbitGlyph(
 /**
  * The stroke width, in viewport units, that draws a [size] glyph at a legible weight.
  *
- * Both platforms converge on the same band for stroked icons — Material asks for 1.5 to 2dp, and
- * SF Symbols' regular weight sits inside it — so the rule is the same on each: take the weight the
- * vector would naturally scale to, and clamp it into that band.
+ * Both platforms converge on roughly the same band for stroked icons — Material asks for 1.5 to 2dp,
+ * and SF Symbols' regular weight sits inside it — so the rule is the same on each: take the weight the
+ * vector would naturally scale to, and clamp it into the band.
  *
- * The floor is what does the work. At the sizes an icon button uses, the natural weight is 1.2 to
- * 1.5dp, so small and medium glyphs are lifted to the floor and large is already there; the result is
- * three sizes of the same glyph that look like one another. The ceiling matters much less often, but
- * without it a 12dp glyph would be asked for a stroke thick enough to close its own counters.
+ * The floor is what does the work, and it is a parameter because the right floor depends on what the
+ * glyph is standing next to. Beside a label it has to hold its own against type; alone inside an icon
+ * button, with a ring already pointing at it, the same weight reads as heavy and starts closing the
+ * counters of a small glyph. The ceiling matters far less often, but without it a 12dp glyph would be
+ * asked for a stroke thick enough to fill itself in.
  *
  * Note that the band is in *dp* while the return value is in viewport units, which is the entire
  * point: converting between them is what makes the weight independent of the rendered size.
  */
 @Composable
-fun orbitGlyphStroke(size: Dp): Float {
-    val sizing = OrbitTheme.sizing
-    val floor = sizing.iconStrokeWidth
-    val ceiling = sizing.borderStrong
+fun orbitGlyphStroke(
+    size: Dp,
+    minimumStroke: Dp = orbitStrokeForTier(size),
+): Float {
+    val ceiling = OrbitTheme.sizing.borderStrong
+    val floor = minimumStroke
     val natural = size * (AuthoredStroke / Viewport)
     val target = natural.coerceIn(floor, ceiling)
     return Viewport * (target / size)
@@ -180,3 +188,34 @@ private const val AuthoredStroke = 1.8f
  * the viewport edge. A tenth covers the widest correction the clamp can produce.
  */
 private const val Bleed = 0.1f
+
+/**
+ * The stroke weight the icon spec assigns to the tier [size] falls in.
+ *
+ * ### Why a step function and not a ratio
+ *
+ * The spec gives four tiers with four stroke weights, and the weights do not scale with the sizes —
+ * 16dp takes 1.5dp of stroke and 48dp takes 2.75dp, which is three times the size for under twice
+ * the ink. That is deliberate and it is how optical sizing works everywhere, type included: a glyph
+ * scaled with its stroke held proportional looks *heavier* as it grows, because the eye reads
+ * absolute stroke against the whitespace around the icon rather than against the icon's own box.
+ * Sub-proportional growth is what keeps the apparent weight flat.
+ *
+ * Boundaries sit at the midpoints between tiers, so an icon drawn at an in-between size — 20dp, say,
+ * which several dense rows use — lands on whichever tier it is nearer rather than always rounding
+ * down and coming out thin.
+ *
+ * This is a *floor*, not a target. [orbitGlyphStroke] still clamps up only when the authored stroke
+ * comes out lighter, so an icon drawn heavy on purpose is left alone.
+ */
+@Composable
+@ReadOnlyComposable
+fun orbitStrokeForTier(size: Dp): Dp {
+    val sizing = OrbitTheme.sizing
+    return when {
+        size < (sizing.iconSm + sizing.iconMd) / 2 -> sizing.iconStrokeSm
+        size < (sizing.iconMd + sizing.iconXl) / 2 -> sizing.iconStrokeMd
+        size < (sizing.iconXl + sizing.iconHero) / 2 -> sizing.iconStrokeLg
+        else -> sizing.iconStrokeHero
+    }
+}

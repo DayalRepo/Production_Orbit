@@ -12,16 +12,12 @@ object OrbitAlpha {
     /** Disabled controls. WCAG 1.4.3 exempts them from the contrast minimum. */
     const val Disabled = 0.38f
 
-    /**
-     * Inactive but still interactive — an unselected tab icon, a stepped-back button.
-     *
-     * 0.65 rather than the more usual 0.60 because inactive content is live UI and owes the full
-     * 4.5:1 for text, not just the 3:1 non-text floor. The binding case is the deep charcoal
-     * `controlContent` on a white surface, which lands at 4.47:1 at 0.60 and 5.3:1 at 0.65 — so the
-     * conventional value fails by a hair and this one passes with room. `ControlContrastTest` holds
-     * the line.
-     */
-    const val Inactive = 0.65f
+    // There was an `Inactive = 0.65f` here, for a dimmed-but-tappable control. It went when
+    // `OrbitButtonState.Inactive` did — see that enum for why the state itself was a bad idea. The
+    // value is not worth keeping around for a future caller: any *new* use would be live UI, which
+    // owes the full 4.5:1 rather than the 3:1 non-text floor, and that calculation depends on which
+    // ink is being faded onto which surface. Whoever needs it next should redo it rather than
+    // inherit a number tuned for a component that no longer exists.
 
     /** Pressed-state overlay. */
     const val Pressed = 0.12f

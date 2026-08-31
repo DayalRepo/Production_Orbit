@@ -32,6 +32,17 @@ data class OrbitShapeTokens(
     val field: CornerBasedShape = RoundedCornerShape(10.dp),
 
     val chip: CornerBasedShape = RoundedCornerShape(percent = 50),
+
+    /**
+     * A chosen value sitting inside a field, as opposed to a filter chip sitting above a list.
+     *
+     * Cornered rather than a full pill, and the difference is doing real work. A pill is the shape
+     * of every control in this system — buttons, filter chips, badges — so a row of pills inside a
+     * text field reads as a row of buttons the user is expected to press. These are entered data.
+     * Squaring the corners keeps them legible as content while staying soft enough to sit inside a
+     * 10dp field without the two radii fighting.
+     */
+    val inputChip: CornerBasedShape = RoundedCornerShape(8.dp),
     val badge: CornerBasedShape = RoundedCornerShape(percent = 50),
     val avatar: CornerBasedShape = RoundedCornerShape(percent = 50),
     val sheet: CornerBasedShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),

@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
@@ -96,9 +97,11 @@ enum class OrbitIconButtonSize { Small, Medium, Large }
  *
  * The fill is achromatic and translucent — white on light, grey on dark — so whatever is behind still
  * tints through. That is the difference between glass and frosted plastic, and it is why the ring can
- * be dropped onto a card, a photo or a coloured header without being retuned for each. It is also why
- * the fill is a neutral rather than a tint of the glyph's hue: the colour here is doing semantic work,
- * and a blue ring around a blue glyph doubles the signal while halving the contrast between the two.
+ * be dropped onto a card, a photo or a coloured header without being retuned for each. The fill is a
+ * neutral, and so is the rim, because the glyph is already carrying the semantic colour. Repeating that
+ * hue on the container gives the same signal twice and puts the two nearest objects in competition;
+ * keeping the container achromatic leaves the glyph as the only coloured thing in the component, which
+ * is what makes a row of these scannable by colour.
  *
  * On a white page a white ring is close to invisible, which is expected rather than a defect. What
  * separates it there is the hairline rim, the highlight along the top edge, and the contact shadow
@@ -109,8 +112,10 @@ enum class OrbitIconButtonSize { Small, Medium, Large }
  *
  * The glyph is small relative to the ring, roughly half its diameter. The clear space is the point;
  * a glyph crowding its ring reads as a mistake in the padding rather than as an icon under a lens. It
- * renders through [OrbitGlyph] rather than `Icon`, because at 16 to 20dp the authored stroke would
- * scale down to 1.2dp and fall under the floor both platforms set for a stroked icon.
+ * renders through [OrbitGlyph] rather than `Icon`, so its stroke comes from the size it is drawn at
+ * instead of from the author's viewport — against `sizing.iconStrokeLight`, the lighter of the two
+ * floors, because a glyph standing alone inside a ring has no type beside it to hold its own against
+ * and the heavier floor closes up the counters of a small one.
  *
  * ### Accessibility
  *
@@ -128,8 +133,8 @@ enum class OrbitIconButtonSize { Small, Medium, Large }
  *
  * @param selected the on state of a toggle — a bookmark, a pinned filter. Pulls a Neutral glyph up to
  *   the accent tone and lifts the highlight, so the state is carried by colour *and* by light.
- * @param state see [OrbitButtonState]; [OrbitButtonState.Inactive] is the right choice for an
- *   available-but-not-current action, and is announced as such.
+ * @param state see [OrbitButtonState]. Only Active and Disabled; de-emphasis is the Neutral style's
+ *   job, not a dimmed variant of a live control.
  */
 @Composable
 fun OrbitIconButton(
@@ -187,19 +192,15 @@ fun OrbitIconButton(
     val shade = if (isDark) effective.darkShade else effective.lightShade
     val content = tone?.let { shade(it).copy(alpha = 1f) } ?: control.controlContent
 
-    // Inactive fades the ring and not the glyph. The ring carries no information, so dimming it is
-    // free; the glyph is the entire content, and fading it as well composites two dimmed layers and
-    // lands well under the 4.5:1 that a still-tappable control owes. Disabled is exempt from that
-    // minimum (WCAG 1.4.3) and fades both.
+    // Ring and glyph now fade together, which is only safe because Disabled is the sole faded
+    // state and WCAG 1.4.3 exempts inactive controls from the contrast minimum. The old Inactive
+    // state had to fade the ring alone — it was still tappable, so it still owed 4.5:1, and dimming
+    // the glyph too composited two faded layers and landed well under it.
     val ringAlpha = when (state) {
         OrbitButtonState.Active -> 1f
-        OrbitButtonState.Inactive -> OrbitAlpha.Inactive
         OrbitButtonState.Disabled -> OrbitAlpha.Disabled
     }
-    val contentAlpha = when (state) {
-        OrbitButtonState.Disabled -> OrbitAlpha.Disabled
-        else -> 1f
-    }
+    val contentAlpha = ringAlpha
 
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
@@ -234,7 +235,6 @@ fun OrbitIconButton(
             )
             .semantics(mergeDescendants = true) {
                 this.contentDescription = contentDescription
-                if (state == OrbitButtonState.Inactive) stateDescription = "Not selected"
             },
         contentAlignment = Alignment.Center,
     ) {
@@ -256,12 +256,22 @@ fun OrbitIconButton(
                     fill = control.ringContainer,
                     shape = shape,
                     highlightAlpha = highlight,
+                    // Neutral, not the glyph's colour. Tinting it was tried and reverted: the glyph
+                    // is already carrying the semantic colour, and repeating that hue on the ring
+                    // around it gives the same signal twice while putting the two nearest objects in
+                    // competition. Keeping the whole container achromatic leaves the glyph as the
+                    // only coloured thing in the component, which is what makes a row of these
+                    // scannable by colour at all.
                     edge = control.controlBorder.copy(
                         alpha = control.controlBorder.alpha * ringAlpha,
                     ),
-                    // A hairline now that the ring has a fill. The fill is what defines the circle,
-                    // so the rim's job shrinks to catching the light along the top edge, and at 2dp
-                    // it was drawing a ring around a ring.
+                    // Just under a hairline. The fill defines the circle now, so all the rim has to do
+                    // is describe an edge, and a full dp on a circumference this short starts reading
+                    // as an outline drawn around the button rather than as light catching a rim.
+                    //
+                    // A real dp rather than `Dp.Hairline`, which was tried and reverted: that is one
+                    // physical pixel, so its apparent weight tracks screen density instead of the
+                    // design — a third of a dp at 3x and no thinner than a hairline at all at 1x.
                     edgeWidth = sizing.hairline,
                 )
                 .indication(interactionSource, orbitPressIndication()),
@@ -273,6 +283,7 @@ fun OrbitIconButton(
                     icon = icon,
                     size = glyphSize,
                     tint = tint,
+                    minimumStroke = sizing.iconStrokeLight,
                     // The button itself carries the description; describing the glyph too would make
                     // screen readers announce the action twice.
                     contentDescription = null,

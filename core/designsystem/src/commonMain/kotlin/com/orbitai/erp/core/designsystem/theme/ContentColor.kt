@@ -28,6 +28,20 @@ data class OrbitContentColors(
     val textDisabled: Color,
 
     val iconPrimary: Color,
+    /**
+     * Brand accent for icons: the one tint that is neither ink nor grey.
+     *
+     * Reserved for icons that are *doing* something rather than labelling something — a selected tab,
+     * an active filter, an interactive link glyph. Spending it anywhere else costs it its meaning,
+     * because an accent only reads as "this one" while it is rare on the screen.
+     */
+    val iconAccent: Color,
+    /**
+     * Glyph on a filled brand or action container. White on both themes, and deliberately not
+     * [iconPrimary] inverted: the container underneath is the same blue in light and dark, so the
+     * glyph on it has no reason to change with the theme.
+     */
+    val iconOnColor: Color,
     /** Inactive tab and toolbar icons. 60%, holding the 3:1 floor of WCAG 1.4.11. */
     val iconInactive: Color,
     val iconDisabled: Color,
@@ -43,59 +57,80 @@ data class OrbitContentColors(
 )
 
 /*
- * Why textTertiary is 65% and not the 60% the brief allows:
+ * The three text emphasis tiers, from the platform colour spec.
  *
- * 60% of #1A1C1E over #FFFFFF is #767778, which measures 4.49:1 — it misses the 4.5:1 requirement
- * for normal text by one hundredth. 60% is safe in the dark theme (5.80:1) but not the light one, so
- * the tier is 65% on both to keep one number in the design system rather than two.
+ * Primary carries Display, H1 and H2 — the lines that establish hierarchy the moment a screen opens,
+ * so they take the highest contrast available. Secondary carries Subheading and Body: a step down,
+ * because a full paragraph at primary contrast is tiring to read for any length. Tertiary carries
+ * captions, timestamps and hints, where the job is to be available without competing.
+ *
+ * ### Where the light theme departs from the spec, and why
+ *
+ * The spec sets tertiary to #8E8E93 on both themes. That measures 5.74:1 against the dark app
+ * background and passes comfortably, but only **3.26:1** against the light one — short of the 4.5:1
+ * WCAG 1.4.3 floor for normal-size text. It is a legal colour for large text or for a non-text UI
+ * element, and it is the value Apple itself uses for `tertiaryLabel`, but our tertiary tier is the
+ * caption tier and captions are normal-size text.
+ *
+ * So the light theme takes the same hue pulled down to #727276, which measures 4.56:1 against the
+ * #F9F9FB app background and 4.79:1 against a white card — the lightest shade on that hue that
+ * clears the floor on both surfaces. The dark theme takes the spec value unchanged.
  */
 
 internal val AndroidLightContentColors = OrbitContentColors(
-    textPrimary = Color(0xFF1A1C1E),   // 17.09:1
-    textSecondary = Color(0xFF5F6062), //  6.29:1
-    textTertiary = Color(0xFF6A6B6D),  //  5.33:1
-    textDisabled = Color(0xFFA8A9AA),  //  2.35:1 — exempt
-    iconPrimary = Color(0xFF1F1F1F),   // 16.48:1
-    iconInactive = Color(0xFF797979),  //  4.35:1
-    iconDisabled = Color(0xFFAAAAAA),  //  2.32:1 — exempt
+    textPrimary = Color(0xFF1C1C1E),   // Dark slate  · 17.01:1 on white
+    textSecondary = Color(0xFF48484A), // Charcoal    ·  9.12:1
+    textTertiary = Color(0xFF727276),  // Mid grey    ·  4.79:1 — see the note above
+    textDisabled = Color(0xFFA8A9AA),  //             ·  2.35:1 — exempt
+    iconPrimary = Color(0xFF1C1C1E),   // matches textPrimary
+    iconAccent = Color(0xFF007AFF),    // Brand blue
+    iconOnColor = Color(0xFFFFFFFF),
+    iconInactive = Color(0xFF8E8E93),  //  3.26:1 — clears the 3:1 graphical floor
+    iconDisabled = Color(0xFFC7C7CC),  //  1.61:1 — exempt
     avatarBorder = Color(0xFFE0E0E0),
     referenceSurface = Color(0xFFFFFFFF),
 )
 
 internal val AndroidDarkContentColors = OrbitContentColors(
-    textPrimary = Color(0xFFE3E2E6),   // 14.53:1
-    textSecondary = Color(0xFFA4A4A6), //  7.53:1
-    textTertiary = Color(0xFF9A999C),  //  6.61:1
-    textDisabled = Color(0xFF616163),  //  3.03:1 — exempt
-    iconPrimary = Color(0xFFE3E2E6),   // 14.53:1
-    iconInactive = Color(0xFF8F8F91),  //  5.80:1
-    iconDisabled = Color(0xFF616163),  //  3.03:1 — exempt
+    textPrimary = Color(0xFFF2F2F7),   // Off-white   · 16.77:1 on the app background
+    textSecondary = Color(0xFFC7C7CC), // Light grey  · 11.11:1
+    textTertiary = Color(0xFF8E8E93),  // Mid grey    ·  5.74:1
+    textDisabled = Color(0xFF616163),  //             ·  3.03:1 — exempt
+    iconPrimary = Color(0xFFF2F2F7),   // matches textPrimary
+    iconAccent = Color(0xFF0A84FF),    // Brand blue
+    iconOnColor = Color(0xFFFFFFFF),
+    iconInactive = Color(0xFF8E8E93),  //  5.74:1
+    iconDisabled = Color(0xFF48484A),  //  1.94:1 — exempt
     avatarBorder = Color(0xFF2E2E2E),
-    referenceSurface = Color(0xFF121212),
+    referenceSurface = Color(0xFF121214),
 )
 
 internal val IosLightContentColors = OrbitContentColors(
-    textPrimary = Color(0xFF1C1C1E),   // 17.01:1
-    textSecondary = Color(0xFF606062), //  6.27:1
-    textTertiary = Color(0xFF6B6B6D),  //  5.32:1
-    textDisabled = Color(0xFFA9A9AA),  //  2.35:1 — exempt
-    iconPrimary = Color(0xFF3A3A3C),   // 11.35:1
-    iconInactive = Color(0xFF89898A),  //  3.49:1
-    iconDisabled = Color(0xFFB4B4B5),  //  2.07:1 — exempt
+    textPrimary = Color(0xFF1C1C1E),   // Dark slate  · 17.01:1 on white
+    textSecondary = Color(0xFF48484A), // Charcoal    ·  9.12:1
+    textTertiary = Color(0xFF727276),  // Mid grey    ·  4.79:1 — see the note above
+    textDisabled = Color(0xFFA8A9AA),  //             ·  2.35:1 — exempt
+    iconPrimary = Color(0xFF1C1C1E),   // matches textPrimary
+    iconAccent = Color(0xFF007AFF),    // Brand blue
+    iconOnColor = Color(0xFFFFFFFF),
+    iconInactive = Color(0xFF8E8E93),  //  3.26:1 — clears the 3:1 graphical floor
+    iconDisabled = Color(0xFFC7C7CC),  //  1.61:1 — exempt
     avatarBorder = Color(0xFFE0E0E0),
     referenceSurface = Color(0xFFFFFFFF),
 )
 
 internal val IosDarkContentColors = OrbitContentColors(
-    textPrimary = Color(0xFFEBEBF5),   // 15.82:1
-    textSecondary = Color(0xFFAAAAB1), //  8.11:1
-    textTertiary = Color(0xFF9F9FA6),  //  7.12:1
-    textDisabled = Color(0xFF646468),  //  3.18:1 — exempt
-    iconPrimary = Color(0xFFEBEBF5),   // 15.82:1
-    iconInactive = Color(0xFF94949A),  //  6.21:1
-    iconDisabled = Color(0xFF646468),  //  3.18:1 — exempt
+    textPrimary = Color(0xFFF2F2F7),   // Off-white   · 16.77:1 on the app background
+    textSecondary = Color(0xFFC7C7CC), // Light grey  · 11.11:1
+    textTertiary = Color(0xFF8E8E93),  // Mid grey    ·  5.74:1
+    textDisabled = Color(0xFF616163),  //             ·  3.03:1 — exempt
+    iconPrimary = Color(0xFFF2F2F7),   // matches textPrimary
+    iconAccent = Color(0xFF0A84FF),    // Brand blue
+    iconOnColor = Color(0xFFFFFFFF),
+    iconInactive = Color(0xFF8E8E93),  //  5.74:1
+    iconDisabled = Color(0xFF48484A),  //  1.94:1 — exempt
     avatarBorder = Color(0xFF2E2E2E),
-    referenceSurface = Color(0xFF121212),
+    referenceSurface = Color(0xFF121214),
 )
 
 internal val LocalOrbitContentColors = staticCompositionLocalOf { AndroidLightContentColors }

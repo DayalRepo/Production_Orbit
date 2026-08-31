@@ -94,14 +94,17 @@ enum class OrbitButtonSize { Small, Medium, Large }
 /** Which side of the label the glyph sits on. */
 enum class OrbitButtonIconPosition {
     /**
-     * Before the label. The default, and correct for almost everything: the glyph is read as part
-     * of naming the action ("✓ Approve").
+     * Before the label. The default, and right whenever the glyph and the label are naming the same
+     * thing: the mark is the faster of the two to recognise, so leading it shortens the scan.
      */
     Leading,
 
     /**
-     * After the label. For actions that move you somewhere — "Send ➤" — where the glyph is about
-     * direction rather than identity.
+     * After the label.
+     *
+     * For a glyph that is not naming the action but pointing at its consequence — the arrow on
+     * "Open" or "Login". A direction indicator belongs at the end of the phrase it applies to, for
+     * the same reason "next →" reads correctly and "→ next" does not.
      */
     Trailing,
 }
@@ -135,11 +138,10 @@ enum class OrbitButtonIconPosition {
  *
  * The label is the accessible name, and the glyph is explicitly not described: it restates the
  * label, and "tick icon, Approve" is noise. Descendants are merged so the control is announced as
- * one node rather than as a glyph and a string, and [OrbitButtonState.Inactive] publishes a state
- * description, since a dimmed-but-tappable control is otherwise indistinguishable from a disabled
- * one to a screen reader.
+ * one node rather than as a glyph and a string.
  *
- * @param icon strongly encouraged. Every preset in `:shared`'s `ui/component/button` supplies one.
+ * @param icon strongly encouraged, and leading by default. Every preset in `:shared`'s
+ *   `ui/component/button` supplies one, along with the side it belongs on.
  * @param loading swaps the glyph for a spinning [OrbitLoadingIcon] and blocks input, without
  *   changing the button's colour or width, so the action cannot be double-fired. Pair it with a
  *   label describing the wait ("Sending…").
@@ -195,16 +197,18 @@ fun OrbitButton(
     val endPadding = size.pick(
         sizing.buttonPaddingSm, sizing.buttonPaddingMd, sizing.buttonPaddingLg,
     )
-    // One step up the scale from where a labelled control would normally sit. These buttons are
-    // text-only, so the label is the entire button — there is no glyph sharing the load, and at the
-    // smaller sizes the pill read as an empty shape with a caption dropped into it.
+    // Three distinct steps, one per size. This is a change: Small used to borrow Medium's type on
+    // the grounds that a text-only pill had no glyph sharing the load, so shrinking the label left
+    // an empty shape with a caption in it. Now that every button carries a glyph that argument is
+    // gone — the mark holds the chip's presence at Small, which frees the label to actually be
+    // small and lets the three sizes read as three sizes rather than as three heights of the same
+    // button.
     //
-    // Small takes the same size as Medium rather than a step below it. A Small button is already
-    // giving up height and padding; taking the type down as well left a label that was legible in
-    // isolation and mushy inside a tinted chip, where the fill reduces the effective contrast of
-    // every stroke. It keeps its identity through the 32dp height, not through smaller text.
+    // Both platforms' scales are followed by taking these from the type ramp rather than pinning
+    // sp values, so Android's 16dp base and iOS's 17pt base each produce their own three steps and
+    // both track the user's font-size setting.
     val textStyle = size.pick(
-        OrbitTheme.typography.labelLarge,
+        OrbitTheme.typography.labelMedium,
         OrbitTheme.typography.labelLarge,
         OrbitTheme.typography.titleMedium,
     ).copy(
@@ -231,23 +235,12 @@ fun OrbitButton(
     // label, because the glyph and text stay clamped together while everything else grows.
     val gap = size.pick(spacing.xs, spacing.sm, spacing.sm)
 
-    // Inactive fades exactly one layer, and which one depends on what the variant actually draws.
-    // Fading the container *and* the label together composites a dimmed label onto a dimmed fill and
-    // lands near 2.6:1; Inactive is still tappable, so it owes the full 4.5:1.
-    //
-    // So: a filled variant fades its fill, a ringed one fades its ring, and Text — which has
-    // neither — fades its label. Fading a tinted fill is safe by construction now that the fills are
-    // translucent tones rather than inverted slabs: thinning the tint moves the background toward
-    // the surface, and every tone's label is tuned to clear the minimum against the surface as well
-    // as against the fill, so contrast rises rather than falls. Disabled is exempt (WCAG 1.4.3) and
-    // fades everything.
+    // Two states, so this is now just "full strength or faded". Disabled fades every layer at once,
+    // which is only allowed because WCAG 1.4.3 exempts inactive controls from the contrast minimum;
+    // that exemption is also why the old Inactive state could not do the same and needed a
+    // per-variant rule about which single layer was safe to fade. Removing it removed the rule.
     val dims = when (state) {
         OrbitButtonState.Active -> Dim(1f, 1f, 1f)
-        OrbitButtonState.Inactive -> when {
-            filled -> Dim(container = OrbitAlpha.Inactive, ring = 1f, content = 1f)
-            ring != null -> Dim(container = 1f, ring = OrbitAlpha.Inactive, content = 1f)
-            else -> Dim(container = 1f, ring = 1f, content = OrbitAlpha.Inactive)
-        }
         OrbitButtonState.Disabled -> OrbitAlpha.Disabled.let { Dim(it, it, it) }
     }
     val interactive = state.interactive && !loading
@@ -294,9 +287,7 @@ fun OrbitButton(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .semantics(mergeDescendants = true) {
-                if (state == OrbitButtonState.Inactive) stateDescription = "Not selected"
-            },
+            .semantics(mergeDescendants = true) {},
         contentAlignment = Alignment.Center,
         propagateMinConstraints = true,
     ) {

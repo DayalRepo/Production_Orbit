@@ -24,18 +24,27 @@ class TypeScaleTest {
     @Test
     fun `scales match the specification sheets`() {
         assertEquals(16.sp, AndroidTypeScale.baseSize)
-        assertEquals(32.sp, AndroidTypeScale.h1.size)
-        assertEquals(40.sp, AndroidTypeScale.h1.lineHeight)
+        assertEquals(23.sp, AndroidTypeScale.displayLarge.size)
+        assertEquals(20.sp, AndroidTypeScale.h1.size)
+        assertEquals(24.sp, AndroidTypeScale.h1.lineHeight)
+        assertEquals(18.sp, AndroidTypeScale.h2.size)
+        // The subheading tier.
+        assertEquals(17.sp, AndroidTypeScale.h3.size)
         assertEquals(16.sp, AndroidTypeScale.body.size)
-        assertEquals(24.sp, AndroidTypeScale.body.lineHeight)
-        assertEquals(12.sp, AndroidTypeScale.caption.size)
+        assertEquals(23.sp, AndroidTypeScale.body.lineHeight)
+        assertEquals(14.sp, AndroidTypeScale.caption.size)
+        assertEquals(19.sp, AndroidTypeScale.caption.lineHeight)
 
         assertEquals(17.sp, IosTypeScale.baseSize)
-        assertEquals(34.sp, IosTypeScale.h1.size)
-        assertEquals(41.sp, IosTypeScale.h1.lineHeight)
+        assertEquals(24.sp, IosTypeScale.displayLarge.size)
+        assertEquals(22.sp, IosTypeScale.h1.size)
+        assertEquals(27.sp, IosTypeScale.h1.lineHeight)
+        assertEquals(19.sp, IosTypeScale.h2.size)
+        assertEquals(18.sp, IosTypeScale.h3.size)
         assertEquals(17.sp, IosTypeScale.body.size)
-        assertEquals(22.sp, IosTypeScale.body.lineHeight)
-        assertEquals(12.sp, IosTypeScale.caption.size)
+        assertEquals(24.sp, IosTypeScale.body.lineHeight)
+        assertEquals(15.sp, IosTypeScale.caption.size)
+        assertEquals(20.sp, IosTypeScale.caption.lineHeight)
     }
 
     @Test
@@ -114,23 +123,32 @@ class TypeScaleTest {
     }
 
     @Test
-    fun `every Material style carries zero tracking except none`() {
-        // "Spacing by default: 0" — Material's Roboto-tuned tracking is not inherited.
+    fun `tracking tightens on large type and opens up on small`() {
+        // The spec sets tracking per tier rather than zeroing it: negative on display and h1, where
+        // default spacing looks gappy, and positive on body and caption, where letterforms crowd.
+        // The guard is on the *direction* rather than the exact values, which the sheet above owns.
         scales.forEach { (name, scale) ->
             val t = orbitTypography(FontFamily.Default, scale)
-            val styles = listOf(
-                "displayLarge" to t.displayLarge, "headlineLarge" to t.headlineLarge,
-                "titleLarge" to t.titleLarge, "titleMedium" to t.titleMedium,
-                "bodyLarge" to t.bodyLarge, "bodyMedium" to t.bodyMedium,
-                "bodySmall" to t.bodySmall, "labelLarge" to t.labelLarge,
-                "labelMedium" to t.labelMedium, "labelSmall" to t.labelSmall,
+            assertTrue(
+                t.displayLarge.letterSpacing.value < 0f,
+                "$name display should be tracked in, was ${t.displayLarge.letterSpacing.value}",
             )
-            styles.forEach { (label, style) ->
-                assertTrue(
-                    abs(style.letterSpacing.value) < 0.001f,
-                    "$name $label has tracking ${style.letterSpacing.value}, expected 0",
-                )
-            }
+            assertTrue(
+                t.headlineLarge.letterSpacing.value < 0f,
+                "$name h1 should be tracked in, was ${t.headlineLarge.letterSpacing.value}",
+            )
+            assertTrue(
+                abs(t.headlineMedium.letterSpacing.value) < 0.001f,
+                "$name h2 should sit at zero, was ${t.headlineMedium.letterSpacing.value}",
+            )
+            assertTrue(
+                t.bodyLarge.letterSpacing.value > 0f,
+                "$name body should be tracked out, was ${t.bodyLarge.letterSpacing.value}",
+            )
+            assertTrue(
+                t.bodySmall.letterSpacing.value > t.bodyLarge.letterSpacing.value,
+                "$name caption should be tracked wider than body",
+            )
         }
     }
 

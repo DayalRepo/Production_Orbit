@@ -207,10 +207,27 @@ internal val OrbitDarkBadgeColors: Map<OrbitBadgeTone, OrbitBadgeColors> = mapOf
         onSolidContainer = Color(0xFF121212),
     ),
     OrbitBadgeTone.Red to OrbitBadgeColors(
-        container = Color(0x57731511),
+        // Lifted from `0x57731511` when the dark card moved from #0D0D0D to the spec's #1C1C1E.
+        //
+        // Red is the one tone where a darker base survives on a near-black card and dies on a
+        // charcoal one, because almost all of its intensity sits in the channel that contributes
+        // least to luminance. Against the old card the fill read as a red wash; against the new one
+        // it composites to #3A1A1A, which measures 1.09:1 - a chip with no body at all, paying for a
+        // translucent fill and getting nothing back.
+        //
+        // The fix is more of the same red rather than a lighter one. Lightening the base was tried
+        // first and it works on the delta chip while breaking the badge, which puts the same fill
+        // behind a pale label on a glassed container - there, a lighter fill eats the label's
+        // contrast. Raising the alpha moves the two in the same direction instead: the chip gains a
+        // visible body and the badge's label gains headroom, because a denser fill is further from
+        // the card in one case and further from the label in the other.
+        container = Color(0x85731511),
         border = Color(0xA6E65B56),
-        label = Color(0xFFF1A4A2),
-        icon = Color(0xFFF4BAB8),
+        // Paler than the other dark tones' labels, to buy back what the denser fill costs in the
+        // hovered state - hover lightens the container, and red's label had the least headroom of
+        // any tone before it did.
+        label = Color(0xFFF6C4C2),
+        icon = Color(0xFFF8D2D0),
         solidContainer = Color(0xFFEC8683),
         onSolidContainer = Color(0xFF121212),
     ),
@@ -266,30 +283,41 @@ object OrbitGlass {
     /**
      * Peak alpha of the white highlight on an icon button's ring.
      *
-     * Modest on light and generous on dark, which is the opposite of the badge pair, because the
-     * ring's fill is achromatic. Piling a white highlight onto a white fill buys nothing on light and
-     * only risks blowing the top edge out; on a grey fill over a near-black page the same highlight is
-     * the main thing saying the circle is glass rather than a flat grey dot.
+     * Modest on light, and **zero** on dark.
      *
-     * Neither figure is spent against a contrast budget the way the badge and button values are, since
-     * the ring carries no text.
+     * Piling a white highlight onto the near-white fill of a light-theme ring buys little and risks
+     * blowing the top edge out, so it is kept small there. On dark it is not merely useless but
+     * actively wrong, and it took three attempts to accept that trimming it was not the answer.
+     *
+     * A highlight is meant to read as light glancing off a raised edge. That only works when it is
+     * brighter than the material *and* the material is brighter than what is behind it. On a
+     * near-black page neither holds: white added to the ring simply lightens the ring, and the
+     * result was a milky bloom across the top of every circle — an effect the eye reads as a
+     * rendering artefact, not as material. Any nonzero value produced a visible film; there was no
+     * amount that was subtle rather than absent.
+     *
+     * On dark the glass read is carried entirely by the rim and the contact shadow, which are
+     * position and material cues rather than a wash, and by the ring's fill now deepening rather
+     * than lightening — see `ringContainer`.
+     *
+     * Neither figure is spent against a contrast budget the way the badge and button values are,
+     * since the ring carries no text.
      */
     const val RingHighlightLight = 0.16f
+    const val RingHighlightDark = 0.0f
 
     /**
-     * Very low, and that is a fix rather than a compromise.
+     * Peak alpha of the white highlight on a large glass *surface* — cards and attachment rows.
      *
-     * A white highlight over the dark theme's grey ring fill produced a milky bloom across the top of
-     * every circle - the fill is already a pale neutral, so adding white to it lightens the fill
-     * instead of reading as light glancing off an edge. On light the same layer is harmless because
-     * white over white is invisible; on dark it is the most visible thing in the component and it
-     * looks like fog rather than glass.
-     *
-     * The glass read on dark is carried by the rim and the shadow instead, which are position and
-     * material cues rather than a wash. This keeps just enough of the highlight to break the flatness
-     * of the top edge.
+     * Split from the ring pair above, which it used to share. The two look like the same value and
+     * are not the same problem: a ring is a 32dp disc whose fill is most of its area, so a wash
+     * across it recolours the whole object, while a card is a wide panel where the same wash falls
+     * as a gradient along a long top edge and reads as the edge catching light. Sharing one constant
+     * meant that fixing the disc would have flattened every card on dark, which is a change nobody
+     * asked for and would have been made silently.
      */
-    const val RingHighlightDark = 0.05f
+    const val SurfaceHighlightLight = 0.16f
+    const val SurfaceHighlightDark = 0.05f
 
     /**
      * Alpha of the black contact shadow under a glass surface, per theme.

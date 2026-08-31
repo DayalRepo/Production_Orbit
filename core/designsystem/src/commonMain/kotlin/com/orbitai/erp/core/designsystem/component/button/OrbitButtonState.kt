@@ -3,26 +3,30 @@ package com.orbitai.erp.core.designsystem.component.button
 /**
  * What a control is currently able to do, in one value.
  *
- * This replaces a `Boolean` for a reason. Two of these states are interactive and look different,
- * so a boolean forced call sites to pass an `enabled` flag *and* dim the thing themselves, which is
- * how two screens end up with different ideas of what a de-emphasised button looks like.
+ * This replaces a `Boolean` mainly so that call sites cannot pass an `enabled` flag *and* dim the
+ * thing themselves, which is how two screens end up with different ideas of what an unavailable
+ * button looks like.
  *
- * The distinction that matters is [Inactive] versus [Disabled]. They are not the same claim: one
- * says "this works, it just isn't the point right now", the other says "this does not work". Using
- * Disabled for the first is the more common mistake and the more expensive one, because a disabled
- * control gives the user nothing to act on and no reason why.
+ * ### There used to be a third state
+ *
+ * `Inactive` sat between these two: interactive, but stepped back to `OrbitAlpha.Inactive` for a
+ * control that works and just is not the point right now. It is gone, and the reason is worth
+ * keeping.
+ *
+ * A dimmed-but-tappable button is a claim nobody can read. Sighted users cannot reliably tell it
+ * from a disabled one — dimming is the universal visual language for "you cannot press this" — so
+ * the state had to publish a `stateDescription` to be legible to a screen reader at all, meaning it
+ * said one thing visually and another thing out loud. It also could not be dimmed honestly: the
+ * control is live, so it still owes the full 4.5:1, which forced a per-variant rule about *which*
+ * single layer was safe to fade. That is a lot of machinery for a distinction that never
+ * corresponded to a real decision in this product.
+ *
+ * De-emphasis is a job for the variant. A supporting action should be `Secondary` or `Text` — which
+ * says "less important" at full contrast, in a way that reads the same to everyone.
  */
 enum class OrbitButtonState {
     /** Normal and interactive. */
     Active,
-
-    /**
-     * Interactive but stepped back, at `OrbitAlpha.Inactive`.
-     *
-     * For a control that is available but not the current focus — an unselected view toggle, a
-     * secondary action in a row that already has a primary one.
-     */
-    Inactive,
 
     /**
      * Not interactive, at `OrbitAlpha.Disabled`.

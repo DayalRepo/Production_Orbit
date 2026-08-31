@@ -50,6 +50,7 @@ kotlin {
             implementation(projects.core.data)
 
             implementation(libs.compose.uiToolingPreview)
+            implementation(libs.compose.components.resources)
             implementation(libs.navigation.compose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.lifecycle.viewmodel)
@@ -68,6 +69,15 @@ kotlin {
             implementation(libs.turbine)
         }
     }
+}
+
+// Sample avatar art lives here rather than in :core:designsystem, because it is content and the
+// design system takes none. Without the package the class lands in
+// `orbitai.shared.generated.resources`; without `always` it is not generated at all, since `auto`
+// skips library modules and this one only gets the resources runtime transitively.
+compose.resources {
+    packageOfResClass = "com.orbitai.erp.resources"
+    generateResClass = always
 }
 
 dependencies {
