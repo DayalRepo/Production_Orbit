@@ -10,23 +10,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.orbitai.erp.core.designsystem.component.dialog.OrbitConfirmDialog
+import com.orbitai.erp.core.designsystem.component.display.OrbitAttachmentLeading
 import com.orbitai.erp.core.designsystem.component.input.OrbitAttachMenu
 import com.orbitai.erp.core.designsystem.component.input.OrbitAttachOption
+import com.orbitai.erp.core.designsystem.component.input.OrbitComposerAttachment
 import com.orbitai.erp.core.designsystem.component.input.OrbitComposerMode
-import com.orbitai.erp.core.designsystem.component.input.OrbitMessageField
+import com.orbitai.erp.core.designsystem.component.input.OrbitMessageComposer
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
+import com.orbitai.erp.platform.PickedFile
+import com.orbitai.erp.platform.rememberDocumentPicker
+import com.orbitai.erp.platform.rememberImagePicker
+import com.orbitai.erp.resources.Res
+import com.orbitai.erp.resources.file_docs
+import com.orbitai.erp.resources.file_pdf
+import com.orbitai.erp.resources.file_sheet
+import com.orbitai.erp.ui.component.attachment.imageUploadLeading
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.painterResource
 import kotlin.math.abs
 import kotlin.math.sin
 import kotlin.random.Random
 
-/**
- * A recorded clip, as the composer hands it back.
- *
- * @param amplitudes the envelope, normalised 0..1.
- * @param seconds length. Kept as a number rather than a formatted string so that the caller can
- *   render it in its own locale; [formatDuration] is here for the common case.
- */
 @Stable
 data class VoiceClip(
     val id: Long,
@@ -34,76 +39,29 @@ data class VoiceClip(
     val seconds: Int,
 )
 
-/**
- * The two placeholders, so the wording is decided once rather than retyped per screen.
- *
- * They are deliberately different sentences and not one shared string. A chat box and an assistant
- * prompt box are the same component doing genuinely different work, and the placeholder is the only
- * thing on screen that says which: "Write a message" sets the expectation that a person reads it,
- * "Ask Orbit AI" that a model answers it. Users write differently for the two — shorter and more
- * elliptical for a colleague, more complete for a model — and they only know which mode they are in
- * from this line.
- *
- * Both are short by construction. See the note on the `placeholder` parameter for why the space is
- * tighter than it looks.
- */
+@Stable
+data class ComposerAttachment(
+    val picked: PickedFile,
+)
+
 object OrbitComposerPlaceholder {
     const val Message = "Write a message"
     const val Ai = "Ask Orbit AI"
 }
 
-/** "0:07". Minutes and seconds is enough — a voice note long enough to need hours is a file. */
 fun formatDuration(seconds: Int): String {
     val m = seconds / 60
     val s = seconds % 60
     return "$m:${s.toString().padStart(2, '0')}"
 }
 
-/**
- * The composer with its recording and menu state wired up.
- *
- * ### Why the state machine lives here and not in the design system
- *
- * `OrbitMessageField` is deliberately inert: it renders a mode and reports taps. Everything that
- * makes the microphone *work* — starting capture, ticking the elapsed clock, accumulating
- * amplitudes, deciding what a stop produces — is sequencing over time, and sequencing over time is
- * where platform reality intrudes. A real implementation of this has to request a runtime
- * permission that the user can refuse, survive the activity being backgrounded mid-recording, and
- * release an audio session it does not own. None of that can live in a component that also has to
- * render in a gallery and a unit test.
- *
- * So the split is: the design system draws, this layer decides. Swapping the stub below for a real
- * `AudioRecord` or `AVAudioEngine` is a change to this file and to nothing else, which is the whole
- * point of putting the seam here.
- *
- * ### The amplitudes are synthetic, and that is flagged rather than hidden
- *
- * [fakeAmplitude] generates a plausible speech envelope so the visualiser can be reviewed before
- * any audio plumbing exists. It is not a placeholder that will quietly ship — it is the only thing
- * in this file a real recorder replaces, and it is named so that it cannot be mistaken for signal.
- *
- * @param onSend fires with the text and any clip attached. The composer clears itself; a composer
- *   that waited for the caller to clear it leaves the sent message sitting in the box on a slow
- *   network, and people send it twice.
- */
 @Composable
 fun MessageComposer(
     modifier: Modifier = Modifier,
-    // Short enough to survive the space it actually has. The composer gives its text area roughly
-    // half the screen once the plus, mic and send buttons have taken their touch targets, and a
-    // placeholder that overruns is ellipsised — a hint ending in "..." reads as a rendering fault
-    // rather than as a prompt, and the half of the sentence that gets cut is always the end.
-    //
-    // The default names the plainer of the two jobs. A composer wired to the assistant should pass
-    // `OrbitComposerPlaceholder.Ai` or its own string: one box doing both jobs cannot say so in the
-    // space available, and trying produced "Ask Orbit AI, or write a mes...". Where the box really
-    // is both, the surrounding screen says which — a placeholder is not the place to explain a
-    // feature.
     placeholder: String = OrbitComposerPlaceholder.Message,
     label: String = "Message",
-    onSend: (text: String, clip: VoiceClip?) -> Unit = { _, _ -> },
-    onAttachImage: () -> Unit = {},
-    onAttachFile: () -> Unit = {},
+    onSend: (text: String, clip: VoiceClip?, attachments: List<ComposerAttachment>) -> Unit =
+        { _, _, _ -> },
     onClipRecorded: (VoiceClip) -> Unit = {},
 ) {
     var text by remember { mutableStateOf("") }
@@ -112,9 +70,20 @@ fun MessageComposer(
     var paused by remember { mutableStateOf(false) }
     var elapsed by remember { mutableIntStateOf(0) }
     val amplitudes = remember { mutableStateListOf<Float>() }
+    val attachments = remember { mutableStateListOf<ComposerAttachment>() }
+    var removeTarget by remember { mutableStateOf<ComposerAttachment?>(null) }
 
-    // One tick drives both the clock and the meter. Separate timers for the two is how the number
-    // and the waveform end up disagreeing about how long the recording is.
+    val launchImagePicker = rememberImagePicker { picked ->
+        if (picked != null) {
+            attachments += ComposerAttachment(picked)
+        }
+    }
+    val launchDocumentPicker = rememberDocumentPicker { picked ->
+        if (picked != null) {
+            attachments += ComposerAttachment(picked)
+        }
+    }
+
     LaunchedEffect(recording, paused) {
         if (!recording || paused) return@LaunchedEffect
         var frame = amplitudes.size
@@ -138,9 +107,6 @@ fun MessageComposer(
 
     fun finishRecording(): VoiceClip? {
         if (!recording) return null
-        // A clip shorter than a syllable is a mis-tap on the mic, not a recording. Returning it
-        // would attach a silent sliver to the message, which the user then has to notice and
-        // delete — worse than the tap simply not having taken.
         val clip = if (elapsed >= MinClipSeconds || amplitudes.size >= FramesPerSecond) {
             VoiceClip(
                 id = Random.nextLong(),
@@ -157,25 +123,38 @@ fun MessageComposer(
         return clip
     }
 
-    OrbitMessageField(
+    val stripItems = attachments.map { entry ->
+        OrbitComposerAttachment(
+            id = entry.picked.id,
+            fileName = entry.picked.name,
+            fileSize = formatComposerBytes(entry.picked.sizeBytes),
+            leading = composerLeading(entry.picked),
+        )
+    }
+
+    OrbitMessageComposer(
         value = text,
         onValueChange = { text = it },
+        modifier = modifier,
         label = label,
         placeholder = placeholder,
         mode = mode,
         attachExpanded = menuOpen,
-        modifier = modifier,
+        attachments = stripItems,
+        onRemoveAttachment = { id ->
+            removeTarget = attachments.firstOrNull { it.picked.id == id }
+        },
         onSend = {
             val clip = finishRecording()
-            if (text.isNotBlank() || clip != null) {
-                onSend(text, clip)
+            val queued = attachments.toList()
+            if (text.isNotBlank() || clip != null || queued.isNotEmpty()) {
+                onSend(text, clip, queued)
                 clip?.let(onClipRecorded)
                 text = ""
+                attachments.clear()
             }
         },
         onMicClick = {
-            // Opening the mic closes the attach menu. Both occupy the same middle of the composer
-            // and leaving the panel up over a live waveform is just clutter.
             menuOpen = false
             recording = true
         },
@@ -192,23 +171,48 @@ fun MessageComposer(
                 expanded = menuOpen,
                 onDismiss = { menuOpen = false },
                 items = listOf(
-                    OrbitAttachOption("Upload image", OrbitIcons.ImageUpload, onAttachImage),
-                    OrbitAttachOption("Attach file", OrbitIcons.FileUpload, onAttachFile),
+                    OrbitAttachOption("Upload image", OrbitIcons.ImageUpload, launchImagePicker),
+                    OrbitAttachOption("Attach file", OrbitIcons.FileUpload, launchDocumentPicker),
                 ),
             )
         },
     )
+
+    removeTarget?.let { target ->
+        OrbitConfirmDialog(
+            title = "Remove file",
+            message = "Remove \"${target.picked.name}\" from this message? You can attach it again.",
+            onConfirm = {
+                attachments.removeAll { it.picked.id == target.picked.id }
+                removeTarget = null
+            },
+            onDismiss = { removeTarget = null },
+        )
+    }
 }
 
-/**
- * A speech-shaped amplitude for frame [n]. **Stub — a real recorder replaces this.**
- *
- * Two sines beating against each other give the slow swell of phrases and the faster bumps of
- * syllables inside them; the noise keeps consecutive bars from being identical, which is the tell
- * that gives a fake waveform away instantly. A single sine looks like a test tone, and pure random
- * looks like static — neither reads as a voice, and the point of the stub is to exercise the
- * visualiser against something shaped like its real input.
- */
+@Composable
+private fun composerLeading(picked: PickedFile): OrbitAttachmentLeading {
+    imageUploadLeading(picked.previewUri, picked.name)?.let { return it }
+    return when (picked.name.substringAfterLast('.', "").lowercase()) {
+        "pdf" -> OrbitAttachmentLeading.Artwork(painterResource(Res.drawable.file_pdf))
+        "doc", "docx", "gdoc" ->
+            OrbitAttachmentLeading.Artwork(painterResource(Res.drawable.file_docs))
+        "xls", "xlsx", "csv", "gsheet" ->
+            OrbitAttachmentLeading.Artwork(painterResource(Res.drawable.file_sheet))
+        else -> OrbitAttachmentLeading.Glyph
+    }
+}
+
+private fun formatComposerBytes(bytes: Long): String = when {
+    bytes < 1024 -> "$bytes B"
+    bytes < 1024 * 1024 -> "${bytes / 1024} KB"
+    else -> {
+        val tenths = (bytes * 10f / (1024f * 1024f)).toInt()
+        "${tenths / 10}.${tenths % 10} MB"
+    }
+}
+
 private fun fakeAmplitude(n: Int): Float {
     val t = n * 0.11f
     val phrase = abs(sin(t * 0.85f))

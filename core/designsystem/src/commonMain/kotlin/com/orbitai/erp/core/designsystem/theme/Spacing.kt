@@ -511,6 +511,50 @@ data class OrbitSizing(
     val composerEdgeInset: Dp = 6.dp,
 
     /**
+     * Square thumbnail for a file queued on the message composer.
+     *
+     * Large enough that a photo still reads as the photo and a PDF mark still shows its letters,
+     * small enough that three of them fit beside each other on a compact phone without scrolling.
+     * A full attachment row would push the draft off-screen; this is the composer-shaped substitute.
+     */
+    val composerThumbSize: Dp = 56.dp,
+
+    /**
+     * Visible diameter of the X that removes a composer thumbnail.
+     *
+     * Smaller than the thumbnail on purpose — the badge is a corner affordance, not a second tile —
+     * while its hit area still expands to [minTouchTarget].
+     */
+    val composerThumbRemove: Dp = 20.dp,
+
+    /**
+     * Node diameter on a step indicator, and the track that connects them.
+     *
+     * Kept small relative to the label underneath: the nodes are waypoints, not buttons, and sizing
+     * them like chips would make five steps look like a toolbar. The full [minTouchTarget] still
+     * wraps each node so a tap lands reliably.
+     */
+    val stepNodeSize: Dp = 12.dp,
+    val stepTrackThickness: Dp = 2.dp,
+    val stepNodeRingWidth: Dp = 2.dp,
+
+    /**
+     * Vertical step-indicator density. The card itself is the hit target, so the node column and
+     * row stay under [minTouchTarget] — packing five stages into a phone card would otherwise force
+     * either a scroll or a wall of empty padding.
+     */
+    val stepGlyphSize: Dp = 24.dp,
+    val stepColumnWidth: Dp = 36.dp,
+    val stepRowMinHeight: Dp = 36.dp,
+    /** Dash and gap retained for any dashed chrome; the stage rail itself is a solid connector. */
+    val stepRailDash: Dp = 3.dp,
+    val stepRailGap: Dp = 3.dp,
+    /** Fallback rail length when a row does not stretch; preferred path fills the row gap. */
+    val stepRailLength: Dp = 24.dp,
+    /** Light connector weight — matches the dashed / solid stage rails. */
+    val stepRailThickness: Dp = 1.5.dp,
+
+    /**
      * The floor and ceiling on a dropdown menu's width.
      *
      * A range rather than a fixed width, so the panel sizes to its longest row and no further —

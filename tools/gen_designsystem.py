@@ -141,6 +141,18 @@ ICONS = {
     "Download": "Download01Icon",
     "MoreVertical": "MoreVerticalIcon",
     "AiMagic": "AiMagicIcon",
+    # Step-indicator nodes. Stroke circle for completed (filled in Compose) and upcoming; dashed
+    # ring marks the stage the work is currently in — see OrbitStepIndicator.
+    "Circle": "CircleIcon",
+    "DashedLineCircle": "DashedLineCircleIcon",
+    # Numbered stage marks for the vertical step track (Hugeicons stroke-rounded one…five-square).
+    "OneSquare": "OneSquareIcon",
+    "TwoSquare": "TwoSquareIcon",
+    "ThreeSquare": "ThreeSquareIcon",
+    "FourSquare": "FourSquareIcon",
+    "FiveSquare": "FiveSquareIcon",
+    # Chat message reply affordance on OrbitMessageBubble.
+    "Reply": "ReplyIcon",
 }
 
 

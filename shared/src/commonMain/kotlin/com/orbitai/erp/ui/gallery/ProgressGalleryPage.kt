@@ -10,41 +10,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.component.display.OrbitDelta
 import com.orbitai.erp.core.designsystem.component.progress.OrbitSegmentedProgress
+import com.orbitai.erp.core.designsystem.component.progress.OrbitStep
+import com.orbitai.erp.core.designsystem.component.progress.OrbitStepIndicator
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.ui.component.progress.ProgressCard
 
-/**
- * The progress card, and the two primitives it is assembled from.
- *
- * The edge cases get as much room as the happy path, because they are where a segmented bar goes
- * wrong: 0% and 100% are the two readings a person acts on, and 1% and 99% are the two that a naive
- * rounding turns into 0% and 100% and quietly lies about.
- */
 @Composable
 internal fun ProgressGalleryPage() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
 
-    // No gallery heading above these two: the point of stacking them bare is to see the cards the
-    // way a dashboard column will, where nothing sits between them and the next card is the only
-    // thing giving scale to the one above it.
     Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
         ProgressCard(
             label = "Progress",
             progress = 0.71f,
             delta = 14f,
         )
-        // The mirror of the card above, and the reason `higherIsBetter` exists. Remaining work
-        // falling is good news, so this delta is negative and green while the one above it is
-        // positive and green — a chip that coloured by sign alone would get one of them wrong.
         ProgressCard(
             label = "Remaining",
             progress = 0.29f,
             delta = -14f,
             higherIsBetter = false,
         )
-        // No heading at all, for a card under a section header that already names it. The spoken
-        // description has to be supplied by hand here, since there is no label to build it from.
         ProgressCard(
             label = null,
             progress = 0.52f,
@@ -96,4 +83,212 @@ internal fun ProgressGalleryPage() {
             )
         }
     }
+
+    GallerySection("Step indicator · STAGES header, tap to expand") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
+            Text(
+                text = "Status sub-lines follow stage vocabulary: Not started, In progress, Inspecting, Pending, Complete.",
+                style = OrbitTheme.typography.bodySmall,
+                color = content.textSecondary,
+            )
+            OrbitStepIndicator(
+                steps = WorkflowNotStarted,
+                currentIndex = 0,
+                progressSummary = "1/5 stages approved",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OrbitStepIndicator(
+                steps = WorkflowInProgress,
+                currentIndex = 1,
+                progressSummary = "2/5 stages approved",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OrbitStepIndicator(
+                steps = WorkflowInspectionReviewing,
+                currentIndex = 2,
+                progressSummary = "3/5 stages approved",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OrbitStepIndicator(
+                steps = WorkflowInspectionRework,
+                currentIndex = 2,
+                progressSummary = "3/5 stages approved",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OrbitStepIndicator(
+                steps = WorkflowApprovalPending,
+                currentIndex = 3,
+                progressSummary = "4/5 stages approved",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OrbitStepIndicator(
+                steps = WorkflowApprovalRejected,
+                currentIndex = 3,
+                progressSummary = "4/5 stages approved",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OrbitStepIndicator(
+                steps = WorkflowComplete,
+                currentIndex = 4,
+                progressSummary = "5/5 stages approved",
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
 }
+
+private val WorkflowNotStarted = listOf(
+    OrbitStep(label = "Scheduled", statusLabel = "Not started"),
+    OrbitStep(label = "In progress", statusLabel = "In progress"),
+    OrbitStep(label = "Inspection", statusLabel = "Inspecting"),
+    OrbitStep(label = "Approval", statusLabel = "Pending"),
+    OrbitStep(label = "Completed", statusLabel = "Complete"),
+)
+
+private val WorkflowInProgress = listOf(
+    OrbitStep(
+        label = "Scheduled",
+        statusLabel = "Started",
+        startedOn = "01/09/2026",
+        endedOn = "02/09/2026",
+    ),
+    OrbitStep(
+        label = "In progress",
+        statusLabel = "In progress",
+        startedOn = "02/09/2026",
+    ),
+    OrbitStep(label = "Inspection", statusLabel = "Inspecting"),
+    OrbitStep(label = "Approval", statusLabel = "Pending"),
+    OrbitStep(label = "Completed", statusLabel = "Complete"),
+)
+
+private val WorkflowInspectionReviewing = listOf(
+    OrbitStep(
+        label = "Scheduled",
+        statusLabel = "Started",
+        startedOn = "28/08/2026",
+        endedOn = "29/08/2026",
+    ),
+    OrbitStep(
+        label = "In progress",
+        statusLabel = "Submitted",
+        startedOn = "29/08/2026",
+        endedOn = "31/08/2026",
+    ),
+    OrbitStep(
+        label = "Inspection",
+        statusLabel = "Reviewing",
+        startedOn = "31/08/2026",
+    ),
+    OrbitStep(label = "Approval", statusLabel = "Pending"),
+    OrbitStep(label = "Completed", statusLabel = "Complete"),
+)
+
+private val WorkflowInspectionRework = listOf(
+    OrbitStep(
+        label = "Scheduled",
+        statusLabel = "Started",
+        startedOn = "28/08/2026",
+        endedOn = "29/08/2026",
+    ),
+    OrbitStep(
+        label = "In progress",
+        statusLabel = "Submitted",
+        startedOn = "29/08/2026",
+        endedOn = "31/08/2026",
+    ),
+    OrbitStep(
+        label = "Inspection",
+        statusLabel = "Rework",
+        startedOn = "31/08/2026",
+    ),
+    OrbitStep(label = "Approval", statusLabel = "Pending"),
+    OrbitStep(label = "Completed", statusLabel = "Complete"),
+)
+
+private val WorkflowApprovalPending = listOf(
+    OrbitStep(
+        label = "Scheduled",
+        statusLabel = "Started",
+        startedOn = "20/08/2026",
+        endedOn = "21/08/2026",
+    ),
+    OrbitStep(
+        label = "In progress",
+        statusLabel = "Submitted",
+        startedOn = "21/08/2026",
+        endedOn = "25/08/2026",
+    ),
+    OrbitStep(
+        label = "Inspection",
+        statusLabel = "Done",
+        startedOn = "25/08/2026",
+        endedOn = "27/08/2026",
+    ),
+    OrbitStep(
+        label = "Approval",
+        statusLabel = "Pending",
+        startedOn = "27/08/2026",
+    ),
+    OrbitStep(label = "Completed", statusLabel = "Complete"),
+)
+
+private val WorkflowApprovalRejected = listOf(
+    OrbitStep(
+        label = "Scheduled",
+        statusLabel = "Started",
+        startedOn = "20/08/2026",
+        endedOn = "21/08/2026",
+    ),
+    OrbitStep(
+        label = "In progress",
+        statusLabel = "Submitted",
+        startedOn = "21/08/2026",
+        endedOn = "25/08/2026",
+    ),
+    OrbitStep(
+        label = "Inspection",
+        statusLabel = "Done",
+        startedOn = "25/08/2026",
+        endedOn = "27/08/2026",
+    ),
+    OrbitStep(
+        label = "Approval",
+        statusLabel = "Rejected",
+        startedOn = "27/08/2026",
+    ),
+    OrbitStep(label = "Completed", statusLabel = "Complete"),
+)
+
+private val WorkflowComplete = listOf(
+    OrbitStep(
+        label = "Scheduled",
+        statusLabel = "Started",
+        startedOn = "15/08/2026",
+        endedOn = "16/08/2026",
+    ),
+    OrbitStep(
+        label = "In progress",
+        statusLabel = "Submitted",
+        startedOn = "16/08/2026",
+        endedOn = "20/08/2026",
+    ),
+    OrbitStep(
+        label = "Inspection",
+        statusLabel = "Done",
+        startedOn = "20/08/2026",
+        endedOn = "22/08/2026",
+    ),
+    OrbitStep(
+        label = "Approval",
+        statusLabel = "Approved",
+        startedOn = "22/08/2026",
+        endedOn = "23/08/2026",
+    ),
+    OrbitStep(
+        label = "Completed",
+        statusLabel = "Complete",
+        startedOn = "23/08/2026",
+        endedOn = "23/08/2026",
+    ),
+)

@@ -61,6 +61,7 @@ fun OrbitVoiceNoteRow(
     onPlayPause: () -> Unit,
     modifier: Modifier = Modifier,
     label: String = "Voice note",
+    listenOnly: Boolean = false,
     onRemove: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
 ) {
@@ -123,7 +124,7 @@ fun OrbitVoiceNoteRow(
             )
         }
 
-        if (onDelete != null) {
+        if (!listenOnly && onDelete != null) {
             OrbitIconButton(
                 contentDescription = "Delete $label",
                 onClick = onDelete,
@@ -132,7 +133,7 @@ fun OrbitVoiceNoteRow(
                 size = OrbitIconButtonSize.Small,
             )
         }
-        if (onRemove != null) {
+        if (!listenOnly && onRemove != null) {
             OrbitIconButton(
                 contentDescription = "Remove $label",
                 onClick = onRemove,

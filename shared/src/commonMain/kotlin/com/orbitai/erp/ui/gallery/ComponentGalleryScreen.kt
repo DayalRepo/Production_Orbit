@@ -78,10 +78,13 @@ fun ComponentGalleryScreen(
 
         DateTimeGalleryPage()
         ProgressGalleryPage()
+        MessageBubbleGalleryPage()
+        ChecklistGalleryPage()
         AvatarGalleryPage(isDark = isDark, onToggleTheme = onToggleTheme)
         DisplayGalleryPage()
         StateGalleryPage()
         InputGalleryPage()
+        AssignGalleryPage()
         ComposerGalleryPage()
         ButtonGalleryPage()
         BadgeGalleryPage()

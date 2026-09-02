@@ -106,6 +106,7 @@ fun OrbitAttachmentRow(
     fileSize: String,
     leading: OrbitAttachmentLeading,
     modifier: Modifier = Modifier,
+    expandWidth: Boolean = true,
     onRemove: (() -> Unit)? = null,
     onRename: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
@@ -123,7 +124,7 @@ fun OrbitAttachmentRow(
 
     Row(
         modifier = modifier
-            .fillMaxWidth()
+            .then(if (expandWidth) Modifier.fillMaxWidth() else Modifier)
             // `heightIn`, never `height`: the filename is text, and at 200% font scale the row has
             // to grow rather than clip the thing it exists to show (WCAG 1.4.4).
             // Which minimum depends on whether the row has controls: they carry their own touch

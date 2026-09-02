@@ -39,7 +39,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>OrbitAI needs photo access so you can attach site images to messages.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>OrbitAI needs photo access so you can attach site images to messages.</string>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>

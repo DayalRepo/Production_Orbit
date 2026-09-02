@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -109,7 +110,7 @@ sealed interface OrbitComposerMode {
  * once you have scrolled down, at the bottom while there is more below, and at both when you are in
  * the middle. Without it a full composer looks exactly like a composer whose text happens to end at
  * the bottom line, and the failure is the quiet kind: the user believes they can see their whole
- * prompt, and sends something with a paragraph they had forgotten about. See [OrbitScrollFade].
+ * The field grows with content up to [maxLines], then scrolls inside a capped viewport with no edge fade.
  *
  * ### Send is disabled, not hidden
  *
@@ -139,6 +140,8 @@ sealed interface OrbitComposerMode {
  * @param attachMenu drawn anchored to the plus button. Pass `OrbitAttachMenu` here; it is a slot
  *   rather than a list of options so a screen can supply its own panel without this signature
  *   growing one parameter per menu item.
+ * @param hasQueuedContent true when something other than typed text should keep Send active — e.g.
+ *   attachments queued in [OrbitMessageComposer] above this field.
  */
 @Composable
 fun OrbitMessageField(
@@ -157,6 +160,7 @@ fun OrbitMessageField(
     onCancelRecording: () -> Unit = {},
     onPauseRecording: () -> Unit = {},
     attachMenu: (@Composable () -> Unit)? = null,
+    hasQueuedContent: Boolean = false,
 ) {
     val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
@@ -191,9 +195,9 @@ fun OrbitMessageField(
     )
     val shape = RoundedCornerShape(radius)
 
-    val canSend = enabled && value.isNotBlank()
+    val canSend = enabled && (value.isNotBlank() || recording || hasQueuedContent)
 
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = sizing.fieldHeightLg)
@@ -202,158 +206,166 @@ fun OrbitMessageField(
             .orbitGlass(
                 fill = control.cardContainer,
                 shape = shape,
-                highlightAlpha = if (OrbitTheme.isDark) {
-                    OrbitGlass.SurfaceHighlightDark
-                } else {
-                    OrbitGlass.SurfaceHighlightLight
-                },
+                highlightAlpha = if (OrbitTheme.isDark) 0f else OrbitGlass.SurfaceHighlightLight,
                 edge = control.controlBorder,
                 edgeWidth = sizing.hairline,
+                sheen = if (OrbitTheme.isDark) 1f else OrbitGlass.Sheen,
             ),
-        // Bottom, not centre. Once the field is several lines tall the buttons have to stay level
-        // with the last line — where the caret is and where the next word will land. Centred, they
-        // drift into the middle of the paragraph and stop looking attached to the writing.
-        verticalAlignment = if (multiline) Alignment.Bottom else Alignment.CenterVertically,
     ) {
-        Box {
-            OrbitIconButton(
-                contentDescription = if (attachExpanded) "Close attach menu" else "Attach",
-                onClick = onAttachClick,
-                icon = OrbitIcons.Add,
-                style = OrbitIconButtonStyle.Neutral,
-                size = OrbitIconButtonSize.Medium,
-                // The plus reads as "on" while its menu is open, which is what tells you the panel
-                // above belongs to this button rather than to the send button beside it.
-                selected = attachExpanded,
-                state = if (enabled) OrbitButtonState.Active else OrbitButtonState.Disabled,
-                modifier = Modifier.padding(start = sizing.composerEdgeInset),
-            )
-            attachMenu?.invoke()
-        }
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                // Horizontal padding as well as vertical, which the first pass was missing. Without
-                // it the text began flush against the plus button's ripple bounds, so the first
-                // character of every message sat closer to the icon than the placeholder's own
-                // descender did to the rim — the composer read as three things crammed together
-                // rather than as one field with controls on either side.
-                .padding(horizontal = spacing.xs, vertical = spacing.xs),
-            contentAlignment = Alignment.CenterStart,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            // Bottom, not centre. Once the field is several lines tall the buttons have to stay level
+            // with the last line — where the caret is and where the next word will land. Centred, they
+            // drift into the middle of the paragraph and stop looking attached to the writing.
+            verticalAlignment = if (multiline) {
+                Alignment.Bottom
+            } else {
+                Alignment.CenterVertically
+            },
         ) {
-            when (mode) {
-                is OrbitComposerMode.Recording -> RecordingMeter(
-                    mode = mode,
-                    onPauseRecording = onPauseRecording,
+            Box {
+                OrbitIconButton(
+                    contentDescription = if (attachExpanded) "Close attach menu" else "Attach",
+                    onClick = onAttachClick,
+                    icon = OrbitIcons.Add,
+                    style = OrbitIconButtonStyle.Neutral,
+                    size = OrbitIconButtonSize.Medium,
+                    // The plus reads as "on" while its menu is open, which is what tells you the panel
+                    // above belongs to this button rather than to the send button beside it.
+                    selected = attachExpanded,
+                    state = if (enabled) OrbitButtonState.Active else OrbitButtonState.Disabled,
+                    modifier = Modifier.padding(start = sizing.composerEdgeInset),
                 )
+                attachMenu?.invoke()
+            }
 
-                OrbitComposerMode.Text -> {
-                    CompositionLocalProvider(
-                        LocalTextSelectionColors provides TextSelectionColors(
-                            handleColor = control.actionContainer,
-                            backgroundColor = control.actionContainer.copy(alpha = SelectionAlpha),
-                        ),
-                    ) {
-                        OrbitScrollFade(scrollState = scrollState) {
-                            BasicTextField(
-                                value = value,
-                                onValueChange = onValueChange,
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    // Horizontal padding as well as vertical, which the first pass was missing. Without
+                    // it the text began flush against the plus button's ripple bounds, so the first
+                    // character of every message sat closer to the icon than the placeholder's own
+                    // descender did to the rim — the composer read as three things crammed together
+                    // rather than as one field with controls on either side.
+                    .padding(horizontal = spacing.xs, vertical = spacing.xs)
+                    // Match the control row height so the placeholder centres against the plus and
+                    // mic, not against an undersized text measure that sat high in the pill.
+                    .heightIn(min = if (multiline) 0.dp else sizing.fieldHeightLg - spacing.xs * 2),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                when (mode) {
+                    is OrbitComposerMode.Recording -> RecordingMeter(
+                        mode = mode,
+                        onPauseRecording = onPauseRecording,
+                    )
+
+                    OrbitComposerMode.Text -> {
+                        CompositionLocalProvider(
+                            LocalTextSelectionColors provides TextSelectionColors(
+                                handleColor = control.actionContainer,
+                                backgroundColor = control.actionContainer.copy(alpha = SelectionAlpha),
+                            ),
+                        ) {
+                            // Cap the viewport, then scroll the field inside it. Putting heightIn and
+                            // verticalScroll on the same node left maxValue at 0 on some hosts, so the
+                            // overflow fade never appeared even when the prompt was past five lines.
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    // The scroll is ours rather than the text field's own. Left to
-                                    // itself, `BasicTextField` clips at `maxLines` and scrolls
-                                    // internally through a state we cannot see — which is fine
-                                    // until you want to draw an overflow hint, at which point
-                                    // there is no way to ask it whether it has overflowed. Capping
-                                    // the height here and scrolling it ourselves puts that answer
-                                    // in a `ScrollState` the fade can read.
-                                    .heightIn(max = maxHeight)
-                                    .verticalScroll(scrollState)
-                                    .orbitReleaseFocusWithKeyboard()
-                                    .semantics { contentDescription = label },
-                                enabled = enabled,
-                                textStyle = base.copy(color = ink, fontWeight = FontWeight.Medium),
-                                // Default, not Send. A prompt is a paragraph and the return key has
-                                // to insert a newline; putting Send there means every attempt at a
-                                // second sentence fires the message off half-written.
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
-                                interactionSource = interactionSource,
-                                cursorBrush = SolidColor(control.actionContainer),
-                                onTextLayout = { lineCount = it.lineCount },
+                                    .heightIn(max = maxHeight),
+                            ) {
+                                BasicTextField(
+                                    value = value,
+                                    onValueChange = onValueChange,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .verticalScroll(scrollState)
+                                        .orbitReleaseFocusWithKeyboard()
+                                        .semantics { contentDescription = label },
+                                    enabled = enabled,
+                                    textStyle = base.copy(color = ink, fontWeight = FontWeight.Medium),
+                                    // Default, not Send. A prompt is a paragraph and the return key has
+                                    // to insert a newline; putting Send there means every attempt at a
+                                    // second sentence fires the message off half-written.
+                                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
+                                    interactionSource = interactionSource,
+                                    cursorBrush = SolidColor(control.actionContainer),
+                                    onTextLayout = { lineCount = it.lineCount },
+                                )
+                            }
+                        }
+
+                        if (value.isEmpty() && placeholder != null) {
+                            Text(
+                                text = placeholder,
+                                // Same weight as the text that replaces it. It was left at the base
+                                // style's regular while the field itself renders Medium, so the hint
+                                // sat visibly lighter *and* on a slightly different baseline, and the
+                                // first keystroke made the line appear to jump and thicken. A
+                                // placeholder is a preview of what you are about to type; any metric it
+                                // does not share with the real text shows up as a shift.
+                                style = base.copy(fontWeight = FontWeight.Medium),
+                                color = hint,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.CenterStart)
+                                    .clearAndSetSemantics {},
                             )
                         }
                     }
-
-                    if (value.isEmpty() && placeholder != null) {
-                        Text(
-                            text = placeholder,
-                            // Same weight as the text that replaces it. It was left at the base
-                            // style's regular while the field itself renders Medium, so the hint
-                            // sat visibly lighter *and* on a slightly different baseline, and the
-                            // first keystroke made the line appear to jump and thicken. A
-                            // placeholder is a preview of what you are about to type; any metric it
-                            // does not share with the real text shows up as a shift.
-                            style = base.copy(fontWeight = FontWeight.Medium),
-                            color = hint,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clearAndSetSemantics {},
-                        )
-                    }
                 }
             }
-        }
 
-        Row(
-            // Explicit air between the mic and send, and between that pair and the rim. These were
-            // butted together at zero, which put two 48dp targets edge to edge: legal by the touch
-            // guidance and still wrong, because adjacent targets with no gap read as one wide
-            // control and are mis-hit at the seam. The gap is a platform token, since Android's
-            // larger targets need less of it than iOS's to look equally spaced.
-            horizontalArrangement = Arrangement.spacedBy(sizing.composerControlGap),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(end = sizing.composerEdgeInset),
-        ) {
-            if (recording) {
+            Row(
+                // Explicit air between the mic and send, and between that pair and the rim. These were
+                // butted together at zero, which put two 48dp targets edge to edge: legal by the touch
+                // guidance and still wrong, because adjacent targets with no gap read as one wide
+                // control and are mis-hit at the seam. The gap is a platform token, since Android's
+                // larger targets need less of it than iOS's to look equally spaced.
+                horizontalArrangement = Arrangement.spacedBy(sizing.composerControlGap),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(end = sizing.composerEdgeInset),
+            ) {
+                if (recording) {
+                    OrbitIconButton(
+                        // Discard, not stop. A red cross means *throw this away* and it has to do
+                        // that; the first pass had it keeping the clip, which is the worst kind of
+                        // mismatch — the control that looks destructive being the safe one teaches
+                        // people to distrust every red glyph in the product.
+                        contentDescription = "Discard recording",
+                        onClick = onCancelRecording,
+                        icon = OrbitIcons.Delete,
+                        style = OrbitIconButtonStyle.Destructive,
+                        size = OrbitIconButtonSize.Medium,
+                    )
+                } else {
+                    OrbitIconButton(
+                        contentDescription = "Record a voice message",
+                        onClick = onMicClick,
+                        icon = OrbitIcons.MicRecord,
+                        style = OrbitIconButtonStyle.Neutral,
+                        size = OrbitIconButtonSize.Medium,
+                        state = if (enabled) OrbitButtonState.Active else OrbitButtonState.Disabled,
+                    )
+                }
+
                 OrbitIconButton(
-                    // Discard, not stop. A red cross means *throw this away* and it has to do
-                    // that; the first pass had it keeping the clip, which is the worst kind of
-                    // mismatch — the control that looks destructive being the safe one teaches
-                    // people to distrust every red glyph in the product.
-                    contentDescription = "Discard recording",
-                    onClick = onCancelRecording,
-                    icon = OrbitIcons.Delete,
-                    style = OrbitIconButtonStyle.Destructive,
-                    size = OrbitIconButtonSize.Medium,
-                )
-            } else {
-                OrbitIconButton(
-                    contentDescription = "Record a voice message",
-                    onClick = onMicClick,
-                    icon = OrbitIcons.MicRecord,
+                    contentDescription = "Send",
+                    onClick = onSend,
+                    // An upward arrow rather than a paper plane. The plane is mail's idiom and carries
+                    // "dispatched, gone"; this box is as often a prompt as a message, and a prompt is
+                    // submitted and answered rather than sent away. The arrow also holds up far better
+                    // at 24dp, being two strokes instead of a folded silhouette that turns to mush.
+                    icon = OrbitIcons.ArrowUp,
                     style = OrbitIconButtonStyle.Neutral,
                     size = OrbitIconButtonSize.Medium,
-                    state = if (enabled) OrbitButtonState.Active else OrbitButtonState.Disabled,
+                    // Present but inert on an empty composer. See the class doc on why this is not
+                    // simply hidden.
+                    state = if (canSend) OrbitButtonState.Active else OrbitButtonState.Disabled,
                 )
             }
-
-            OrbitIconButton(
-                contentDescription = "Send",
-                onClick = onSend,
-                // An upward arrow rather than a paper plane. The plane is mail's idiom and carries
-                // "dispatched, gone"; this box is as often a prompt as a message, and a prompt is
-                // submitted and answered rather than sent away. The arrow also holds up far better
-                // at 24dp, being two strokes instead of a folded silhouette that turns to mush.
-                icon = OrbitIcons.ArrowUp,
-                style = OrbitIconButtonStyle.Neutral,
-                size = OrbitIconButtonSize.Medium,
-                // Present but inert on an empty composer. See the class doc on why this is not
-                // simply hidden.
-                state = if (canSend || recording) OrbitButtonState.Active else OrbitButtonState.Disabled,
-            )
         }
     }
 }

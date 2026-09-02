@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
  * Every glyph is authored on a 24x24 viewport with a 1.5-unit stroke, round caps and round joins,
  * which is where the set's uniform stroke weight comes from. Because the stroke is in viewport
  * units it scales with the glyph: at `iconMd` (24dp) it draws 1.5dp, at a 16dp badge icon it draws
- * 1dp. That is intended ÔøΩ holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
+ * 1dp. That is intended ? holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
  * counters and the icon turns into a blob.
  *
  * Colour is opaque black here and always overwritten: every call site renders through
@@ -628,6 +628,117 @@ object OrbitIcons {
             ),
         )
     }
+
+    val Circle: ImageVector by lazy {
+        vector(
+            name = "Circle",
+            stroke = listOf(
+                "M2.0 12.0A10.0 10.0 0 1 0 22.0 12.0A10.0 10.0 0 1 0 2.0 12.0Z",
+            ),
+        )
+    }
+
+    val DashedLineCircle: ImageVector by lazy {
+        vector(
+            name = "DashedLineCircle",
+            stroke = listOf(
+                "M14 2.20004C13.3538 2.06886 12.6849 2 12 2C11.3151 2 10.6462 2.06886 10 2.20004M21.8 10C21.9311 10.6462 22 11.3151 22 12C22 12.6849 21.9311 13.3538 21.8 14M14 21.8C13.3538 21.9311 12.6849 22 12 22C11.3151 22 10.6462 21.9311 10 21.8M2.20004 14C2.06886 13.3538 2 12.6849 2 12C2 11.3151 2.06886 10.6462 2.20004 10M17.5 3.64702C18.6332 4.39469 19.6053 5.36678 20.353 6.5M20.353 17.5C19.6053 18.6332 18.6332 19.6053 17.5 20.353M6.5 20.353C5.36678 19.6053 4.39469 18.6332 3.64702 17.5M3.64702 6.5C4.39469 5.36678 5.36678 4.39469 6.5 3.64702",
+            ),
+        )
+    }
+
+    val OneSquare: ImageVector by lazy {
+        vector(
+            name = "OneSquare",
+            stroke = listOf(
+                "M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z",
+                "M10.5 8.5L12.5 7V17",
+            ),
+        )
+    }
+
+    val TwoSquare: ImageVector by lazy {
+        vector(
+            name = "TwoSquare",
+            stroke = listOf(
+                "M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z",
+                "M9 10C9 8.34315 10.3431 7 12 7C13.6569 7 15 8.34315 15 10C15 12.0786 12.1196 13.9172 10.3503 14.8505C9.54685 15.2743 9 16.0917 9 17H15",
+            ),
+        )
+    }
+
+    val ThreeSquare: ImageVector by lazy {
+        vector(
+            name = "ThreeSquare",
+            stroke = listOf(
+                "M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z",
+                "M12.5 12H11.5M12.5 12C13.8807 12 15 10.8807 15 9.5C15 8.11929 13.8807 7 12.5 7H11.5C10.1193 7 9 8.11929 9 9.5M12.5 12C13.8807 12 15 13.1193 15 14.5C15 15.8807 13.8807 17 12.5 17H11.5C10.1193 17 9 15.8807 9 14.5",
+            ),
+        )
+    }
+
+    val FourSquare: ImageVector by lazy {
+        vector(
+            name = "FourSquare",
+            stroke = listOf(
+                "M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z",
+                "M15 7V12.5M15 12.5V17M15 12.5H9.43601C9.19521 12.5 9 12.3048 9 12.064C9 12.0216 9.00619 11.9794 9.01839 11.9387L10.5 7",
+            ),
+        )
+    }
+
+    val FiveSquare: ImageVector by lazy {
+        vector(
+            name = "FiveSquare",
+            stroke = listOf(
+                "M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z",
+                "M9 15C9 15 9.5 17 12 17C13.6569 17 15 15.7949 15 14C15 12.2051 13.6569 11 12 11C10.3431 11 9 12 9 12L10 7H15",
+            ),
+        )
+    }
+
+    /** Assign field ó Hugeicons [UserAdd01](https://hugeicons.com/icon/user-add-01?style=stroke-rounded). */
+    val UserAdd: ImageVector by lazy {
+        vector(
+            name = "UserAdd",
+            stroke = listOf(
+                "M15 8A5 5 0 1 0 5 8a5 5 0 0 0 10 0m2.5 13v-7M14 17.5h7",
+                "M3 20a7 7 0 0 1 11-5.745",
+            ),
+        )
+    }
+
+    val Reply: ImageVector by lazy {
+        vector(
+            name = "Reply",
+            stroke = listOf(
+                "M3.99219 10H11.9922C13.8521 10 14.7821 10 15.5451 10.2044C17.6157 10.7592 19.2329 12.3765 19.7877 14.4471C19.9922 15.2101 19.9922 16.1401 19.9922 18",
+                "M7.99219 6L6.83839 6.87652C4.94092 8.31801 3.99219 9.03875 3.99219 10C3.99219 10.9612 4.94092 11.682 6.83839 13.1235L7.99219 14",
+            ),
+        )
+    }
+
+    /** Reply-thread connector ù Hugeicons [ArrowMoveUpLeft](https://hugeicons.com/icon/arrow-move-up-left?style=stroke-rounded). */
+    val ArrowMoveUpLeft: ImageVector by lazy {
+        vector(
+            name = "ArrowMoveUpLeft",
+            stroke = listOf(
+                "M20 21V18.9231C20 16.9221 20 15.9217 19.8547 15.0846C19.0547 10.4765 15.0934 6.86243 10.0426 6.13259C9.12509 6 7.19318 6 5 6",
+                "M7 3C6.39316 3.58984 4 5.15973 4 6C4 6.84027 6.39316 8.41016 7 9",
+            ),
+        )
+    }
+
+    /** Reply-thread connector ù Hugeicons [ArrowMoveDownLeft](https://hugeicons.com/icon/arrow-move-down-left?style=stroke-rounded). */
+    val ArrowMoveDownLeft: ImageVector by lazy {
+        vector(
+            name = "ArrowMoveDownLeft",
+            stroke = listOf(
+                "M20 3V5.07692C20 7.07786 20 8.07833 19.8547 8.91545C19.0547 13.5235 15.0934 17.1376 10.0426 17.8674C9.12509 18 7.19318 18 5 18",
+                "M7 21C6.39316 20.4102 4 18.8403 4 18C4 17.1597 6.39316 15.5898 7 15",
+            ),
+        )
+    }
 }
 
 /**
@@ -669,10 +780,10 @@ private const val VIEWPORT = 24f
 /**
  * Stroke weight in viewport units, so 1.8dp once the glyph is rendered at 24dp.
  *
- * The stroke is in viewport units, which means it scales with the glyph ÔøΩ and that is exactly why
- * this is 1.8 rather than 1.5. Almost nothing draws at 24dp: a badge glyph is 14ÔøΩ18dp and a small
- * button glyph is 16dp, so at 1.5 units those rendered at 0.9ÔøΩ1.1dp and looked hairline-thin beside
- * their labels. At 1.8 the same glyphs land at 1.05ÔøΩ1.35dp and a 24dp toolbar icon at 1.8dp, which
- * puts the whole set inside the 1.5ÔøΩ2dp band the design rules ask for at the sizes actually used.
+ * The stroke is in viewport units, which means it scales with the glyph ? and that is exactly why
+ * this is 1.8 rather than 1.5. Almost nothing draws at 24dp: a badge glyph is 14?18dp and a small
+ * button glyph is 16dp, so at 1.5 units those rendered at 0.9?1.1dp and looked hairline-thin beside
+ * their labels. At 1.8 the same glyphs land at 1.05?1.35dp and a 24dp toolbar icon at 1.8dp, which
+ * puts the whole set inside the 1.5?2dp band the design rules ask for at the sizes actually used.
  */
 private const val STROKE_WIDTH = 1.8f

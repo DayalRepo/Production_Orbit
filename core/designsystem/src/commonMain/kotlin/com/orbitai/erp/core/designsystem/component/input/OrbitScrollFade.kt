@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -70,13 +71,9 @@ internal fun OrbitScrollFade(
         label = "orbit-scroll-fade-bottom",
     )
 
-    if (topAlpha == 0f && bottomAlpha == 0f) {
-        content()
-        return
-    }
-
     Box(
         modifier = Modifier
+            .fillMaxWidth()
             .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
             .drawWithContent {
                 drawContent()

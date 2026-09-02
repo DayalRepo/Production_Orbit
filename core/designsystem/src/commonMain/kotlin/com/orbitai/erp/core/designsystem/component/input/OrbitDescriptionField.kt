@@ -226,7 +226,7 @@ fun OrbitDescriptionField(
     }
 }
 
-private val DefaultCollapsedHeight = 350.dp
+private val DefaultCollapsedHeight = 300.dp
 private val DefaultExpandedHeight = 900.dp
 private val MinScrollViewport = 56.dp
 private const val SelectionAlpha = 0.28f

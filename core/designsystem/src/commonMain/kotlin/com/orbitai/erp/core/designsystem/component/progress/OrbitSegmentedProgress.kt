@@ -120,6 +120,14 @@ object OrbitProgressDefaults {
     const val SegmentCount = 50
 
     /**
+     * Fixed slat count for checklist progress — independent of how many items the list has.
+     *
+     * Twenty-four bars at full width reads as a standard bunch on phone cards; [OrbitSegmentedProgress]
+     * scales slat width down on narrow tracks but keeps the same count cap.
+     */
+    const val ChecklistBarCount = 24
+
+    /**
      * Peak alpha of the specular highlight on a lit slat, per theme.
      *
      * Deliberately weaker than every other glass surface in the system, and on light it is weak

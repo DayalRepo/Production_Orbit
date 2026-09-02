@@ -46,6 +46,45 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
 import kotlinx.coroutines.launch
 
 /**
+ * A horizontal scrollbar with end arrows — same chrome as [OrbitVerticalScrollbar].
+ */
+@Composable
+fun OrbitHorizontalScrollbar(
+    scrollState: ScrollState,
+    modifier: Modifier = Modifier,
+    thickness: Dp = OrbitScrollbarDefaults.Thickness,
+    minThumbLength: Dp = OrbitScrollbarDefaults.MinThumbLength,
+) {
+    val max = scrollState.maxValue
+    if (max <= 0) return
+
+    val scope = rememberCoroutineScope()
+    val fraction = scrollState.value.toFloat() / max.toFloat()
+    val step = (scrollState.viewportSize * 0.85f).toInt().coerceAtLeast(1)
+
+    OrbitScrollbarChrome(
+        vertical = false,
+        thumbFraction = viewportFraction(scrollState.viewportSize, max),
+        travelFraction = fraction,
+        thickness = thickness,
+        minThumbLength = minThumbLength,
+        modifier = modifier,
+        onDecrease = {
+            scope.launch {
+                scrollState.scrollTo((scrollState.value - step).coerceAtLeast(0))
+            }
+        },
+        onIncrease = {
+            scope.launch {
+                scrollState.scrollTo((scrollState.value + step).coerceAtMost(max))
+            }
+        },
+        decreaseDescription = "Scroll left",
+        increaseDescription = "Scroll right",
+    )
+}
+
+/**
  * A vertical scrollbar with end arrows, a recessed track and a pill thumb — per the component spec.
  *
  * The arrows step by roughly one viewport. The thumb reports position only; flicking the list remains

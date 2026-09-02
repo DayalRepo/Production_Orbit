@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.component.input.OrbitMessageField
 import com.orbitai.erp.core.designsystem.component.media.OrbitAudioWave
+import com.orbitai.erp.core.designsystem.component.media.OrbitVoiceNoteRow
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.ui.component.composer.ManagedVoiceNoteRow
 import com.orbitai.erp.ui.component.composer.MessageComposer
@@ -56,8 +57,7 @@ internal fun ComposerGalleryPage() {
         progress = 0f
     }
 
-    // Both jobs, side by side, because the placeholder is the only thing distinguishing them and
-    // the point is that it reads as two different invitations rather than one vague one.
+    // Attach via the plus menu — thumbnails queue above the composer in a horizontal strip.
     GallerySection("Message composer · chat and AI prompt") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             MessageComposer(
@@ -140,8 +140,6 @@ internal fun ComposerGalleryPage() {
 
     GallerySection("Voice notes · play, scrub, delete") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
-            // A canned pair, so the section has something in it before anyone records. The clips a
-            // reviewer records land underneath these.
             SampleVoiceNote(
                 seconds = 14,
                 playing = playingId == SampleAId,
@@ -150,8 +148,6 @@ internal fun ComposerGalleryPage() {
                     playingId = if (playingId == SampleAId) null else SampleAId
                     progress = 0f
                 },
-                // Both controls, so the section shows the two dialogs side by side: the mild
-                // "remove from message" on one row and the destructive "delete" on the other.
                 onRemove = {},
             )
             SampleVoiceNote(
@@ -164,11 +160,16 @@ internal fun ComposerGalleryPage() {
                 },
                 onDelete = {},
             )
+            SampleListenOnlyVoiceNote(
+                seconds = 9,
+                playing = playingId == SampleListenId,
+                progress = if (playingId == SampleListenId) progress else 0f,
+                onPlayPause = {
+                    playingId = if (playingId == SampleListenId) null else SampleListenId
+                    progress = 0f
+                },
+            )
 
-            // Clips recorded above land here, and unlike the two static samples they are wired
-            // through `ManagedVoiceNoteRow` — so the bin asks first, and answering Yes actually
-            // removes the row. That is the pair worth reviewing together: a confirmation you can
-            // open but never answer tells you nothing about what happens after Yes.
             clips.forEach { clip ->
                 ManagedVoiceNoteRow(
                     amplitudes = clip.amplitudes,
@@ -184,6 +185,24 @@ internal fun ComposerGalleryPage() {
             }
         }
     }
+}
+
+@Composable
+private fun SampleListenOnlyVoiceNote(
+    seconds: Int,
+    playing: Boolean,
+    progress: Float,
+    onPlayPause: () -> Unit,
+) {
+    OrbitVoiceNoteRow(
+        amplitudes = remember(seconds) { sampleEnvelope(seconds * 4) },
+        progress = progress,
+        duration = formatDuration(seconds),
+        playing = playing,
+        onPlayPause = onPlayPause,
+        listenOnly = true,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
@@ -227,3 +246,4 @@ private val LongPrompt = """
 
 private const val SampleAId = -1L
 private const val SampleBId = -2L
+private const val SampleListenId = -3L

@@ -151,12 +151,15 @@ Built so far:
 - `badge/` — `OrbitBadge` (three emphases, three sizes, glass fill)
 - `button/` — `OrbitButton` (five variants, three sizes, two states, loading state),
   `OrbitIconButton` (four styles, three sizes, two states)
-- `input/` — `OrbitTextField`, `OrbitSearchField`, over a shared `OrbitFieldShell`
+- `input/` — `OrbitTextField`, `OrbitSearchField`, over a shared `OrbitFieldShell`,
+  `OrbitMessageField` with `OrbitComposerAttachmentStrip` for queued file thumbnails
 - `status/` — `OrbitChip` (label and count, no glyph)
 - `display/` — `OrbitAvatar` (five tiers, photo or initials), `OrbitAvatarGroup` (overlapping stack
   with an overflow count), `OrbitDelta` (signed change chip), `OrbitCountBadge` and
-  `OrbitPresenceDot`, `OrbitAttachmentRow`
-- `progress/` — `OrbitSegmentedProgress`
+  `OrbitPresenceDot`, `OrbitAttachmentRow`, `OrbitMessageBubble` (user / AI / other, expand, copy,
+  reply)
+- `progress/` — `OrbitSegmentedProgress`, `OrbitStepIndicator` (vertical collapsible workflow track
+  with numbered square stages)
 - `container/` — `OrbitCard`, `OrbitDivider` and `OrbitVerticalDivider`
 - `feedback/` — `OrbitLoadingIcon`, `OrbitSkeleton` / `OrbitSkeletonLine` / `OrbitSkeletonList`
 - `foundation/` — `Modifier.orbitGlass`, `Modifier.orbitGlassScrollbar`, `orbitPressIndication`,
