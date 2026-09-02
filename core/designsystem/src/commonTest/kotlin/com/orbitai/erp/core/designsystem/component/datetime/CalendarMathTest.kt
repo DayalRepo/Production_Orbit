@@ -209,7 +209,7 @@ class DateFormatTest {
             date = OrbitCalendarDate(2025, 6, 12),
             time = OrbitTimeOfDay(10, 0),
         )
-        assertEquals("12/06/2025 · 10:00 AM", selection.format())
+        assertEquals("Thursday, 12/06/2025 · 10:00 AM", selection.format())
         assertEquals("12 Jun 2025 at 10:00 AM", selection.formatSentence())
     }
 }

@@ -98,6 +98,7 @@ ICONS = {
     # two strokes rather than a shape with an internal fold.
     "ArrowUp": "ArrowUp02Icon",
     "Expand": "ExpandIcon",
+    "Collapse": "CollapseIcon",
     "BatteryLow": "BatteryLowIcon",
     "BatteryMedium": "BatteryMedium01Icon",
     "BatteryHigh": "BatteryMedium02Icon",
@@ -137,6 +138,9 @@ ICONS = {
     # Rename an attachment. A capital A with a caret, which is the near-universal mark for "edit
     # this text" and reads as such at 16dp where a pencil turns to mush.
     "TextEdit": "TextIcon",
+    "Download": "Download01Icon",
+    "MoreVertical": "MoreVerticalIcon",
+    "AiMagic": "AiMagicIcon",
 }
 
 

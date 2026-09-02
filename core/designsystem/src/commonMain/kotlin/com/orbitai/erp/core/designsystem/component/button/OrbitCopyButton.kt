@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.orbitai.erp.core.designsystem.component.button
 
 import androidx.compose.runtime.Composable
@@ -69,10 +71,9 @@ fun OrbitCopyButton(
             copied = true
         },
         icon = if (copied) OrbitIcons.Tick else OrbitIcons.Copy,
-        // `Positive` is the system's existing green-for-affirmative style, so this matches every
-        // other "this worked" in the product rather than introducing a second green.
         style = if (copied) OrbitIconButtonStyle.Positive else OrbitIconButtonStyle.Neutral,
         size = size,
+        ringed = false,
         modifier = modifier,
     )
 }

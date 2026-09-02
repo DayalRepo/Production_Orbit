@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.component.button.OrbitButton
@@ -103,8 +104,11 @@ fun OrbitDateTimePicker(
         )
 
         PickerFooter(
-            value = draftDate?.let { date ->
-                draftTime?.let { time -> OrbitDateTimeSelection(date, time).format() }
+            value = when {
+                draftDate != null && draftTime != null ->
+                    OrbitDateTimeSelection(draftDate!!, draftTime!!).format()
+                draftDate != null -> draftDate!!.formatWithWeekday()
+                else -> null
             },
             placeholder = when {
                 draftDate == null -> "Select a date"
@@ -245,8 +249,10 @@ private fun PickerFooter(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = sizing.fieldHeightMd)
+            .orbitGlassShadow(shape = OrbitTheme.shapeTokens.field, elevation = sizing.shadowBadge)
+            .clip(OrbitTheme.shapeTokens.field)
             .orbitGlass(
-                fill = control.insetContainer,
+                fill = control.cardContainer,
                 shape = OrbitTheme.shapeTokens.field,
                 highlightAlpha = if (OrbitTheme.isDark) {
                     OrbitGlass.SurfaceHighlightDark
@@ -324,11 +330,21 @@ private fun PickerFooter(
     }
 }
 
-/** A rule with the panel's standard breathing room above and below it. */
+/**
+ * A rule with the panel's breathing room above and below it.
+ *
+ * Opened up from `md` to `lg`. The panel has four bands in it — grid, time, value, actions — and at
+ * the tighter gap the rules were doing all the separating on their own while the bands themselves
+ * were touching them. Air on both sides of a rule is what makes it read as a boundary between two
+ * regions rather than as a line drawn across one.
+ *
+ * Given the panel's own ink rather than the default divider colour, for the same reason the popover
+ * cards were: this is an elevated white surface, and `dividerSubtle` on white is nothing.
+ */
 @Composable
 private fun PanelRule() {
     val spacing = OrbitTheme.spacing
-    Box(modifier = Modifier.height(spacing.md))
-    OrbitDivider()
-    Box(modifier = Modifier.height(spacing.md))
+    Box(modifier = Modifier.height(spacing.lg))
+    OrbitDivider(color = OrbitTheme.controlColors.dividerElevated)
+    Box(modifier = Modifier.height(spacing.lg))
 }

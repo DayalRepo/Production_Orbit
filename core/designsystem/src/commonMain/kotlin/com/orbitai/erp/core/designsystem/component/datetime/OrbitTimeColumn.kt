@@ -5,7 +5,10 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import com.orbitai.erp.core.designsystem.component.container.OrbitLazyScrollbar
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -114,21 +117,31 @@ fun OrbitTimeRow(
         if (index >= 0) listState.scrollToItem(index = maxOf(0, index - ContextRows))
     }
 
-    LazyRow(
-        modifier = modifier,
-        state = listState,
-        horizontalArrangement = Arrangement.spacedBy(spacing.xs),
-    ) {
-        items(slots) { slot ->
-            TimeSlot(
-                slot = slot,
-                selected = slot == selected,
-                enabled = slot !in unavailable,
-                onClick = { onSelect(slot) },
-                // Sized to its label rather than stretched, since a row has no single width to fill.
-                modifier = Modifier.width(SlotWidth),
-            )
+    Column(modifier = modifier.padding(top = spacing.sm)) {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            state = listState,
+            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+        ) {
+            items(slots) { slot ->
+                TimeSlot(
+                    slot = slot,
+                    selected = slot == selected,
+                    enabled = slot !in unavailable,
+                    onClick = { onSelect(slot) },
+                    // Sized to its label rather than stretched, since a row has no single width to fill.
+                    modifier = Modifier.width(SlotWidth),
+                )
+            }
         }
+
+        OrbitLazyScrollbar(
+            listState = listState,
+            horizontal = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = spacing.md),
+        )
     }
 }
 
@@ -174,7 +187,7 @@ private fun TimeSlot(
             // discourage — but `orbitGlass` is two gradients and a rim with no backdrop blur, so it
             // costs no more per row than a solid fill would. The rule exists for real blurs.
             .orbitGlass(
-                fill = if (selected) control.actionContainer else control.insetContainer,
+                fill = if (selected) control.actionContainer else control.cardContainer,
                 shape = shape,
                 highlightAlpha = if (OrbitTheme.isDark) {
                     OrbitGlass.BadgeHighlightDark

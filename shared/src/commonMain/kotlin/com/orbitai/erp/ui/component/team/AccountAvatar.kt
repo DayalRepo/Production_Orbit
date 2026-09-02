@@ -28,6 +28,9 @@ import com.orbitai.erp.core.designsystem.component.overlay.OrbitInfoField
  *   Spoken, not drawn, like every other label in these bubbles.
  * @param onSignOut ending a session touches storage, navigation and whatever the platform does with
  *   credentials, none of which belongs in a shared component. It is raised to the caller.
+ * @param themeDark current mode, for the panel's theme row. Omit along with [onThemeChange] to leave
+ *   the row out.
+ * @param onThemeChange fired when the theme row is toggled.
  */
 @Composable
 fun AccountAvatar(
@@ -40,6 +43,11 @@ fun AccountAvatar(
     modifier: Modifier = Modifier,
     avatar: Painter? = null,
     size: OrbitAvatarSize = OrbitAvatarSize.Sm,
+    // Forwarded rather than read from `OrbitTheme`, for the same reason the popover takes them: the
+    // current mode is readable from the theme, but changing it is not something a leaf component can
+    // do. Both null and the panel simply has no theme row.
+    themeDark: Boolean? = null,
+    onThemeChange: ((Boolean) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -69,6 +77,8 @@ fun AccountAvatar(
                 OrbitInfoField(tenancyLabel, tenancy),
             ),
             onSignOut = onSignOut,
+            themeDark = themeDark,
+            onThemeChange = onThemeChange,
         )
     }
 }

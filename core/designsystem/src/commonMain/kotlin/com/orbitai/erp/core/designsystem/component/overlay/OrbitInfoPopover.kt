@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.button.OrbitCopyButton
-import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
  * One line in an [OrbitInfoPopover].
@@ -112,24 +112,16 @@ fun OrbitInfoPopover(
             // Enough to separate the facts, no more. The lines are different weights and different
             // inks, so they do not need a wide gap to stop reading as one wrapped paragraph — and
             // there is now a rule between them doing the separating structurally.
-            verticalArrangement = Arrangement.spacedBy(spacing.xs),
+            verticalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
-            fields.forEachIndexed { index, field ->
-                // A rule between every pair of facts, inset from the panel's own padding so it reads
-                // as a separator *inside* the bubble rather than as a line cutting the bubble in
-                // half. Between the name and the number this is the whole point: they are two
-                // different kinds of thing — who, and how to reach them — and without a rule the
-                // second line reads as a continuation of the first.
-                if (index > 0) {
-                    OrbitDivider(inset = spacing.xs, endInset = spacing.xs)
-                }
+            fields.forEach { field ->
                 InfoRow(
                     field = field,
                     // The first value is the subject — the name the user tapped a face to find — and
                     // everything after it is supporting detail. Weight rather than size does the
                     // separating, because a larger first line would push the bubble wider on exactly
                     // the records with the longest names.
-                    primary = index == 0,
+                    primary = field == fields.first(),
                 )
             }
         }

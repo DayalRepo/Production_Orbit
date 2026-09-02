@@ -2,8 +2,8 @@ package com.orbitai.erp.core.designsystem.foundation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Shape
@@ -56,23 +56,29 @@ fun Modifier.orbitDropShadow(
     if (OrbitTheme.isDark) return this
     if (level.opacity <= 0f || alpha <= MinimumVisibleAlpha) return this
 
-    return drawBehind {
+    val shadowColor = Color.Black.copy(alpha = level.opacity * alpha)
+
+    return drawWithCache {
         val blurPx = level.blur.toPx()
         val offsetPx = level.offsetY.toPx()
         val outline = shape.createOutline(size, layoutDirection, this)
 
-        drawIntoCanvas { canvas ->
-            val paint = Paint().apply {
-                color = Color.Black.copy(alpha = level.opacity * alpha)
-                if (blurPx > 0f) orbitBlur(blurPx)
+        // Cached across frames. The uncached version built a new [Paint] and [BlurMaskFilter] on
+        // every draw, which is fine for a static card and expensive for anything that animates or
+        // for a whole screen recomposing at once — exactly what a light-to-dark theme flip does to
+        // every elevated surface in the gallery.
+        val paint = Paint().apply {
+            color = shadowColor
+            if (blurPx > 0f) orbitBlur(blurPx)
+        }
+
+        onDrawBehind {
+            drawIntoCanvas { canvas ->
+                canvas.save()
+                canvas.translate(0f, offsetPx)
+                canvas.drawOutline(outline, paint)
+                canvas.restore()
             }
-            // Translate rather than build a second, offset outline. The outline is derived from the
-            // content's own shape, so re-deriving it at a different origin risks the two drifting
-            // apart for any shape whose path depends on position — the bubble pointer, for one.
-            canvas.save()
-            canvas.translate(0f, offsetPx)
-            canvas.drawOutline(outline, paint)
-            canvas.restore()
         }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -25,8 +26,8 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
+import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
-import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
 import com.orbitai.erp.core.designsystem.theme.OrbitBadgeColors
@@ -133,6 +134,8 @@ enum class OrbitIconButtonSize { Small, Medium, Large }
  *
  * @param selected the on state of a toggle — a bookmark, a pinned filter. Pulls a Neutral glyph up to
  *   the accent tone and lifts the highlight, so the state is carried by colour *and* by light.
+ * @param ringed when false, draws the glyph alone with no glass ring. Use inside popovers, chips and
+ *   attachment rows where a second circular container reads as a control stuck onto a control.
  * @param state see [OrbitButtonState]. Only Active and Disabled; de-emphasis is the Neutral style's
  *   job, not a dimmed variant of a live control.
  */
@@ -142,20 +145,19 @@ fun OrbitIconButton(
     onClick: () -> Unit,
     icon: ImageVector,
     modifier: Modifier = Modifier,
-    style: OrbitIconButtonStyle = OrbitIconButtonStyle.Accent,
+    style: OrbitIconButtonStyle = OrbitIconButtonStyle.Neutral,
     size: OrbitIconButtonSize = OrbitIconButtonSize.Medium,
     state: OrbitButtonState = OrbitButtonState.Active,
     selected: Boolean = false,
+    ringed: Boolean = false,
 ) {
     val sizing = OrbitTheme.sizing
     val control = OrbitTheme.controlColors
+    val contentColors = OrbitTheme.contentColors
     val shape = OrbitTheme.shapeTokens.avatar
     val isDark = OrbitTheme.isDark
 
-    // A selected Neutral toggle borrows Accent whole — its tone *and* its shade — so "on" is visible
-    // without needing a second glyph. Borrowing only the tone would pair blue with Neutral's own
-    // shade, which is the deep label value, and the toggle would go dark rather than lighting up.
-    val effective = if (selected) OrbitIconButtonStyle.Accent else style
+    val effective = style
     val tone = effective.tone?.colors
 
     val diameter = when (size) {
@@ -190,7 +192,10 @@ fun OrbitIconButton(
     // `border` carries alpha, because on a badge it is a rim over a tint. Here it is ink, so the alpha
     // is dropped; left in, the glyph would half-dissolve into the ring behind it.
     val shade = if (isDark) effective.darkShade else effective.lightShade
-    val content = tone?.let { shade(it).copy(alpha = 1f) } ?: control.controlContent
+    val content = when (effective) {
+        OrbitIconButtonStyle.Neutral -> contentColors.iconPrimary
+        else -> tone?.let { shade(it).copy(alpha = 1f) } ?: contentColors.iconPrimary
+    }
 
     // Ring and glyph now fade together, which is only safe because Disabled is the sole faded
     // state and WCAG 1.4.3 exempts inactive controls from the contrast minimum. The old Inactive
@@ -225,6 +230,7 @@ fun OrbitIconButton(
     Box(
         modifier = modifier
             .size(maxOf(diameter, sizing.minTouchTarget))
+            .clip(CircleShape)
             .orbitHandCursor()
             .clickable(
                 interactionSource = interactionSource,
@@ -233,11 +239,26 @@ fun OrbitIconButton(
                 role = Role.Button,
                 onClick = onClick,
             )
+            .indication(interactionSource, orbitCircularPressIndication())
             .semantics(mergeDescendants = true) {
                 this.contentDescription = contentDescription
             },
         contentAlignment = Alignment.Center,
     ) {
+        if (!ringed) {
+            val tint = content.copy(alpha = content.alpha * contentAlpha)
+            CompositionLocalProvider(LocalContentColor provides tint) {
+                OrbitGlyph(
+                    icon = icon,
+                    size = glyphSize,
+                    tint = tint,
+                    minimumStroke = sizing.iconStrokeLight,
+                    contentDescription = null,
+                )
+            }
+            return@Box
+        }
+
         Box(
             modifier = Modifier
                 .size(diameter)
@@ -274,7 +295,7 @@ fun OrbitIconButton(
                     // design — a third of a dp at 3x and no thinner than a hairline at all at 1x.
                     edgeWidth = sizing.hairline,
                 )
-                .indication(interactionSource, orbitPressIndication()),
+                .indication(interactionSource, orbitCircularPressIndication()),
             contentAlignment = Alignment.Center,
         ) {
             val tint = content.copy(alpha = content.alpha * contentAlpha)

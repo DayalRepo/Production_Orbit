@@ -72,13 +72,13 @@ fun ComponentGalleryScreen(
                 },
                 onClick = onToggleTheme,
                 icon = if (isDark) OrbitIcons.Sun else OrbitIcons.Moon,
-                style = OrbitIconButtonStyle.Accent,
+                style = OrbitIconButtonStyle.Neutral,
             )
         }
 
         DateTimeGalleryPage()
         ProgressGalleryPage()
-        AvatarGalleryPage()
+        AvatarGalleryPage(isDark = isDark, onToggleTheme = onToggleTheme)
         DisplayGalleryPage()
         StateGalleryPage()
         InputGalleryPage()

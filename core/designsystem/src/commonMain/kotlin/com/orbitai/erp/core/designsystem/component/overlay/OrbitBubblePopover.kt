@@ -247,6 +247,7 @@ internal fun OrbitBubblePopover(
                         icon = OrbitIcons.Cancel,
                         style = OrbitIconButtonStyle.Neutral,
                         size = OrbitIconButtonSize.Small,
+                        ringed = false,
                     )
                 }
 
@@ -258,6 +259,7 @@ internal fun OrbitBubblePopover(
                 OrbitDivider(
                     inset = spacing.md + spacing.xs,
                     endInset = spacing.md + spacing.xs,
+                    color = OrbitTheme.controlColors.dividerElevated,
                 )
 
                 Spacer(modifier = Modifier.height(spacing.xs))

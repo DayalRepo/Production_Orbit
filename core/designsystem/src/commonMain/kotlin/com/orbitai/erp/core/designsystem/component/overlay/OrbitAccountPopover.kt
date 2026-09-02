@@ -3,6 +3,7 @@ package com.orbitai.erp.core.designsystem.component.overlay
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -25,13 +25,16 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.button.OrbitCopyButton
-import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitBadgeTone
+import com.orbitai.erp.core.designsystem.component.input.OrbitSwitch
+import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.core.designsystem.theme.controlColors
 import com.orbitai.erp.core.designsystem.theme.colors
 
 /**
@@ -112,6 +115,16 @@ fun OrbitAccountPopover(
     modifier: Modifier = Modifier,
     title: String = "Account",
     signOutLabel: String = "Sign out",
+    /**
+     * The theme row's state and handler.
+     *
+     * Optional as a pair: pass neither and the section is not drawn at all. The design system cannot
+     * own this state — whether the app is dark is the app's decision, held above `OrbitTheme` and
+     * usually persisted — so a component that rendered the row unconditionally would either need a
+     * default that lies or a switch that does nothing.
+     */
+    themeDark: Boolean? = null,
+    onThemeChange: ((Boolean) -> Unit)? = null,
     // Wider than the shared bounds, for the same reason the identity bubble is narrower: the panel
     // is sized by what it holds. Every line here is a caption and a value on one row, so the width
     // has to carry the longest of each at once — and the fourth value is an organisation name, the
@@ -145,45 +158,26 @@ fun OrbitAccountPopover(
             // and the caption binds itself to the value below it. The gap that has to read as "new
             // fact" is the one between pairs, and it only works if it is clearly larger than the gap
             // inside a pair — which is zero.
-            // Down a step from the identity card's gap. Four two-line entries stacked at the wider
-            // rhythm made this panel tall enough to cover the row of faces it opened from, and a
-            // panel that hides its own anchor is one the user cannot orient against. The caps
-            // captions give each pair a hard top edge, so the pairs stay separable at the tighter
-            // gap in a way plain sentence-case lines would not.
-            verticalArrangement = Arrangement.spacedBy(spacing.xs),
+            // Wider rhythm now that dividers are gone — the caps captions give each pair a hard top
+            // edge, so pairs stay separable at `sm` without rules between them.
+            verticalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
-            fields.forEachIndexed { index, field ->
-                // A rule between each identity section. Without one, four caption-and-value pairs at
-                // this gap read as a single eight-line block, and the caps alone have to carry the
-                // whole job of saying where one fact ends and the next begins. The rule makes the
-                // boundary structural, which is what lets the gap stay tight enough to keep the panel
-                // from covering the faces it opened from.
-                //
-                // Inset both ends past the column's own padding, so it separates rows inside the
-                // panel rather than looking like the panel has been sliced into pieces.
-                if (index > 0) {
-                    OrbitDivider(inset = spacing.xs, endInset = spacing.xs)
-                }
+            fields.forEach { field ->
                 AccountRow(field)
             }
         }
 
-        // The same rule, at the same inset and with the same gap either side, as the ones between the
-        // identity sections above. It was full-bleed with no gap beneath it, on the reasoning that the
-        // boundary between "facts" and "an action" is a stronger one than the boundaries between
-        // facts — but the effect was one rule that did not line up with the three above it and a
-        // sign-out row sitting tighter to its rule than any other row, so the panel read as having
-        // been assembled from two different cards.
-        //
-        // The inset is stated as `md + xs` because this rule is a sibling of the padded column rather
-        // than a child of it, so it has to reproduce that column's padding to land on the same pixel
-        // as the rules inside it.
-        OrbitDivider(
-            inset = spacing.md + spacing.xs,
-            endInset = spacing.md + spacing.xs,
-        )
+        if (themeDark != null && onThemeChange != null) {
+            Spacer(modifier = Modifier.height(spacing.xs))
 
-        Spacer(modifier = Modifier.height(spacing.xs))
+            ThemeRow(
+                dark = themeDark,
+                onChange = onThemeChange,
+                modifier = Modifier.padding(horizontal = spacing.md),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(spacing.sm))
 
         val signOutInteraction = remember { MutableInteractionSource() }
 
@@ -213,13 +207,11 @@ fun OrbitAccountPopover(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
-            Icon(
-                imageVector = OrbitIcons.Logout,
-                // The row's own text names the action, and a second reading of it from the icon is
-                // noise on a control this short.
-                contentDescription = null,
+            OrbitGlyph(
+                icon = OrbitIcons.Logout,
+                size = AccountGlyphSize,
                 tint = danger,
-                modifier = Modifier.size(sizing.iconSm),
+                contentDescription = null,
             )
             Text(
                 text = signOutLabel,
@@ -262,6 +254,89 @@ fun OrbitAccountPopover(
  * Manager" as two unrelated stops, which is the same problem the drawn caption exists to solve for
  * sighted users, reintroduced one layer down.
  */
+/**
+ * `THEME  [icon] Dark  ————  [switch]`.
+ *
+ * ### The label states the current mode, not the one the switch would reach
+ *
+ * It reads "Dark" while dark, and the icon is a moon. The alternative — labelling it with the
+ * destination, so a dark app offers "Light" — is defensible for a *button*, where the text names what
+ * tapping does. It is wrong for a switch, whose position already says what tapping does: with
+ * "Light" showing and the switch on, the row says one thing and the control says the opposite, and
+ * the user has to work out which of the two is describing reality.
+ *
+ * The caption is the same tracked caps as the fields above it, so this row joins the panel's rhythm
+ * rather than arriving as a differently-built strip at the bottom of it.
+ *
+ * The whole row is the target, not just the switch. A 44dp control at the far rim of a popover is a
+ * small thing to hit with a thumb, and the label beside it is dead space that may as well work.
+ */
+@Composable
+private fun ThemeRow(
+    dark: Boolean,
+    onChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = OrbitTheme.spacing
+    val sizing = OrbitTheme.sizing
+    val content = OrbitTheme.contentColors
+
+    val mode = if (dark) "Dark" else "Light"
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Column(modifier = modifier) {
+        Text(
+            text = "THEME",
+            style = OrbitTheme.extendedTypography.cardLabel,
+            color = content.textSecondary,
+            maxLines = 1,
+            modifier = Modifier.clearAndSetSemantics {},
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = sizing.iconButtonSm)
+                .indication(interactionSource, orbitPressIndication())
+                .orbitHandCursor()
+                .toggleable(
+                    value = dark,
+                    role = Role.Switch,
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onValueChange = onChange,
+                )
+                // One node for the row, so a screen reader gets "Dark theme, on" as a single switch
+                // rather than a label, an image and a control as three unrelated stops.
+                .semantics(mergeDescendants = true) { contentDescription = "$mode theme" },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+        ) {
+            OrbitGlyph(
+                icon = if (dark) OrbitIcons.Moon else OrbitIcons.Sun,
+                size = AccountGlyphSize,
+                tint = content.iconPrimary,
+                contentDescription = null,
+            )
+            Text(
+                text = mode,
+                style = OrbitTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = content.textPrimary,
+                maxLines = 1,
+                modifier = Modifier.weight(1f),
+            )
+            OrbitSwitch(
+                checked = dark,
+                // Null, because the row above already owns the gesture. Wired here as well, both
+                // would fire and the theme would flip twice on one tap — back to where it started.
+                onCheckedChange = null,
+                contentDescription = "$mode theme",
+            )
+        }
+    }
+}
+
 @Composable
 private fun AccountRow(field: OrbitInfoField) {
     val content = OrbitTheme.contentColors
@@ -321,11 +396,22 @@ private fun AccountRow(field: OrbitInfoField) {
  * A multiplier on the shared token rather than its own dp pair, so the two bubbles stay proportional
  * if the base moves.
  *
- * Raised from 1.05, which was chosen on the reasoning that stacking each value under its caption
- * already gives it the full width so the panel needed only enough extra to keep an organisation name
- * off the rim. That was true of the width the *text* needs and missed what the panel now contains:
- * four sections each floored to a control's height, separated by rules inset from the padding. At the
- * old width the longer values — a full organisation name, a number with its country code — were
- * ellipsising while the rules made the panel read as a denser object than it used to.
+ * Raised in two steps from 1.05. That original value assumed the panel's contents were four
+ * caption-and-value pairs and nothing else, so it needed only enough width to keep an organisation
+ * name off the rim. The panel has grown since: every section is floored to a control's height, rules
+ * separate all of them, and there is now a theme row carrying a glyph, a label and a 44dp switch on
+ * one line. That last row is the binding case — it has three things competing for the width where the
+ * others have two — and at the narrower ratio the switch was crowding the label.
  */
-private const val AccountWidthRatio = 1.2f
+/**
+ * The panel's three glyphs: the sun or moon on the theme row, and the sign-out arrow.
+ *
+ * Between the inline and standard tiers, and off-grid on purpose. `iconSm` left them looking like
+ * marks beside their labels rather than part of them; `iconMd` overcorrected — at the standard size a
+ * glyph is sized for a top bar or a list item, and on rows this short it outweighed the words it was
+ * labelling and pulled the eye to the icon column. 20dp is the size at which each glyph and its label
+ * read as one object.
+ */
+private val AccountGlyphSize = 20.dp
+
+private const val AccountWidthRatio = 1.35f

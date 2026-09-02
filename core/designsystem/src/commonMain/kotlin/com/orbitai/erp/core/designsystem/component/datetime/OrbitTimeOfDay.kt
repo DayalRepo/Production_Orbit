@@ -100,8 +100,8 @@ data class OrbitDateTimeSelection(
     val date: OrbitCalendarDate,
     val time: OrbitTimeOfDay,
 ) {
-    /** `12/06/2025 · 10:00 AM` — the field's display value. */
-    fun format(): String = "${date.formatSlashed()} · ${time.format12Hour()}"
+    /** `Thursday, 12/06/2025 · 10:00 AM` — the field's display value. */
+    fun format(): String = "${date.formatWithWeekday()} · ${time.format12Hour()}"
 
     /** `12 Jun 2025 at 10:00 AM` — for the confirmation sentence under a picker. */
     fun formatSentence(): String = "${date.formatMedium()} at ${time.format12Hour()}"

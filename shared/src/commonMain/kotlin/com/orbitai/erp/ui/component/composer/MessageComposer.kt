@@ -210,12 +210,15 @@ fun MessageComposer(
  * visualiser against something shaped like its real input.
  */
 private fun fakeAmplitude(n: Int): Float {
-    val phrase = abs(sin(n * 0.06f))
-    val syllable = abs(sin(n * 0.31f))
-    val noise = Random.nextFloat() * 0.25f
-    return (0.25f + 0.55f * phrase * syllable + noise).coerceIn(0f, 1f)
+    val t = n * 0.11f
+    val phrase = abs(sin(t * 0.85f))
+    val syllable = abs(sin(t * 3.1f))
+    val burst = abs(sin(t * 6.4f + sin(t * 0.55f)))
+    val noise = Random.nextFloat() * 0.55f
+    val spike = if (Random.nextFloat() < 0.12f) Random.nextFloat() * 0.35f else 0f
+    return (0.08f + 0.55f * phrase + 0.42f * syllable * burst + noise + spike).coerceIn(0.04f, 1f)
 }
 
-private const val TickMs = 80L
+private const val TickMs = 50L
 private const val FramesPerSecond = 1000 / TickMs.toInt()
 private const val MinClipSeconds = 1

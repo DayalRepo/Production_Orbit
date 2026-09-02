@@ -102,22 +102,20 @@ class OrbitButtonTest {
     }
 
     @Test
-    fun `an icon button ring leaves clear space around its glyph`() {
-        // A glyph crowding its ring reads as a bug in the padding rather than as an icon inside a
-        // lens. The reference set keeps roughly a glyph-width of clear space around each one, and
-        // since the ring has no fill, that space is where the surface shows through — it is the part
-        // that makes the thing look like glass rather than like a circled letter.
+    fun `an icon button glyph leaves room inside its hit target`() {
+        // Bare glyphs are the default now; the touch target is still the full platform minimum
+        // while the ink stays smaller, so there is always clear space around the stroke.
         platforms.forEach { (name, tokens) ->
             with(tokens.sizing) {
                 listOf(
-                    Triple("small", iconButtonGlyphSm, iconButtonSm),
-                    Triple("medium", iconButtonGlyphMd, iconButtonMd),
-                    Triple("large", iconButtonGlyphLg, iconButtonLg),
-                ).forEach { (size, glyph, diameter) ->
+                    Triple("small", iconButtonGlyphSm, maxOf(iconButtonSm, minTouchTarget)),
+                    Triple("medium", iconButtonGlyphMd, maxOf(iconButtonMd, minTouchTarget)),
+                    Triple("large", iconButtonGlyphLg, maxOf(iconButtonLg, minTouchTarget)),
+                ).forEach { (size, glyph, target) ->
                     assertTrue(
-                        diameter - glyph >= 16.dp,
-                        "$name $size icon button leaves under 16dp of ring around its $glyph " +
-                            "glyph in a $diameter circle",
+                        target - glyph >= 12.dp,
+                        "$name $size icon button leaves under 12dp around its $glyph " +
+                            "glyph in a $target target",
                     )
                 }
             }

@@ -21,9 +21,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.orbitai.erp.core.designsystem.theme.OrbitPalette
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
-import com.orbitai.erp.core.designsystem.theme.controlColors
 import kotlin.math.abs
 import kotlin.math.PI
 import kotlin.math.max
@@ -41,16 +39,13 @@ data class OrbitWaveColors(
 
 object OrbitWaveDefaults {
     val colors: OrbitWaveColors
-        @Composable get() = OrbitWaveColors(
-            active = if (OrbitTheme.isDark) OrbitPalette.Blue80 else OrbitPalette.Blue50,
-            // Neutral ink at partial strength, *not* the near-invisible `controlContainer` the
-            // progress track uses. The two look like the same job and are not: a progress track's
-            // unlit run is empty space — there is nothing there to see — whereas a voice note's
-            // unplayed run is the clip's own shape, which is the main thing the row is showing and
-            // the only way to tell one recording from another before playing it. At the track's 8%
-            // the silhouette was so faint the row read as a disabled control.
-            inactive = OrbitTheme.contentColors.iconPrimary.copy(alpha = InactiveAlpha),
-        )
+        @Composable get() {
+            val ink = OrbitTheme.contentColors.iconPrimary
+            return OrbitWaveColors(
+                active = ink,
+                inactive = ink.copy(alpha = InactiveAlpha),
+            )
+        }
 
     /**
      * Shortest a bar is ever drawn, as a fraction of the band.
@@ -106,6 +101,7 @@ object OrbitWaveDefaults {
  * @param live the clip is still being captured. Changes what happens when there are fewer samples
  *   than bars — grow in from the right, rather than stretch to fill. See [resample]; the difference
  *   is visible and the wrong choice looks like a bug in both directions.
+ * @param paused capture is held. When [live], resonance freezes rather than clearing.
  * @param playing audio is coming out of the speaker right now. Adds a travelling ripple through the
  *   bars behind the playhead.
  *
@@ -131,6 +127,7 @@ fun OrbitAudioWave(
     modifier: Modifier = Modifier,
     progress: Float = 1f,
     live: Boolean = false,
+    paused: Boolean = false,
     playing: Boolean = false,
     colors: OrbitWaveColors = OrbitWaveDefaults.colors,
 ) {
@@ -140,7 +137,9 @@ fun OrbitAudioWave(
     // The transition is only created while it is being used, so a list of twenty finished voice
     // notes is not running twenty animation clocks in the background. A stopped waveform costs
     // nothing beyond its single draw.
-    val phase = if (playing) {
+    // Resonance runs while audio is playing or while a live capture is in progress — not when paused.
+    val resonating = (playing || (live && !paused)) && amplitudes.isNotEmpty()
+    val phase = if (resonating) {
         val transition = rememberInfiniteTransition(label = "orbit-wave")
         val animated by transition.animateFloat(
             initialValue = 0f,
@@ -176,7 +175,13 @@ fun OrbitAudioWave(
         val count = ((width + gapPx) / slot).toInt()
         if (count <= 0) return@Canvas
 
-        val bars = resample(amplitudes, count, live)
+        val bars = if (live && !paused && amplitudes.isNotEmpty()) {
+            liveEnvelope(amplitudes, count)
+        } else {
+            resample(amplitudes, count, live)
+        }
+        val latestSample = amplitudes.lastOrNull()?.coerceIn(0f, 1f) ?: 0f
+        val liveTail = bars.lastIndex.coerceAtLeast(0)
         val mid = size.height / 2f
         // Rounded caps eat radius from both ends of a bar, so a bar shorter than its own width
         // renders as a squashed lozenge rather than a stub. Floor the height at the width.
@@ -188,12 +193,30 @@ fun OrbitAudioWave(
             // ripple along with everything else. Exempting them would leave the quiet passages of a
             // clip conspicuously frozen while the loud ones moved, which reads as the animation
             // being broken rather than as the audio being quiet.
-            val swell = if (playing && index < playedTo) {
-                1f + RippleDepth * sin(TwoPi * (index.toFloat() / count * RippleWaves - phase))
+            val amplitude = bars[index].coerceIn(0f, 1f)
+            val recency = if (live && count > 1) {
+                1f - ((liveTail - index).coerceAtLeast(0).toFloat() / (count - 1))
             } else {
-                1f
+                0f
             }
-            val h = max(minHeight, amplitude.coerceIn(0f, 1f) * size.height) * swell
+            val energy = if (live && !paused) {
+                (amplitude * (0.25f + 0.75f * recency) + latestSample * recency * 0.85f).coerceIn(0f, 1f)
+            } else {
+                amplitude
+            }
+            val swell = when {
+                playing && index < playedTo -> {
+                    val resonance = RippleDepth + amplitude * ResonanceDepth
+                    1f + resonance * sin(TwoPi * (index.toFloat() / count * RippleWaves - phase))
+                }
+                live && !paused -> {
+                    val resonance = RippleDepth + energy * LiveResonanceDepth
+                    1f + resonance * sin(TwoPi * (index.toFloat() / count * RippleWaves - phase + recency * 0.35f))
+                }
+                else -> 1f
+            }
+            val heightScale = if (live && !paused) energy else amplitude
+            val h = max(minHeight, heightScale.coerceIn(0f, 1f) * size.height) * swell
             drawRoundRect(
                 color = if (index < playedTo) colors.active else colors.inactive,
                 topLeft = Offset(x = index * slot, y = mid - h / 2f),
@@ -220,9 +243,46 @@ private const val RippleWaves = 2.5f
  * Peak height change, as a fraction. Eight percent: visible as motion in the row as a whole, small
  * enough that no single bar's height can be misread because of it.
  */
-private const val RippleDepth = 0.08f
+private const val RippleDepth = 0.06f
+
+/** Extra motion on louder samples while playing — driven by the amplitudes the caller supplies. */
+private const val ResonanceDepth = 0.14f
+
+/** Stronger resonance during live capture so voice energy is visible in the meter. */
+private const val LiveResonanceDepth = 0.38f
+
+/** Bars within this distance of the latest sample pick up its energy for a visible pulse. */
+private const val LiveTailSpread = 8f
+
+/** Peak window when smoothing live samples across neighbouring bars. */
+private const val LiveSmoothRadius = 3
 
 private const val TwoPi = (2.0 * PI).toFloat()
+
+/**
+ * Right-aligns live samples and spreads each peak across neighbouring bars so a single incoming
+ * frame visibly moves the meter rather than twitching one pixel-wide bar.
+ */
+internal fun liveEnvelope(source: List<Float>, count: Int): List<Float> {
+    if (count <= 0) return emptyList()
+    if (source.isEmpty()) return List(count) { 0f }
+
+    val tail = source.takeLast(count).map { it.coerceIn(0f, 1f) }
+    val padded = List(count - tail.size) { 0f } + tail
+    val latest = tail.last()
+
+    return List(count) { index ->
+        val windowStart = (index - LiveSmoothRadius).coerceAtLeast(0)
+        var peak = 0f
+        for (i in windowStart..index) {
+            val weight = 1f - (index - i).toFloat() / (LiveSmoothRadius + 1)
+            peak = max(peak, padded[i] * weight)
+        }
+        val distFromEnd = (count - 1 - index).coerceAtLeast(0)
+        val tailBoost = latest * (1f - distFromEnd / LiveTailSpread).coerceIn(0f, 1f)
+        (peak + tailBoost * 0.45f).coerceIn(0f, 1f)
+    }
+}
 
 /**
  * Fits [source] to exactly [count] bars.

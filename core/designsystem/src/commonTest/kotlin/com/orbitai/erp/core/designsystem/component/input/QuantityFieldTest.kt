@@ -13,19 +13,19 @@ import kotlin.test.assertTrue
  */
 class QuantityFieldTest {
 
-    private val range = 1..999
+    private val range = 1..9_999_999
 
     @Test
     fun `a number inside the range is accepted`() {
         assertTrue(isAcceptableQuantity("1", range), "the floor is inclusive")
         assertTrue(isAcceptableQuantity("250", range))
-        assertTrue(isAcceptableQuantity("999", range), "the ceiling is inclusive")
+        assertTrue(isAcceptableQuantity("9999999", range), "the ceiling is inclusive")
     }
 
     @Test
     fun `a number outside the range is refused rather than clamped`() {
         assertFalse(isAcceptableQuantity("0", range), "below a range that starts at one")
-        assertFalse(isAcceptableQuantity("1000", range))
+        assertFalse(isAcceptableQuantity("10000000", range))
     }
 
     @Test

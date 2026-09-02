@@ -1,9 +1,14 @@
 package com.orbitai.erp.core.designsystem.component.input
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -12,12 +17,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -25,16 +36,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
-import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
-import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
-import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
+import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
+import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
+import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
- * A number with a stepper either side of it: `+ [ 12 ] −`.
+ * A number with a stepper either side of it: `− [ 12 ] +`.
  *
  * ### Typing and stepping are both first-class
  *
@@ -99,10 +109,10 @@ fun OrbitQuantityField(
     val content = OrbitTheme.contentColors
     val control = OrbitTheme.controlColors
 
-    val buttonSize = size.pick(
-        OrbitIconButtonSize.Small,
-        OrbitIconButtonSize.Small,
-        OrbitIconButtonSize.Medium,
+    val iconSize = size.pick(
+        OrbitTheme.sizing.iconSm,
+        OrbitTheme.sizing.iconSm,
+        OrbitTheme.sizing.iconMd,
     )
     val textStyle = size.pick(
         OrbitTheme.typography.bodyMedium,
@@ -114,6 +124,10 @@ fun OrbitQuantityField(
     // keystroke here — a stepper tap, a form reset, a value arriving from the network.
     var draft by remember(value) { mutableStateOf(value.toString()) }
     val interactionSource = remember { MutableInteractionSource() }
+    var slotWidth by remember { mutableIntStateOf(0) }
+    var lineWidth by remember { mutableFloatStateOf(0f) }
+    val focused by interactionSource.collectIsFocusedAsState()
+    val overflowed = slotWidth > 0 && lineWidth > slotWidth
 
     val ink = if (enabled) content.textPrimary else content.textDisabled
 
@@ -126,68 +140,57 @@ fun OrbitQuantityField(
         state = state,
         modifier = modifier,
     ) {
-        // Plus on the left and minus on the right, which is the layout this control was specified
-        // with. It is the reverse of the more common arrangement, so: it is deliberate, and nothing
-        // here depends on the reader inferring an order — each glyph is unambiguous alone and each
-        // button names its direction to a screen reader.
-        OrbitIconButton(
-            icon = OrbitIcons.PlusSign,
-            contentDescription = "Increase $label",
-            onClick = { onValueChange((value + step).coerceIn(range)) },
-            state = if (enabled && value < range.last) {
-                OrbitButtonState.Active
-            } else {
-                OrbitButtonState.Disabled
-            },
-            size = buttonSize,
-            // Chrome, not action. A blue plus next to a blue minus turns a stepper into two competing
-            // buttons with a number wedged between them; the number is the content here.
-            style = OrbitIconButtonStyle.Neutral,
+        QuantityStepperButton(
+            icon = OrbitIcons.MinusSign,
+            contentDescription = "Decrease $label",
+            enabled = enabled && value > range.first,
+            iconSize = iconSize,
+            onClick = { onValueChange((value - step).coerceIn(range)) },
         )
 
         Box(
             modifier = Modifier
                 .weight(1f)
-                .widthIn(min = numberMinWidth),
+                .widthIn(min = numberMinWidth)
+                .onSizeChanged { slotWidth = it.width },
             contentAlignment = Alignment.Center,
         ) {
             if (enabled) {
-                // `BasicTextField`, because this sits inside a shell that already draws the fill, the
-                // rim and the focus state. Material's field would bring a second set of all three and
-                // its own minimum height on top of the tier's.
                 CompositionLocalProvider(
                     LocalTextSelectionColors provides TextSelectionColors(
                         handleColor = control.actionContainer,
                         backgroundColor = control.actionContainer.copy(alpha = SelectionAlpha),
                     ),
                 ) {
-                    BasicTextField(
-                        value = draft,
-                        onValueChange = { typed ->
-                            // Digits only, capped at the width of the range's ceiling. Filtering the
-                            // keystroke is what stops the field ever displaying a value it will later
-                            // refuse.
-                            val digits = typed.filter { it.isDigit() }
-                                .take(range.last.toString().length)
-                            draft = digits
-                            digits.toIntOrNull()?.let { parsed ->
-                                if (parsed in range) onValueChange(parsed)
-                            }
-                        },
-                        textStyle = textStyle.copy(
-                            color = ink,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center,
-                        ),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        cursorBrush = SolidColor(control.actionContainer),
-                        interactionSource = interactionSource,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .orbitReleaseFocusWithKeyboard()
-                            .semantics { contentDescription = label },
-                    )
+                    OrbitFieldOverflowFade(overflowed = overflowed, atStart = focused) {
+                        BasicTextField(
+                            value = draft,
+                            onValueChange = { typed ->
+                                val maxDigits = range.last.toString().length
+                                val digits = typed.filter { it.isDigit() }.take(maxDigits)
+                                draft = digits
+                                digits.toIntOrNull()?.let { parsed ->
+                                    if (parsed in range) onValueChange(parsed)
+                                }
+                            },
+                            textStyle = textStyle.copy(
+                                color = ink,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Center,
+                            ),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            cursorBrush = SolidColor(control.actionContainer),
+                            interactionSource = interactionSource,
+                            onTextLayout = { result ->
+                                lineWidth = if (result.lineCount > 0) result.getLineRight(0) else 0f
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .orbitReleaseFocusWithKeyboard()
+                                .semantics { contentDescription = label },
+                        )
+                    }
                 }
             } else {
                 // A disabled stepper still has to show its number, and a text field that cannot be
@@ -206,20 +209,62 @@ fun OrbitQuantityField(
             }
         }
 
-        OrbitIconButton(
-            icon = OrbitIcons.MinusSign,
-            contentDescription = "Decrease $label",
-            onClick = { onValueChange((value - step).coerceIn(range)) },
-            state = if (enabled && value > range.first) {
-                OrbitButtonState.Active
-            } else {
-                OrbitButtonState.Disabled
-            },
-            size = buttonSize,
-            style = OrbitIconButtonStyle.Neutral,
+        QuantityStepperButton(
+            icon = OrbitIcons.PlusSign,
+            contentDescription = "Increase $label",
+            enabled = enabled && value < range.last,
+            iconSize = iconSize,
+            onClick = { onValueChange((value + step).coerceIn(range)) },
         )
     }
 }
+
+@Composable
+internal fun QuantityStepperButton(
+    icon: ImageVector,
+    contentDescription: String,
+    enabled: Boolean,
+    iconSize: Dp,
+    onClick: () -> Unit,
+) {
+    val content = OrbitTheme.contentColors
+    val sizing = OrbitTheme.sizing
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Box(
+        modifier = Modifier
+            .size(sizing.minTouchTarget)
+            .clip(CircleShape)
+            .then(
+                if (enabled) {
+                    Modifier
+                        .orbitHandCursor()
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                            role = Role.Button,
+                            onClick = onClick,
+                        )
+                        .indication(interactionSource, orbitCircularPressIndication())
+                } else {
+                    Modifier
+                },
+            )
+            .semantics { this.contentDescription = contentDescription },
+        contentAlignment = Alignment.Center,
+    ) {
+        OrbitGlyph(
+            icon = icon,
+            size = iconSize,
+            tint = if (enabled) content.iconPrimary else content.iconDisabled,
+            contentDescription = null,
+            minimumStroke = StepperIconStroke,
+        )
+    }
+}
+
+/** Heavier stroke so the bare +/- glyphs read clearly without a square container behind them. */
+private val StepperIconStroke = 1.5.dp
 
 /**
  * Whether [draft] is a quantity this field would accept.
@@ -233,14 +278,12 @@ internal fun isAcceptableQuantity(draft: String, range: IntRange): Boolean =
     draft.toIntOrNull()?.let { it in range } == true
 
 /**
- * One to nine hundred and ninety-nine.
+ * One to nine million nine hundred ninety-nine thousand nine hundred ninety-nine.
  *
- * Not zero-based. This is a quantity to be ordered or recorded, and zero of something is the absence
- * of the line rather than a value for it — a caller who wants "none" to be reachable passes a range
- * starting at zero and thereby says so. The ceiling is three digits because that is what
- * [DefaultNumberMinWidth] is sized for; the two move together.
+ * Seven digits covers site-scale quantities without letting the field grow unbounded. Callers with
+ * a different ceiling pass [range] explicitly.
  */
-private val DefaultRange = 1..999
+private val DefaultRange = 1..9_999_999
 
 /**
  * Floor for the number's box: three digits at the largest tier, with room for the caret.

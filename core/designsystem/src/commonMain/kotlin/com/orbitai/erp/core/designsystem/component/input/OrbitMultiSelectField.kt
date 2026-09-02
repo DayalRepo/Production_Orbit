@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -15,14 +16,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.onSizeChanged
@@ -34,7 +37,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
+import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
+import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
+import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -192,27 +197,36 @@ fun OrbitMultiSelectField(
                         verticalArrangement = Arrangement.spacedBy(spacing.xxs),
                     ) {
                         selected.forEach { item ->
-                            SelectedChip(
-                                label = item,
-                                enabled = enabled,
-                                onRemove = { onToggle(item) },
-                            )
+                            // Keyed on the material, which is the fix for a genuinely confusing bug:
+                            // removing a chip made the *next* chip flash as though it had been
+                            // pressed. Without a key, Compose reuses the slot — the chip that shifts
+                            // up into the removed one's position inherits its composition, and with it
+                            // the press animation that was still running on the control the finger had
+                            // just lifted from. So the user tapped one X and watched a different chip
+                            // light up.
+                            key(item) {
+                                SelectedChip(
+                                    label = item,
+                                    enabled = enabled,
+                                    onRemove = { onToggle(item) },
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            Icon(
-                imageVector = OrbitIcons.ChevronDown,
-                contentDescription = null,
+            OrbitGlyph(
+                icon = OrbitIcons.ChevronDown,
+                size = sizing.iconMd,
                 tint = if (enabled) {
-                    content.iconPrimary
+                    content.iconInactive
                 } else {
-                    content.iconPrimary.copy(OrbitAlpha.Disabled)
+                    content.iconInactive.copy(OrbitAlpha.Disabled)
                 },
-                modifier = Modifier
-                    .size(sizing.iconMd)
-                    .rotate(rotation),
+                contentDescription = null,
+                minimumStroke = sizing.iconStrokeLight,
+                modifier = Modifier.rotate(rotation),
             )
         }
 
@@ -235,15 +249,23 @@ fun OrbitMultiSelectField(
                 )
             },
         ) {
-            visible.forEachIndexed { index, option ->
-                if (index > 0) {
-                    OrbitDivider(inset = spacing.md, endInset = spacing.md)
-                }
-                val taken = option in selected
+            // Chosen first, then the rest, each keeping the caller's order within its group.
+            //
+            // Two things were wrong with leaving them in place and greying them out. A user checking
+            // what they had picked had to read the whole list to find the ticks, which is the job the
+            // chips in the field do badly enough already at four selections. And a disabled row is a
+            // dead end: the only way to undo a mis-tap was to close the panel and find the chip's X,
+            // so the list could add but never subtract. Now the ticked rows sit together at the top
+            // and tapping one takes it off — the same gesture that put it on, which is what makes the
+            // row read as a toggle rather than as a button that has been used up.
+            val ordered = remember(visible, selected) {
+                visible.sortedByDescending { it in selected }
+            }
+
+            ordered.forEach { option ->
                 OrbitDropdownRow(
                     label = option,
-                    selected = taken,
-                    enabled = !taken,
+                    selected = option in selected,
                     onClick = { onToggle(option) },
                 )
             }
@@ -323,23 +345,44 @@ private fun SelectedChip(
                 modifier = Modifier.clearAndSetSemantics {},
             )
 
+            // Its own source, keyed to the label, and its own indication clipped to a circle. Belt
+            // and braces alongside the `key(item)` above: a source that outlives the control it
+            // belonged to is what lets a press animation finish somewhere it was never started, and
+            // the ripple is bounded to a circle so it reads as a press on the X rather than a wash
+            // across the chip.
+            val removeInteraction = remember(label) { MutableInteractionSource() }
+
+            // No surface of its own — the glyph sits directly on the chip.
+            //
+            // A raised tile was tried here and read as a control stuck onto a control: a chip is
+            // already a small object inside a field, and giving the X its own fill, rim and shadow
+            // made the chip look like two nested buttons and drew far more attention to deleting a
+            // material than to the material itself. The chip's rim is enough of a boundary for the
+            // glyph inside it; the circle-bounded ripple below is what confirms the press.
             Box(
                 modifier = Modifier
                     .size(sizing.iconMd)
-                    .clickable(enabled = enabled, role = Role.Button, onClick = onRemove)
+                    .clip(CircleShape)
+                    .indication(removeInteraction, orbitCircularPressIndication())
+                    .clickable(
+                        interactionSource = removeInteraction,
+                        indication = null,
+                        enabled = enabled,
+                        role = Role.Button,
+                        onClick = onRemove,
+                    )
                     // The field speaks the full selection, so this control is the one thing inside
                     // the chip a screen reader needs to reach — and it names what it will remove
                     // rather than saying a bare "Remove".
                     .semantics { contentDescription = "Remove $label" },
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    imageVector = OrbitIcons.Cancel,
-                    contentDescription = null,
-                    // The quieter icon ink. The X has to be findable, but a row of them at full
-                    // strength turns a field of entered values into a field of delete buttons.
+                OrbitGlyph(
+                    icon = OrbitIcons.Cancel,
+                    size = sizing.iconSm,
                     tint = if (enabled) content.iconInactive else content.iconDisabled,
-                    modifier = Modifier.size(sizing.iconSm),
+                    contentDescription = null,
+                    minimumStroke = sizing.iconStrokeLight,
                 )
             }
         }
@@ -355,4 +398,4 @@ private fun SelectedChip(
  * chip tappable at 48dp would be worse than useless here, because the only thing tapping a chip can
  * do is delete it.
  */
-private val ChipMinHeight = 28.dp
+private val ChipMinHeight = 24.dp

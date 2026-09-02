@@ -70,7 +70,7 @@ data class OrbitSizing(
      * Uniform stroke weight for outlined icons. Mixing heavy outlines with hairline ones is the
      * fastest way to make an icon set look assembled from three different libraries.
      */
-    val iconStrokeWidth: Dp = 1.5.dp,
+    val iconStrokeWidth: Dp = 1.dp,
     /**
      * Stroke per icon tier, so weight stays *apparently* constant as size changes.
      *
@@ -84,10 +84,10 @@ data class OrbitSizing(
      * glyphs with tight interiors, and the fix for a hero icon looking thin is more size, not more
      * ink.
      */
-    val iconStrokeSm: Dp = 1.5.dp,
-    val iconStrokeMd: Dp = 2.dp,
-    val iconStrokeLg: Dp = 2.25.dp,
-    val iconStrokeHero: Dp = 2.75.dp,
+    val iconStrokeSm: Dp = 1.dp,
+    val iconStrokeMd: Dp = 1.dp,
+    val iconStrokeLg: Dp = 1.dp,
+    val iconStrokeHero: Dp = 1.dp,
 
     /**
      * The lighter stroke floor, for a glyph that is not competing with body text.
@@ -98,7 +98,7 @@ data class OrbitSizing(
      * close up the counters of a small glyph and the icon turns into a mark. This is the floor those
      * use instead.
      */
-    val iconStrokeLight: Dp = 1.25.dp,
+    val iconStrokeLight: Dp = 1.dp,
 
     /**
      * The thinnest stroke the system will draw, for a glyph sharing a row with flat-colour artwork.
@@ -210,17 +210,18 @@ data class OrbitSizing(
      * popover, against a low-contrast `dividerSubtle` ink, it disappeared — the account card read as
      * one eight-line block and the sections it was meant to separate ran together.
      *
-     * Now 2dp, matching [borderStrong]. It went 1dp to 1.5dp first, on the worry that 2dp would read
-     * as a frame cutting a small panel in half. On device it does not: these rules are inset from the
-     * panel's padding and drawn in a deliberately quiet ink, and both of those pull far more weight
-     * than the half-dp did. At 1.5dp against `dividerSubtle` inside a popover the rule was still
-     * closer to a smudge than a boundary.
+     * Back to 1dp, after 1.5 and then 2 both went the wrong way about the same problem. The rules in
+     * the popover cards genuinely were hard to see, but the cause was the *ink* — `dividerSubtle` is
+     * a hair off white and those cards are white — and thickening a nearly-invisible colour only ever
+     * produced a wider smudge. Fixed properly by letting a caller choose a legible colour (see
+     * [com.orbitai.erp.core.designsystem.component.container.OrbitDivider]), at which point a
+     * hairline is once again the right weight and 2dp reads as a frame cutting a small panel in two.
      *
      * Safe at a fraction for the same reason [borderFocus] is: a rule is drawn as a filled box
      * against a solid surface, not as a translucent stroke around a curve, so there is no sub-pixel
      * edge to go patchy at 3x.
      */
-    val dividerThickness: Dp = 2.dp,
+    val dividerThickness: Dp = 1.dp,
 
     /**
      * Visible button heights, applied as `heightIn(min = ...)` so a scaled label grows the pill.
@@ -300,9 +301,9 @@ data class OrbitSizing(
      * would draw a stroke of 1.2 to 1.5dp if the vector were left to scale on its own, so they are
      * always rendered through `OrbitGlyph`, which lifts the stroke back to the platform floor.
      */
-    val iconButtonGlyphSm: Dp = 16.dp,
-    val iconButtonGlyphMd: Dp = 18.dp,
-    val iconButtonGlyphLg: Dp = 20.dp,
+    val iconButtonGlyphSm: Dp = 18.dp,
+    val iconButtonGlyphMd: Dp = 20.dp,
+    val iconButtonGlyphLg: Dp = 22.dp,
 
     /**
      * Minimum heights for a text field, one per size.

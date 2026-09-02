@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -27,10 +28,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
+import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
-import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
  * The five avatar tiers, from `User Profile Avatars (Android & iOS).xlsx`.
@@ -108,7 +110,7 @@ fun OrbitAvatar(
 ) {
     val sizing = OrbitTheme.sizing
     val content = OrbitTheme.contentColors
-    val scheme = OrbitTheme.colorScheme
+    val control = OrbitTheme.controlColors
     val shape = CircleShape
 
     val diameter: Dp = when (size) {
@@ -140,10 +142,10 @@ fun OrbitAvatar(
                 .size(diameter)
                 .orbitGlassShadow(shape = shape, elevation = sizing.shadowBadge)
                 .clip(shape)
-                .background(scheme.surfaceContainerHigh, shape)
+                .background(control.cardContainer, shape)
                 .then(
                     if (onClick != null) {
-                        Modifier.indication(interactionSource, orbitPressIndication())
+                        Modifier.indication(interactionSource, orbitCircularPressIndication())
                     } else {
                         Modifier
                     },
@@ -163,7 +165,7 @@ fun OrbitAvatar(
                 Text(
                     text = monogram,
                     style = label,
-                    color = content.textSecondary,
+                    color = content.iconPrimary,
                     textAlign = TextAlign.Center,
                     // The monogram is a picture of the name, not a word. Read aloud it becomes "P S",
                     // which is noise on top of a description that already names the person.
@@ -210,6 +212,7 @@ fun OrbitAvatar(
         Box(
             modifier = modifier
                 .size(maxOf(diameter, sizing.minTouchTarget))
+                .clip(CircleShape)
                 .orbitHandCursor()
                 .clickable(
                     interactionSource = interactionSource,

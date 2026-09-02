@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,7 +43,10 @@ import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
 import com.orbitai.erp.core.designsystem.component.media.OrbitAudioWave
+import androidx.compose.ui.draw.clip
+import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
+import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -194,10 +198,18 @@ fun OrbitMessageField(
             .fillMaxWidth()
             .heightIn(min = sizing.fieldHeightLg)
             .orbitGlassShadow(shape = shape, elevation = sizing.shadowBadge)
-            // Solid, like every other field. The white glass wash is what made typed text hard to
-            // read on both themes; see OrbitFieldShell for the full argument.
-            .background(color = control.cardContainer, shape = shape)
-            .border(width = sizing.hairline, color = control.controlBorder, shape = shape),
+            .clip(shape)
+            .orbitGlass(
+                fill = control.cardContainer,
+                shape = shape,
+                highlightAlpha = if (OrbitTheme.isDark) {
+                    OrbitGlass.SurfaceHighlightDark
+                } else {
+                    OrbitGlass.SurfaceHighlightLight
+                },
+                edge = control.controlBorder,
+                edgeWidth = sizing.hairline,
+            ),
         // Bottom, not centre. Once the field is several lines tall the buttons have to stay level
         // with the last line — where the caret is and where the next word will land. Centred, they
         // drift into the middle of the paragraph and stop looking attached to the writing.
@@ -336,7 +348,7 @@ fun OrbitMessageField(
                 // submitted and answered rather than sent away. The arrow also holds up far better
                 // at 24dp, being two strokes instead of a folded silhouette that turns to mush.
                 icon = OrbitIcons.ArrowUp,
-                style = OrbitIconButtonStyle.Accent,
+                style = OrbitIconButtonStyle.Neutral,
                 size = OrbitIconButtonSize.Medium,
                 // Present but inert on an empty composer. See the class doc on why this is not
                 // simply hidden.
@@ -373,19 +385,20 @@ private fun RecordingMeter(
             contentDescription = if (mode.paused) "Resume recording" else "Pause recording",
             onClick = onPauseRecording,
             icon = if (mode.paused) OrbitIcons.Play else OrbitIcons.Pause,
-            style = OrbitIconButtonStyle.Accent,
+            style = OrbitIconButtonStyle.Neutral,
             size = OrbitIconButtonSize.Small,
         )
-        OrbitAudioWave(
-            amplitudes = mode.amplitudes,
-            // Everything captured so far is "played" — there is no playhead while recording.
-            progress = 1f,
-            // Grow in from the right rather than stretching the first second across the whole
-            // width, which would make the meter appear to shrink as more of it arrived.
-            live = true,
-            contentDescription = if (mode.paused) "Recording paused" else "Recording",
-            modifier = Modifier.weight(1f),
-        )
+        key(mode.amplitudes.size, mode.amplitudes.lastOrNull()) {
+            OrbitAudioWave(
+                amplitudes = mode.amplitudes,
+                // Everything captured so far is "played" — there is no playhead while recording.
+                progress = 1f,
+                live = true,
+                paused = mode.paused,
+                contentDescription = if (mode.paused) "Recording paused" else "Recording",
+                modifier = Modifier.weight(1f),
+            )
+        }
         Text(
             text = mode.elapsed,
             style = OrbitTheme.extendedTypography.metricCaption,

@@ -34,6 +34,19 @@ internal fun orbitPressIndication(): Indication = when (currentPlatform) {
 }
 
 /**
+ * A circular press halo for icon-sized targets.
+ *
+ * The default Material ripple is bounded to the composable's rectangular bounds, which on a 48dp
+ * square touch target reads as a square flash behind a round glyph. Clipping the ripple to a circle
+ * matches the icon's silhouette and only appears for the duration of the press.
+ */
+@Composable
+internal fun orbitCircularPressIndication(): Indication = when (currentPlatform) {
+    OrbitPlatform.Android -> ripple(bounded = true)
+    OrbitPlatform.Ios -> OrbitPressIndication
+}
+
+/**
  * A UIKit-style press: shrink to [PressedScale] on a short curve, quicker down than up.
  *
  * Implemented as an [IndicationNodeFactory] rather than by hoisting `isPressed` into the caller and

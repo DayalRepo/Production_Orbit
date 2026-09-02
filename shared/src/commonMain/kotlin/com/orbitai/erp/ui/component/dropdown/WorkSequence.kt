@@ -168,6 +168,24 @@ object WorkSequence {
  * "Cement" alone is not orderable; "Cement (OPC 53)" is. The dropdown exists to produce a line on a
  * requisition, so the entries have to be specific enough to be one.
  */
+val ConstructionUnits = listOf(
+    "Nos",
+    "Kg",
+    "Tonnes",
+    "Metres",
+    "Square Metres",
+    "Cubic Metres",
+    "Litres",
+    "Bags",
+    "Sheets",
+    "Rolls",
+    "Bundles",
+    "Pairs",
+    "Sets",
+    "Hours",
+    "Days",
+)
+
 val ConstructionMaterials = listOf(
     "Cement (OPC 53)",
     "Cement (PPC)",

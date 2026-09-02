@@ -71,10 +71,12 @@ class FieldValidityContrastTest {
 
     @Test
     fun `each validity rim is visible on every surface a field can sit on`() {
-        themes.forEach { (theme, surfaces, badges) ->
+        themes.forEach { (theme, surfaces, _) ->
+            val errorRim = if (theme == "light") OrbitPalette.Red40 else OrbitPalette.Red70
+            val successRim = if (theme == "light") OrbitPalette.Green40 else OrbitPalette.Green70
             listOf(
-                "empty" to badges.getValue(OrbitBadgeTone.Red).label,
-                "filled" to badges.getValue(OrbitBadgeTone.Green).label,
+                "empty" to errorRim,
+                "filled" to successRim,
             ).forEach { (stateName, rim) ->
                 surfaces.forEach { surface ->
                     val ratio = contrast(rim.over(surface), surface)
@@ -94,9 +96,9 @@ class FieldValidityContrastTest {
         // the same 3:1 the rims owe the page. The reasoning is that if the two rims are closer to
         // each other than either is to its background, the thing carrying the state is weaker than
         // the thing carrying mere presence, and a user reads presence instead of state.
-        themes.forEach { (theme, _, badges) ->
-            val empty = badges.getValue(OrbitBadgeTone.Red).label
-            val filled = badges.getValue(OrbitBadgeTone.Green).label
+        themes.forEach { (theme, _, _) ->
+            val empty = if (theme == "light") OrbitPalette.Red40 else OrbitPalette.Red70
+            val filled = if (theme == "light") OrbitPalette.Green40 else OrbitPalette.Green70
             val ratio = contrast(empty, filled)
             val hueGap = abs(empty.red - filled.red) + abs(empty.green - filled.green)
             assertTrue(
@@ -118,8 +120,7 @@ class FieldValidityContrastTest {
             "light" to OrbitLightControlColors,
             "dark" to OrbitDarkControlColors,
         ).forEach { (theme, control) ->
-            val badges = if (theme == "light") OrbitLightBadgeColors else OrbitDarkBadgeColors
-            val rim = badges.getValue(OrbitBadgeTone.Red).label
+            val rim = if (theme == "light") OrbitPalette.Red40 else OrbitPalette.Red70
             assertTrue(
                 rim.alpha > control.outlineBorder.alpha,
                 "the $theme invalid rim (${rim.alpha}) is no more opaque than the focus ring " +

@@ -57,9 +57,13 @@ data class OrbitCalendarDate(
             return (y + y / 4 - y / 100 + y / 400 + offsets[month - 1] + day).mod(7)
         }
 
-    /** `dd/MM/yyyy`, zero-padded. The format the field displays and the user reads back. */
+    /** `dd/MM/yyyy`, zero-padded. The numeric portion of what the field displays. */
     fun formatSlashed(): String =
         "${pad2(day)}/${pad2(month)}/$year"
+
+    /** `Thursday, 12/06/2025` — weekday plus slashed date for field display. */
+    fun formatWithWeekday(): String =
+        "${OrbitWeekdayNames.full(dayOfWeek)}, ${formatSlashed()}"
 
     /** `12 Jun 2025` — for summary lines, where a slashed date reads as a serial number. */
     fun formatMedium(): String =
@@ -143,19 +147,8 @@ data class OrbitCalendarBounds(
         month.year > lastSelectableYear
 
     private companion object {
-        /**
-         * Twenty years.
-         *
-         * It was five, chosen so the year picker stayed short enough to render as a single row of
-         * pills that all fitted at once. That was the picker's constraint leaking into the domain
-         * rule, and it was the wrong way round — five years is short for this domain, where a
-         * handover date or a warranty expiry on a structure can sit a decade or more out.
-         *
-         * Now the year list scrolls, the picker no longer cares how long the window is, so the bound
-         * can be set by what a person might plausibly need. Twenty is still a bound: it keeps a
-         * mis-hit on `next year` from stranding someone in the year 3000 with no way back.
-         */
-        const val DefaultYearsAhead = 20
+        /** Seventeen years ahead — ends at 2043 when today is 2026, excluding 2044 and 2045. */
+        const val DefaultYearsAhead = 17
     }
 }
 
@@ -189,5 +182,13 @@ internal object OrbitMonthNames {
  * grid's proportions.
  */
 internal val OrbitWeekdayLabels = listOf("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
+
+internal object OrbitWeekdayNames {
+    private val full = listOf(
+        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+    )
+
+    fun full(dayOfWeek: Int): String = full[dayOfWeek]
+}
 
 internal fun pad2(value: Int): String = if (value < 10) "0$value" else value.toString()

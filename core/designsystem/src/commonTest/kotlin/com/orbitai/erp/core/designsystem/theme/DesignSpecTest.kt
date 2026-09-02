@@ -254,16 +254,10 @@ class DesignSpecTest {
                 assertEquals(32.dp, tokens.sizing.iconXl, "$name large icon")
                 assertEquals(48.dp, tokens.sizing.iconHero, "$name hero icon")
 
-                assertEquals(1.5.dp, tokens.sizing.iconStrokeSm, "$name small stroke")
-                assertEquals(2.dp, tokens.sizing.iconStrokeMd, "$name medium stroke")
-                assertTrue(
-                    tokens.sizing.iconStrokeLg.value in 2.0f..2.5f,
-                    "$name large stroke is outside the spec's 2.0-2.5dp band",
-                )
-                assertTrue(
-                    tokens.sizing.iconStrokeHero.value in 2.5f..3.0f,
-                    "$name hero stroke is outside the spec's 2.5-3.0dp band",
-                )
+                assertEquals(1.dp, tokens.sizing.iconStrokeSm, "$name small stroke")
+                assertEquals(1.dp, tokens.sizing.iconStrokeMd, "$name medium stroke")
+                assertEquals(1.dp, tokens.sizing.iconStrokeLg, "$name large stroke")
+                assertEquals(1.dp, tokens.sizing.iconStrokeHero, "$name hero stroke")
             }
     }
 

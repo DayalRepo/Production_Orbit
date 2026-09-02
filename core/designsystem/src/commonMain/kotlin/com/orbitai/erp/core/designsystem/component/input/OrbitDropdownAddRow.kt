@@ -9,21 +9,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
+import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
-import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
  * The "add a new one" action pinned to the top of a dropdown.
@@ -58,7 +56,7 @@ fun OrbitDropdownAddRow(
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
-    val control = OrbitTheme.controlColors
+    val content = OrbitTheme.contentColors
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -82,12 +80,12 @@ fun OrbitDropdownAddRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
-        Icon(
-            imageVector = OrbitIcons.Add,
-            // The label names the action; a description here would say it twice.
+        OrbitGlyph(
+            icon = OrbitIcons.Add,
+            size = sizing.iconSm,
+            tint = content.iconPrimary,
             contentDescription = null,
-            tint = control.actionContainer,
-            modifier = Modifier.size(sizing.iconSm),
+            minimumStroke = sizing.iconStrokeLight,
         )
         Text(
             text = label,
@@ -96,7 +94,7 @@ fun OrbitDropdownAddRow(
             // panel is easier to scan when the one control in it is not competing at the same
             // weight as the hundred things it sits above.
             fontWeight = FontWeight.SemiBold,
-            color = control.actionContainer,
+            color = content.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )

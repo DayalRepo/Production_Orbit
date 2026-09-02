@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,9 +16,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
-import com.orbitai.erp.core.designsystem.theme.OrbitBadgeTone
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.colors
 
@@ -82,12 +81,8 @@ fun OrbitDropdownRow(
             // not get heavier.
             fontWeight = FontWeight.Medium,
             color = if (enabled) content.textPrimary else content.textDisabled,
-            // Stage names out of the work sequence run long — "Internal Other Area Plastering
-            // (Staircase except Lift Door Wall)" is a real one. Wrapping them would give rows of
-            // wildly different heights and turn the list into a wall; the ellipsis keeps the list
-            // scannable, and the full string is still spoken and still searchable.
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            // Stage and unit names wrap rather than ellipsize — the full string is what gets ordered.
+            maxLines = Int.MAX_VALUE,
             modifier = Modifier
                 .weight(1f)
                 // Selection and unavailability are carried by a glyph and by dimming; the dimming
@@ -102,16 +97,12 @@ fun OrbitDropdownRow(
         )
 
         if (selected) {
-            Icon(
-                imageVector = OrbitIcons.Tick,
-                // The row above already says "selected"; repeating it here would double it.
+            OrbitGlyph(
+                icon = OrbitIcons.Tick,
+                size = sizing.iconSm,
+                tint = if (enabled) content.iconPrimary else content.iconPrimary.copy(alpha = OrbitAlpha.Disabled),
                 contentDescription = null,
-                tint = if (enabled) {
-                    OrbitBadgeTone.Green.colors.label
-                } else {
-                    OrbitBadgeTone.Green.colors.label.copy(alpha = OrbitAlpha.Disabled)
-                },
-                modifier = Modifier.size(sizing.iconSm),
+                minimumStroke = sizing.iconStrokeLight,
             )
         }
     }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
+import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -137,10 +136,6 @@ fun OrbitDropdownField(
         label = "orbit-dropdown-chevron",
     )
 
-    // Measured, not guessed. A value that happens to be short must not get a fade, or every field
-    // on the form looks like its contents are cut off.
-    var overflowed by remember { mutableStateOf(false) }
-
     val visible = options.filterByQuery(query)
 
     fun close() {
@@ -172,34 +167,23 @@ fun OrbitDropdownField(
                 ) { if (expanded) close() else expanded = true }
                 .semantics { contentDescription = "$label, ${selected ?: placeholder}" },
         ) {
-            // Selected stage names run long enough to overflow a phone-width field, and the fade is
-            // the affordance that says so — a hard ellipsis alone reads as the value's real ending.
-            OrbitFieldOverflowFade(
-                overflowed = overflowed,
-                atStart = false,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(
-                    text = selected ?: placeholder,
-                    style = base,
-                    fontWeight = FontWeight.Medium,
-                    color = if (selected != null) ink else hint,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    // The shell already speaks the label and the value together; reading the value
-                    // again here says the same field twice.
-                    onTextLayout = { overflowed = it.hasVisualOverflow },
-                    modifier = Modifier.clearAndSetSemantics {},
-                )
-            }
-
-            Icon(
-                imageVector = OrbitIcons.ChevronDown,
-                contentDescription = null,
-                tint = if (enabled) content.iconPrimary else content.iconPrimary.copy(OrbitAlpha.Disabled),
+            Text(
+                text = selected ?: placeholder,
+                style = base,
+                fontWeight = FontWeight.Medium,
+                color = if (selected != null) ink else hint,
                 modifier = Modifier
-                    .size(sizing.iconMd)
-                    .rotate(rotation),
+                    .weight(1f)
+                    .clearAndSetSemantics {},
+            )
+
+            OrbitGlyph(
+                icon = OrbitIcons.ChevronDown,
+                size = sizing.iconMd,
+                tint = if (enabled) content.iconInactive else content.iconInactive.copy(OrbitAlpha.Disabled),
+                contentDescription = null,
+                minimumStroke = sizing.iconStrokeLight,
+                modifier = Modifier.rotate(rotation),
             )
         }
 
@@ -225,13 +209,7 @@ fun OrbitDropdownField(
                 )
             },
         ) {
-            visible.forEachIndexed { index, option ->
-                if (index > 0) {
-                    // Inset from both edges, so it reads as a separator between two items of the
-                    // same kind rather than as a structural cut across the panel — that heavier
-                    // meaning belongs to the header's full-bleed rule.
-                    OrbitDivider(inset = spacing.md, endInset = spacing.md)
-                }
+            visible.forEach { option ->
                 OrbitDropdownRow(
                     label = option,
                     selected = option == selected,

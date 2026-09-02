@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
+import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -163,11 +163,12 @@ fun OrbitBadge(
     ) {
         if (icon != null) {
             Box(modifier = Modifier.size(iconSize), contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
+                OrbitGlyph(
+                    icon = icon,
+                    size = iconSize,
                     tint = iconColor,
-                    modifier = Modifier.size(iconSize),
+                    contentDescription = null,
+                    minimumStroke = sizing.iconStrokeLight,
                 )
             }
         }

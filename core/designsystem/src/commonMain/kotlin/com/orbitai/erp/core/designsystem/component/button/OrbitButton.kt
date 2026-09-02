@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +31,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.orbitai.erp.core.designsystem.component.feedback.OrbitLoadingIcon
+import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
@@ -361,12 +361,12 @@ fun OrbitButton(
                     }
                     icon != null -> {
                         {
-                            Icon(
-                                imageVector = icon,
-                                // Decorative: the label already names the action.
-                                contentDescription = null,
+                            OrbitGlyph(
+                                icon = icon,
+                                size = glyphSize,
                                 tint = tint,
-                                modifier = Modifier.size(glyphSize),
+                                minimumStroke = sizing.iconStrokeMd,
+                                contentDescription = null,
                             )
                         }
                     }

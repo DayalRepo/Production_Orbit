@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
  * Every glyph is authored on a 24x24 viewport with a 1.5-unit stroke, round caps and round joins,
  * which is where the set's uniform stroke weight comes from. Because the stroke is in viewport
  * units it scales with the glyph: at `iconMd` (24dp) it draws 1.5dp, at a 16dp badge icon it draws
- * 1dp. That is intended — holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
+ * 1dp. That is intended ï¿½ holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
  * counters and the icon turns into a blob.
  *
  * Colour is opaque black here and always overwritten: every call site renders through
@@ -413,6 +413,16 @@ object OrbitIcons {
         )
     }
 
+    val Collapse: ImageVector by lazy {
+        vector(
+            name = "Collapse",
+            stroke = listOf(
+                "M13 4L13 7.00002C13 8.88563 13.0001 9.82843 13.5858 10.4142C14.1716 11 15.1144 11 17 11L20 11",
+                "M11.0001 20L11 17C11 15.1144 11 14.1715 10.4142 13.5858C9.82843 13 8.88563 13 7.00002 13L4.00006 13",
+            ),
+        )
+    }
+
     val BatteryLow: ImageVector by lazy {
         vector(
             name = "BatteryLow",
@@ -589,6 +599,35 @@ object OrbitIcons {
             ),
         )
     }
+
+    val Download: ImageVector by lazy {
+        vector(
+            name = "Download",
+            stroke = listOf(
+                "M2.99969 17.0002C2.99969 17.9302 2.99969 18.3952 3.10192 18.7767C3.37932 19.8119 4.18796 20.6206 5.22324 20.898C5.60474 21.0002 6.06972 21.0002 6.99969 21.0002L16.9997 21.0002C17.9297 21.0002 18.3947 21.0002 18.7762 20.898C19.8114 20.6206 20.6201 19.8119 20.8975 18.7767C20.9997 18.3952 20.9997 17.9302 20.9997 17.0002",
+                "M16.4998 11.5002C16.4998 11.5002 13.1856 16.0002 11.9997 16.0002C10.8139 16.0002 7.49976 11.5002 7.49976 11.5002M11.9997 15.0002V3.00016",
+            ),
+        )
+    }
+
+    val MoreVertical: ImageVector by lazy {
+        vector(
+            name = "MoreVertical",
+            stroke = listOf(
+                "M11.9967 12.5V12M11.9967 6.5V6M11.9967 18.5V18M12.9967 12.5C12.9967 11.9477 12.549 11.5 11.9967 11.5C11.4444 11.5 10.9967 11.9477 10.9967 12.5C10.9967 13.0523 11.4444 13.5 11.9967 13.5C12.549 13.5 12.9967 13.0523 12.9967 12.5ZM12.9967 6.5C12.9967 5.94772 12.549 5.5 11.9967 5.5C11.4444 5.5 10.9967 5.94772 10.9967 6.5C10.9967 7.05228 11.4444 7.5 11.9967 7.5C12.549 7.5 12.9967 7.05228 12.9967 6.5ZM12.9967 18.5C12.9967 17.9477 12.549 17.5 11.9967 17.5C11.4444 17.5 10.9967 17.9477 10.9967 18.5C10.9967 19.0523 11.4444 19.5 11.9967 19.5C12.549 19.5 12.9967 19.0523 12.9967 18.5Z",
+            ),
+        )
+    }
+
+    val AiMagic: ImageVector by lazy {
+        vector(
+            name = "AiMagic",
+            stroke = listOf(
+                "M13.427 8.08396C12.8007 5.84272 12.3226 4 11.0004 4C9.67824 4 9.19964 5.84274 8.5731 8.08399C8.31853 8.99465 8.19125 9.44998 7.82042 9.82077C7.4496 10.1916 6.99434 10.3188 6.08381 10.5732C3.84273 11.1995 2 11.6775 2 13C2 14.3225 3.84273 14.8005 6.08381 15.4268C6.99434 15.6812 7.4496 15.8084 7.82042 16.1792C8.19125 16.55 8.31853 17.0054 8.5731 17.916C9.19964 20.1573 9.67824 22 11.0004 22C12.3226 22 12.8007 20.1573 13.427 17.916C13.6815 17.0054 13.8087 16.5501 14.1795 16.1793C14.5504 15.8085 15.0056 15.6812 15.9162 15.4268C18.1573 14.8005 20 14.3225 20 13C20 11.6775 18.1573 11.1995 15.9162 10.5732C15.0056 10.3188 14.5504 10.1915 14.1795 9.8207C13.8087 9.44986 13.6815 8.99456 13.427 8.08396Z",
+                "M19.5 2.9375V4.5M19.5 4.5V6.0625M19.5 4.5H18.25M19.5 4.5H20.75M22 4.5L21.548 4.34934C20.8497 4.11658 20.5006 4.00019 20.2502 3.74981C19.9998 3.49942 19.8834 3.15027 19.6507 2.45198L19.5 2L19.3493 2.45198C19.1166 3.15027 19.0002 3.49942 18.7498 3.74981C18.4994 4.00019 18.1503 4.11658 17.452 4.34934L17 4.5L17.452 4.65066C18.1503 4.88342 18.4994 4.99981 18.7498 5.25019C19.0002 5.50058 19.1166 5.84973 19.3493 6.54802L19.5 7L19.6507 6.54802C19.8834 5.84973 19.9998 5.50058 20.2502 5.25019C20.5006 4.99981 20.8497 4.88342 21.548 4.65066L22 4.5Z",
+            ),
+        )
+    }
 }
 
 /**
@@ -630,10 +669,10 @@ private const val VIEWPORT = 24f
 /**
  * Stroke weight in viewport units, so 1.8dp once the glyph is rendered at 24dp.
  *
- * The stroke is in viewport units, which means it scales with the glyph — and that is exactly why
- * this is 1.8 rather than 1.5. Almost nothing draws at 24dp: a badge glyph is 14–18dp and a small
- * button glyph is 16dp, so at 1.5 units those rendered at 0.9–1.1dp and looked hairline-thin beside
- * their labels. At 1.8 the same glyphs land at 1.05–1.35dp and a 24dp toolbar icon at 1.8dp, which
- * puts the whole set inside the 1.5–2dp band the design rules ask for at the sizes actually used.
+ * The stroke is in viewport units, which means it scales with the glyph ï¿½ and that is exactly why
+ * this is 1.8 rather than 1.5. Almost nothing draws at 24dp: a badge glyph is 14ï¿½18dp and a small
+ * button glyph is 16dp, so at 1.5 units those rendered at 0.9ï¿½1.1dp and looked hairline-thin beside
+ * their labels. At 1.8 the same glyphs land at 1.05ï¿½1.35dp and a 24dp toolbar icon at 1.8dp, which
+ * puts the whole set inside the 1.5ï¿½2dp band the design rules ask for at the sizes actually used.
  */
 private const val STROKE_WIDTH = 1.8f

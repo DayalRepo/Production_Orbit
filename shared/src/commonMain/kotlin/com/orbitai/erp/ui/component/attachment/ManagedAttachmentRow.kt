@@ -70,6 +70,7 @@ fun ManagedAttachmentRow(
 ) {
     var prompt by remember { mutableStateOf<AttachmentPrompt?>(null) }
     val dismiss = { prompt = null }
+    val nameParts = remember(fileName) { fileName.fileNameParts() }
 
     FileAttachmentRow(
         fileName = fileName,
@@ -84,10 +85,17 @@ fun ManagedAttachmentRow(
 
     when (prompt) {
         AttachmentPrompt.Rename -> OrbitRenameDialog(
-            initialValue = fileName,
+            initialValue = nameParts.stem,
             title = "Rename file",
             label = "File name",
-            onConfirm = { newName ->
+            placeholder = if (nameParts.extension.isEmpty()) null else "Without ${nameParts.extension}",
+            onConfirm = { newStem ->
+                val trimmed = newStem.trim().fileNameParts().stem
+                val newName = if (nameParts.extension.isEmpty()) {
+                    trimmed
+                } else {
+                    "$trimmed${nameParts.extension}"
+                }
                 onRenamed?.invoke(newName)
                 dismiss()
             },
@@ -121,5 +129,17 @@ fun ManagedAttachmentRow(
         )
 
         null -> Unit
+    }
+}
+
+/** The editable stem and the preserved extension, split at the last dot. */
+internal data class FileNameParts(val stem: String, val extension: String)
+
+internal fun String.fileNameParts(): FileNameParts {
+    val dot = lastIndexOf('.')
+    return if (dot > 0) {
+        FileNameParts(substring(0, dot), substring(dot))
+    } else {
+        FileNameParts(this, "")
     }
 }

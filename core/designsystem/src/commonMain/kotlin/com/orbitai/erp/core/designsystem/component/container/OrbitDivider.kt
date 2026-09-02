@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -31,8 +32,18 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
  * from the semantics tree. Left in, a settings screen with eight sections announces eight anonymous
  * nodes between the things a person is actually looking for.
  *
+ * ### Why the colour is a parameter
+ *
+ * The default, `dividerSubtle`, is tuned for a list separator sitting on the app background — where
+ * it only has to say "different row" and anything stronger stripes the list. On an *elevated* surface
+ * it stops working: the card is white and the token is a hair off white, so inside a popover the rule
+ * is invisible. That is a colour problem and not a weight one, which is worth stating because the
+ * first two attempts to fix it thickened the line instead and produced a wider invisible line.
+ *
  * @param inset distance from the leading edge. Pass `spacing.cardPadding + sizing.avatarSm +
  *   spacing.md` to line up with text in an avatar row; leave at zero for a section break.
+ * @param color the rule's ink. Pass `controlColors.controlBorder` on an elevated surface — a card, a
+ *   popover, a modal — where the default has nothing to contrast against.
  */
 @Composable
 fun OrbitDivider(
@@ -49,13 +60,14 @@ fun OrbitDivider(
      */
     endInset: Dp = OrbitTheme.spacing.none,
     thickness: Dp = OrbitTheme.sizing.dividerThickness,
+    color: Color = OrbitTheme.controlColors.dividerSubtle,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(start = inset, end = endInset)
             .height(thickness)
-            .background(OrbitTheme.controlColors.dividerSubtle)
+            .background(color)
             .clearAndSetSemantics {},
     )
 }
@@ -72,12 +84,13 @@ fun OrbitDivider(
 fun OrbitVerticalDivider(
     modifier: Modifier = Modifier,
     thickness: Dp = OrbitTheme.sizing.dividerThickness,
+    color: Color = OrbitTheme.controlColors.dividerSubtle,
 ) {
     Box(
         modifier = modifier
             .fillMaxHeight()
             .width(thickness)
-            .background(OrbitTheme.controlColors.dividerSubtle)
+            .background(color)
             .clearAndSetSemantics {},
     )
 }

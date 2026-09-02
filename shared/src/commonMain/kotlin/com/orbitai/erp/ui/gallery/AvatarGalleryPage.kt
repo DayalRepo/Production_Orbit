@@ -26,7 +26,10 @@ import org.jetbrains.compose.resources.painterResource
  * platform, and a misordered tier is far easier to spot against a shared baseline.
  */
 @Composable
-internal fun AvatarGalleryPage() {
+internal fun AvatarGalleryPage(
+    isDark: Boolean,
+    onToggleTheme: () -> Unit,
+) {
     val spacing = OrbitTheme.spacing
 
     val faces = listOf(
@@ -87,6 +90,10 @@ internal fun AvatarGalleryPage() {
                 onSignOut = {},
                 avatar = painterResource(Res.drawable.avatar_01),
                 size = OrbitAvatarSize.Md,
+                // Wired to the gallery's real theme state, not a local boolean. A switch that moves
+                // but changes nothing demonstrates the drawing and not the component.
+                themeDark = isDark,
+                onThemeChange = { onToggleTheme() },
             )
             AccountAvatar(
                 name = "Ravi Menon",
@@ -97,6 +104,8 @@ internal fun AvatarGalleryPage() {
                 onSignOut = {},
                 avatar = painterResource(Res.drawable.avatar_03),
                 size = OrbitAvatarSize.Md,
+                themeDark = isDark,
+                onThemeChange = { onToggleTheme() },
             )
         }
     }

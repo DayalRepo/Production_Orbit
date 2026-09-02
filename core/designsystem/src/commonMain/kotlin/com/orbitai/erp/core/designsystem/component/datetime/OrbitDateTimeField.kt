@@ -34,8 +34,8 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
  * action rather than as one of the form's values.
  *
  * @param value the formatted selection, or null for the empty state. Pass
- *   `selection?.format()` for a single moment or `range.format()` for a span; both produce
- *   `dd/MM/yyyy`, which is what this field is for.
+ *   `selection?.format()` for a single moment or `range.format()` for a span; both include the
+ *   weekday name and `dd/MM/yyyy`, with time when applicable.
  * @param placeholder shown when [value] is null. Should name what is being picked — "Target date"
  *   rather than "Select" — because the field is the only label many forms give it.
  */

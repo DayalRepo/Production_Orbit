@@ -2,6 +2,7 @@ package com.orbitai.erp.core.designsystem.foundation
 
 import android.graphics.BlurMaskFilter
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.nativePaint
 
 /**
  * Android's mask filter, available since API 1 and unaffected by the API 31 floor on
@@ -18,5 +19,5 @@ import androidx.compose.ui.graphics.Paint
  * spread.
  */
 internal actual fun Paint.orbitBlur(radiusPx: Float) {
-    asFrameworkPaint().maskFilter = BlurMaskFilter(radiusPx / 2f, BlurMaskFilter.Blur.NORMAL)
+    nativePaint.maskFilter = BlurMaskFilter(radiusPx / 2f, BlurMaskFilter.Blur.NORMAL)
 }

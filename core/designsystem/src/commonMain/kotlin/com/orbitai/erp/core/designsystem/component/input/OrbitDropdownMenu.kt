@@ -10,6 +10,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -30,9 +31,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
-import com.orbitai.erp.core.designsystem.foundation.orbitGlass
+import com.orbitai.erp.core.designsystem.component.container.OrbitVerticalScrollbar
 import com.orbitai.erp.core.designsystem.foundation.orbitDropShadow
 import com.orbitai.erp.core.designsystem.foundation.orbitElevatedFill
+import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitShadow
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -116,8 +118,12 @@ internal fun OrbitDropdownMenu(
     val control = OrbitTheme.controlColors
     val shape = OrbitTheme.shapeTokens.field
 
-    val gapPx = with(LocalDensity.current) { OrbitDropdownGap.roundToPx() }
-    val provider = remember(gapPx) { BelowAnchorPositionProvider(gapPx) }
+    val density = LocalDensity.current
+    val gapPx = with(density) { OrbitDropdownGap.roundToPx() }
+    val edgeMarginPx = with(density) { OrbitDropdownEdgeMargin.roundToPx() }
+    val provider = remember(gapPx, edgeMarginPx) {
+        BelowAnchorPositionProvider(gapPx, edgeMarginPx)
+    }
 
     Popup(
         popupPositionProvider = provider,
@@ -158,16 +164,24 @@ internal fun OrbitDropdownMenu(
             ) {
                 header?.invoke(this)
 
-                Column(
-                    // Capped, then scrolled — and the cap is on the list alone, so a tall header
-                    // shortens the panel rather than pushing the last options off the bottom of it.
-                    // See `dropdownMaxHeight` for why the cap cuts a row rather than landing between
-                    // two.
-                    modifier = Modifier
-                        .heightIn(max = sizing.dropdownMaxHeight)
-                        .verticalScroll(rememberScrollState()),
-                    content = content,
-                )
+                val listScroll = rememberScrollState()
+
+                Row(
+                    modifier = Modifier.heightIn(max = sizing.dropdownMaxHeight),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(listScroll),
+                        content = content,
+                    )
+                    if (listScroll.maxValue > 0) {
+                        OrbitVerticalScrollbar(
+                            scrollState = listScroll,
+                            modifier = Modifier.padding(end = spacing.xs),
+                        )
+                    }
+                }
             }
         }
     }
@@ -188,6 +202,15 @@ internal fun OrbitDropdownMenu(
 private val OrbitDropdownGap = 4.dp
 
 /**
+ * The least space the panel keeps between itself and the edge of the screen.
+ *
+ * Matches the popover cards' own edge margin, so a dropdown and an avatar bubble pushed against the
+ * same rim stop at the same place — two overlays inset by different amounts is the kind of difference
+ * nobody can name but everybody sees.
+ */
+private val OrbitDropdownEdgeMargin = 12.dp
+
+/**
  * Hangs the panel off the bottom of its anchor, and flips it above when there is no room below.
  *
  * The flip is not a nicety. A dropdown near the bottom of a scrolling form is the common case rather
@@ -195,23 +218,52 @@ private val OrbitDropdownGap = 4.dp
  * reached at all. Anchoring left rather than centring keeps the panel's leading edge flush with the
  * field's, so the option text starts on the same vertical line as the value it will replace.
  */
-private class BelowAnchorPositionProvider(private val gapPx: Int) : PopupPositionProvider {
+private class BelowAnchorPositionProvider(
+    private val gapPx: Int,
+    private val edgeMarginPx: Int,
+) : PopupPositionProvider {
     override fun calculatePosition(
         anchorBounds: IntRect,
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize,
     ): IntOffset {
-        // Below the field when the panel fits there, above it when it does not. A field near the
-        // bottom of a long form has no room beneath it, and a menu clipped by the screen edge is one
-        // whose last options cannot be reached at all.
+        // Below the field when the panel fits there, above it only when it fits there and not below.
+        //
+        // ### Why "fits" is checked on both sides and not just below
+        //
+        // The first version flipped above whenever the panel did not fit below, then clamped the result
+        // into the window. For a field in the middle of a form that clamp is what produced the bug it
+        // was supposed to prevent: neither side had room for the panel, so it flipped above, computed a
+        // negative y, got pushed back down to the top margin — and landed straight over the field that
+        // opened it. The value you were choosing was hidden behind the list of choices.
+        //
+        // So a flip now requires that the panel genuinely fit above. When neither side can hold it the
+        // panel stays below, where its top is anchored to the field and it is the panel's own tail that
+        // runs off the screen rather than the field that disappears. That is the better failure: the
+        // list scrolls internally, so its lower rows are still reachable, and the field stays visible
+        // the whole time. In practice this case is rare, because the list is capped at
+        // `dropdownMaxHeight` precisely so a panel is never tall enough to need it.
         val below = anchorBounds.bottom + gapPx
-        val fitsBelow = below + popupContentSize.height <= windowSize.height
-        val y = if (fitsBelow) below else (anchorBounds.top - popupContentSize.height - gapPx)
+        val above = anchorBounds.top - popupContentSize.height - gapPx
 
-        val x = anchorBounds.left
-            .coerceIn(0, (windowSize.width - popupContentSize.width).coerceAtLeast(0))
+        val fitsBelow = below + popupContentSize.height <= windowSize.height - edgeMarginPx
+        val fitsAbove = above >= edgeMarginPx
 
-        return IntOffset(x, y.coerceAtLeast(0))
+        val y = if (!fitsBelow && fitsAbove) above else below
+
+        // Held off the screen's edges rather than flush against them. A panel wider than the control
+        // that opened it gets pushed sideways until it fits, and clamping at zero put it hard into the
+        // corner — where it has no shadow to read against, its rounded corner is cut by the display's
+        // own, and it stops looking like a panel belonging to a field and starts looking like part of
+        // the chrome. The year grid is where this showed up: four year pills are much wider than the
+        // year trigger, so it is always the panel that gets pushed.
+        val maxX = (windowSize.width - popupContentSize.width - edgeMarginPx).coerceAtLeast(edgeMarginPx)
+        val x = anchorBounds.left.coerceIn(edgeMarginPx.coerceAtMost(maxX), maxX)
+
+        // y is deliberately not clamped. Both branches above already respect the margin on the side
+        // they were chosen for, and a clamp here is exactly what used to drag an above-placed panel
+        // back down over its own field.
+        return IntOffset(x, y)
     }
 }

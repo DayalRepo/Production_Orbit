@@ -120,6 +120,25 @@ data class OrbitControlColors(
     val dividerSubtle: Color,
 
     /**
+     * The divider ink for rules drawn *on an elevated surface* — popover cards, modals, the picker
+     * panel.
+     *
+     * ### Why elevation needs its own divider colour
+     *
+     * [dividerSubtle] is tuned against the app background and is a hair off white, which is exactly
+     * right on a list and useless on a white card. The obvious substitute was [controlBorder], and in
+     * light mode that is the answer — but in dark mode it fails the other way: an elevated dark surface
+     * is already *lighter* than the background, so a rim colour picked to contrast with the background
+     * has almost nothing left to contrast with once it is drawn on a raised panel. #3F3F46 on #252528
+     * is a difference of about eight per cent luminance, which on device is an invisible line.
+     *
+     * So this goes lighter in dark mode than any of the border tokens do, and in light mode simply
+     * matches the standard border. One token rather than a conditional at each call site, because the
+     * rule "which grey separates two rows on a raised panel" should be answered once.
+     */
+    val dividerElevated: Color,
+
+    /**
      * Active/focus rim: focused inputs, selected cards.
      *
      * The one place a brand colour appears on an otherwise monochrome control. Focus is the single
@@ -156,6 +175,7 @@ internal val OrbitLightControlColors = OrbitControlColors(
     outlineBorder = Color(0x471A1C1E),
     insetContainer = Color(0xFFF2F2F7),
     dividerSubtle = Color(0xFFF2F2F7),
+    dividerElevated = Color(0xFFE2E2E6),
     borderFocus = Color(0xFF007AFF),
     interactiveContainer = Color(0xFFEBEBEF),
 )
@@ -185,6 +205,7 @@ internal val OrbitDarkControlColors = OrbitControlColors(
     outlineBorder = Color(0x5CE3E2E6),
     insetContainer = Color(0xFF2C2C2E),
     dividerSubtle = Color(0xFF2C2C2E),
+    dividerElevated = Color(0xFF55555A),
     borderFocus = Color(0xFF0A84FF),
     interactiveContainer = Color(0xFF3A3A3C),
 )

@@ -96,7 +96,7 @@ fun OrbitVoiceNoteRow(
             contentDescription = if (playing) "Pause $label" else "Play $label",
             onClick = onPlayPause,
             icon = if (playing) OrbitIcons.Pause else OrbitIcons.Play,
-            style = OrbitIconButtonStyle.Accent,
+            style = OrbitIconButtonStyle.Neutral,
             size = OrbitIconButtonSize.Small,
         )
 

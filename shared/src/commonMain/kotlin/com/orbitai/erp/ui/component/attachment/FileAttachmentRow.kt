@@ -32,6 +32,7 @@ import org.jetbrains.compose.resources.painterResource
  *   Pass this or [onRemove], not both — they look nearly identical and mean very different things,
  *   and a row offering both asks the user to distinguish "take this off the draft" from "delete
  *   this permanently" using two small glyphs.
+ * @param onDownload save the file locally. Typical on read-only rows where no edit controls appear.
  */
 @Composable
 fun FileAttachmentRow(
@@ -42,6 +43,7 @@ fun FileAttachmentRow(
     onRemove: (() -> Unit)? = null,
     onRename: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
+    onDownload: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
 ) {
     val leading = when {
@@ -64,6 +66,7 @@ fun FileAttachmentRow(
         onRemove = onRemove,
         onRename = onRename,
         onDelete = onDelete,
+        onDownload = onDownload,
         onClick = onClick,
     )
 }

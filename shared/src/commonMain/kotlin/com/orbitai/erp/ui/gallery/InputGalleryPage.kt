@@ -2,13 +2,19 @@ package com.orbitai.erp.ui.gallery
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.orbitai.erp.core.designsystem.component.input.OrbitDescriptionField
+import com.orbitai.erp.ui.component.input.ManagedDescriptionField
+import com.orbitai.erp.ui.component.input.ManagedQuantityUnitField
 import com.orbitai.erp.core.designsystem.component.input.OrbitDropdownField
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldSize
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldState
@@ -18,6 +24,7 @@ import com.orbitai.erp.core.designsystem.component.input.OrbitTextField
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.ui.component.dropdown.ManagedMaterialsDropdown
 import com.orbitai.erp.ui.component.dropdown.ManagedStageDropdown
+import com.orbitai.erp.ui.component.dropdown.ManagedUnitsDropdown
 
 /**
  * Text and search fields.
@@ -42,6 +49,16 @@ internal fun InputGalleryPage() {
     var bags by remember { mutableStateOf(12) }
     var sheets by remember { mutableStateOf(1) }
     var rods by remember { mutableStateOf(999) }
+    var compactBags by remember { mutableStateOf(4) }
+    var description by remember {
+        mutableStateOf(
+            "Pour on level 4 slipped to Thursday. Pump still on Tower A — coordinate with the " +
+                "structural team before resequencing the slab cycle.",
+        )
+    }
+    var longDescription by remember { mutableStateOf(DescriptionSample) }
+    var longDescriptionExpanded by remember { mutableStateOf(false) }
+    var compactSheets by remember { mutableStateOf(8) }
 
 
     GallerySection("Text field · three sizes") {
@@ -81,6 +98,39 @@ internal fun InputGalleryPage() {
                 label = "Rebar rods",
                 size = OrbitFieldSize.Large,
                 modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
+    // Width is the modifier's job — these sit beside the full-width tiers above so a narrow table
+    // cell and a compact inline counter can be compared without guessing from a stretched field.
+    GallerySection("Quantity · compact width") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing.fieldGap),
+            ) {
+                OrbitQuantityField(
+                    value = compactBags,
+                    onValueChange = { compactBags = it },
+                    label = "Bags",
+                    size = OrbitFieldSize.Small,
+                    modifier = Modifier.width(132.dp),
+                )
+                OrbitQuantityField(
+                    value = compactSheets,
+                    onValueChange = { compactSheets = it },
+                    label = "Sheets",
+                    size = OrbitFieldSize.Small,
+                    modifier = Modifier.width(160.dp),
+                )
+            }
+            OrbitQuantityField(
+                value = 6,
+                onValueChange = {},
+                label = "Skips, narrow medium",
+                size = OrbitFieldSize.Medium,
+                modifier = Modifier.width(180.dp),
             )
         }
     }
@@ -198,6 +248,13 @@ internal fun InputGalleryPage() {
         }
     }
 
+    GallerySection("Dropdown · units") {
+        ManagedUnitsDropdown(
+            label = "Unit",
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+
     GallerySection("Dropdown · materials, multi select") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             ManagedMaterialsDropdown(
@@ -214,4 +271,37 @@ internal fun InputGalleryPage() {
             )
         }
     }
+
+    GallerySection("Quantity + unit · single field") {
+        ManagedQuantityUnitField(
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+
+    GallerySection("Description · overflow affordance") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
+            ManagedDescriptionField(
+                value = description,
+                onValueChange = { description = it },
+                label = "Work description",
+                placeholder = "Scope, constraints and handover notes",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OrbitDescriptionField(
+                value = longDescription,
+                onValueChange = { longDescription = it },
+                label = "Handover notes",
+                expanded = longDescriptionExpanded,
+                onExpandedChange = { longDescriptionExpanded = it },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
 }
+
+private val DescriptionSample = """
+    Level 4 pour slipped to Thursday after the pump was reassigned to Tower A. Structural has
+    asked for a revised sequence before we lock the slab cycle, and procurement still owes lead
+    times on the mesh that was substituted last week. Capture anything the night shift needs to
+    know about access, curing blankets and the inspection hold point before sign-off.
+""".trimIndent()

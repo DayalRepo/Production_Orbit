@@ -1,6 +1,7 @@
 package com.orbitai.erp.core.designsystem.component.display
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -30,6 +32,7 @@ import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
  * One face in an [OrbitAvatarGroup].
@@ -131,7 +134,7 @@ fun OrbitAvatarGroup(
     val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
-    val scheme = OrbitTheme.colorScheme
+    val control = OrbitTheme.controlColors
 
     val diameter: Dp = when (size) {
         OrbitAvatarSize.Xs -> sizing.avatarXs
@@ -242,7 +245,7 @@ fun OrbitAvatarGroup(
                             // The same neutral fill the overflow chip and the monogram fallback
                             // use. This is a control rather than a person, and tinting it would
                             // make it the most prominent thing in a row of faces.
-                            .background(scheme.surfaceContainerHigh, CircleShape),
+                            .background(control.interactiveContainer, CircleShape),
                         contentAlignment = Alignment.Center,
                     ) {
                         OrbitGlyph(
@@ -320,26 +323,26 @@ fun OrbitAvatarGroup(
                     .clearAndSetSemantics {},
                 contentAlignment = Alignment.Center,
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(diameter)
-                        // The same neutral fill the initials fallback uses. A tinted overflow chip
-                        // is the obvious move and it is wrong: colour means something specific
-                        // everywhere else in this product, and "four more people" means nothing.
-                        .background(scheme.surfaceContainerHigh, CircleShape),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "+$overflow",
-                        style = when (size) {
-                            OrbitAvatarSize.Xs, OrbitAvatarSize.Sm -> OrbitTheme.typography.labelSmall
-                            OrbitAvatarSize.Md -> OrbitTheme.typography.labelLarge
-                            OrbitAvatarSize.Lg -> OrbitTheme.typography.titleMedium
-                            OrbitAvatarSize.Xl -> OrbitTheme.typography.headlineSmall
-                        },
-                        color = content.textSecondary,
-                    )
-                }
+                    Box(
+                        modifier = Modifier
+                            .size(diameter)
+                            .clip(CircleShape)
+                            .background(control.interactiveContainer, CircleShape)
+                            .border(sizing.hairline, control.controlBorder, CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "+$overflow",
+                            style = when (size) {
+                                OrbitAvatarSize.Xs, OrbitAvatarSize.Sm -> OrbitTheme.typography.labelSmall
+                                OrbitAvatarSize.Md -> OrbitTheme.typography.labelLarge
+                                OrbitAvatarSize.Lg -> OrbitTheme.typography.titleMedium
+                                OrbitAvatarSize.Xl -> OrbitTheme.typography.headlineSmall
+                            },
+                            fontWeight = FontWeight.SemiBold,
+                            color = content.textSecondary,
+                        )
+                    }
             }
         }
     }

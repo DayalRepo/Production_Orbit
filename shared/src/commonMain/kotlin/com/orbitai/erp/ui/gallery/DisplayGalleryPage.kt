@@ -21,6 +21,7 @@ import com.orbitai.erp.core.designsystem.theme.OrbitBadgeTone
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
 import com.orbitai.erp.ui.component.attachment.FileAttachmentRow
+import com.orbitai.erp.ui.component.attachment.ManagedFileUpload
 import com.orbitai.erp.ui.component.team.TeamAvatarGroup
 import com.orbitai.erp.ui.component.team.TeamMember
 import com.orbitai.erp.ui.component.attachment.ManagedAttachmentRow
@@ -118,6 +119,10 @@ internal fun DisplayGalleryPage() {
         }
     }
 
+    GallerySection("File upload · drop zone and progress") {
+        ManagedFileUpload(modifier = Modifier.fillMaxWidth())
+    }
+
     // Both attachment sections are live rather than stubbed: the rows below hold real state, so
     // removing one removes it, and renaming one renames it. Wired dead — `onRemove = {}` — the
     // dialogs could be opened but never answered, and the one thing worth reviewing here is what
@@ -156,11 +161,15 @@ internal fun DisplayGalleryPage() {
         )
     }
 
-    // Read-only: an attachment on a saved record is evidence, not a draft. No controls at all, and
-    // it is here to show that the row still reads as complete without them.
+    // Read-only: an attachment on a saved record is evidence, not a draft. Download is the only
+    // action offered.
     GallerySection("Attachments · read only") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            FileAttachmentRow(fileName = "signed-challan.pdf", fileSize = "1.1 MB")
+            FileAttachmentRow(
+                fileName = "signed-challan.pdf",
+                fileSize = "1.1 MB",
+                onDownload = {},
+            )
         }
     }
 

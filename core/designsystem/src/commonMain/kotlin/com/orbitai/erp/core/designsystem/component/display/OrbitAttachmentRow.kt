@@ -20,6 +20,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -32,6 +33,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
+import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
@@ -96,6 +98,7 @@ sealed interface OrbitAttachmentLeading {
  *   convention, neither of which belongs in the design system.
  * @param onRemove renders the trailing close control when set. Leave `null` on a read-only view of
  *   an existing record, where the row is evidence rather than a draft.
+ * @param onDownload renders a download control for read-only rows where the file can be saved locally.
  */
 @Composable
 fun OrbitAttachmentRow(
@@ -106,6 +109,7 @@ fun OrbitAttachmentRow(
     onRemove: (() -> Unit)? = null,
     onRename: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
+    onDownload: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
 ) {
     val sizing = OrbitTheme.sizing
@@ -126,7 +130,7 @@ fun OrbitAttachmentRow(
             // target and push a row past its stated height, so a row without them needs a taller
             // floor to end up the same height as its neighbours. See the token.
             .heightIn(
-                min = if (onRemove == null && onRename == null && onDelete == null) {
+                min = if (onRemove == null && onRename == null && onDelete == null && onDownload == null) {
                     sizing.attachmentRowHeightReadOnly
                 } else {
                     sizing.attachmentRowHeight
@@ -239,6 +243,15 @@ fun OrbitAttachmentRow(
             )
         }
 
+        // Download before rename on read-only rows — the one action a saved attachment offers.
+        if (onDownload != null) {
+            OrbitAttachmentAction(
+                icon = OrbitIcons.Download,
+                tint = content.iconInactive,
+                description = "Download $fileName",
+                onClick = onDownload,
+            )
+        }
         // Rename before delete, and delete last. The destructive control goes at the far edge so
         // that a thumb reaching in from the side of the screen meets the recoverable action first —
         // the same reasoning that puts Delete at the bottom of a menu rather than the top.
@@ -308,6 +321,7 @@ private fun OrbitAttachmentAction(
     Box(
         modifier = Modifier
             .size(sizing.minTouchTarget)
+            .clip(CircleShape)
             .orbitHandCursor()
             .clickable(
                 interactionSource = interactionSource,
@@ -315,7 +329,7 @@ private fun OrbitAttachmentAction(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .indication(interactionSource, orbitPressIndication())
+            .indication(interactionSource, orbitCircularPressIndication())
             .semantics { contentDescription = description },
         contentAlignment = Alignment.Center,
     ) {

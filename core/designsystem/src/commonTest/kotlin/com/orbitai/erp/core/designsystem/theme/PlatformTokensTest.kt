@@ -74,10 +74,10 @@ class PlatformTokensTest {
     }
 
     @Test
-    fun `icon stroke weight sits in the 1_5 to 2 range`() {
+    fun `icon stroke weight is 1dp across platforms`() {
         listOf("Android" to android, "iOS" to ios).forEach { (name, tokens) ->
             val stroke = tokens.sizing.iconStrokeWidth.value
-            assertTrue(stroke in 1.5f..2.0f, "$name icon stroke is $stroke, expected 1.5–2")
+            assertEquals(1.0f, stroke, "$name icon stroke should be 1dp")
         }
     }
 
