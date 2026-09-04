@@ -61,6 +61,10 @@ data class OrbitCalendarDate(
     fun formatSlashed(): String =
         "${pad2(day)}/${pad2(month)}/$year"
 
+    /** `yyyy/MM/dd` — countdown and remaining-time fields, where year-first matches a launch clock. */
+    fun formatYmd(): String =
+        "$year/${pad2(month)}/${pad2(day)}"
+
     /** `Thursday, 12/06/2025` — weekday plus slashed date for field display. */
     fun formatWithWeekday(): String =
         "${OrbitWeekdayNames.full(dayOfWeek)}, ${formatSlashed()}"
@@ -68,6 +72,35 @@ data class OrbitCalendarDate(
     /** `12 Jun 2025` — for summary lines, where a slashed date reads as a serial number. */
     fun formatMedium(): String =
         "$day ${OrbitMonthNames.short(month)} $year"
+
+    /**
+     * Inclusive day count from this date to [other], either direction.
+     *
+     * A one-day job is `1`, not `0`: start and end on the same day still occupies a day of the
+     * programme. The arithmetic lives here so the calendar grid, the allocated-days field and the
+     * stages TOTAL row cannot drift apart.
+     */
+    fun inclusiveDaysUntil(other: OrbitCalendarDate): Int {
+        val a = minOf(this, other)
+        val b = maxOf(this, other)
+        return b.toEpochDay() - a.toEpochDay() + 1
+    }
+
+    /**
+     * Days since 1970-01-01 for a proleptic Gregorian date.
+     *
+     * The shifted-year trick: by treating March as the first month, the leap day lands at the *end*
+     * of the year, so the day-of-year formula needs no leap-year branch at all.
+     */
+    internal fun toEpochDay(): Int {
+        val shiftedYear = if (month <= 2) year - 1 else year
+        val era = shiftedYear.floorDiv(400)
+        val yearOfEra = shiftedYear - era * 400
+        val shiftedMonth = if (month > 2) month - 3 else month + 9
+        val dayOfYear = (153 * shiftedMonth + 2) / 5 + day - 1
+        val dayOfEra = yearOfEra * 365 + yearOfEra / 4 - yearOfEra / 100 + dayOfYear
+        return era * 146097 + dayOfEra - 719468
+    }
 
     companion object {
         fun isLeapYear(year: Int): Boolean =
@@ -182,6 +215,47 @@ internal object OrbitMonthNames {
  * grid's proportions.
  */
 internal val OrbitWeekdayLabels = listOf("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
+
+/**
+ * A committed start and end day, with the start never after the end.
+ *
+ * Time is not part of this type. The picker that produces it is a calendar, and a span of work is
+ * counted in days; a clock time on either end would invite "does the last day count?" questions the
+ * inclusive count already answers.
+ */
+@Immutable
+data class OrbitDateRange(
+    val start: OrbitCalendarDate,
+    val end: OrbitCalendarDate,
+) {
+    init {
+        require(start <= end) { "start ($start) must not be after end ($end)" }
+    }
+
+    val days: Int get() = start.inclusiveDaysUntil(end)
+
+    /** `12/06/2025 – 18/06/2025` — the range field's display value. */
+    fun format(): String = "${start.formatSlashed()} – ${end.formatSlashed()}"
+}
+
+/**
+ * Parse `dd/MM/yyyy` as produced by [OrbitCalendarDate.formatSlashed].
+ *
+ * Null rather than a thrown error: stage dates arrive as already-formatted strings from callers,
+ * and a typo in gallery copy must not crash the TOTAL row.
+ */
+fun parseOrbitSlashedDate(value: String?): OrbitCalendarDate? {
+    if (value.isNullOrBlank()) return null
+    val parts = value.split('/')
+    if (parts.size != 3) return null
+    val day = parts[0].toIntOrNull() ?: return null
+    val month = parts[1].toIntOrNull() ?: return null
+    val year = parts[2].toIntOrNull() ?: return null
+    if (month !in 1..12) return null
+    val length = runCatching { OrbitCalendarDate.daysInMonth(year, month) }.getOrNull() ?: return null
+    if (day !in 1..length) return null
+    return OrbitCalendarDate(year, month, day)
+}
 
 internal object OrbitWeekdayNames {
     private val full = listOf(

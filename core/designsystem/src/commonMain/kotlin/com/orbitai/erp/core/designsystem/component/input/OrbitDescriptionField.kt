@@ -1,13 +1,9 @@
 package com.orbitai.erp.core.designsystem.component.input
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,12 +23,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -44,7 +44,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
-import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
@@ -56,7 +55,8 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
  * A multiline description box with a toolbar and expand/collapse height control.
  *
  * The toolbar carries an optional AI assist control on the left and an expand/collapse control on
- * the right. The AI menu opens as a dropdown card anchored to the AI button.
+ * the right. The AI menu and the translate language list open as elevated dropdown cards hung from
+ * the toolbar strip — the same popup layer as a stage list — not inside the text area.
  */
 @Composable
 fun OrbitDescriptionField(
@@ -78,7 +78,7 @@ fun OrbitDescriptionField(
     onAiMenuExpandedChange: (Boolean) -> Unit = {},
     onAiRewrite: () -> Unit = {},
     onAiTranslate: () -> Unit = {},
-    aiPanel: (@Composable () -> Unit)? = null,
+    aiPanel: (@Composable (anchorWidth: Dp) -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
@@ -86,6 +86,8 @@ fun OrbitDescriptionField(
     val control = OrbitTheme.controlColors
     val interactionSource = remember { MutableInteractionSource() }
     val scrollState = rememberScrollState()
+    val density = LocalDensity.current
+    var menuWidth by remember { mutableStateOf(0.dp) }
 
     val padding = size.pick(sizing.fieldPaddingSm, sizing.fieldPaddingMd, sizing.fieldPaddingLg)
     val base: TextStyle = size.pick(
@@ -112,9 +114,8 @@ fun OrbitDescriptionField(
         shellHeight - spacing.xs * 2 - toolbarBlock - spacing.xs
         ).coerceAtLeast(MinScrollViewport)
 
-    Column(
+    Box(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
         OrbitFieldShell(
             interactionSource = interactionSource,
@@ -148,19 +149,11 @@ fun OrbitDescriptionField(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (aiAssistEnabled && enabled) {
-                        Box {
-                            DescriptionToolbarIconButton(
-                                contentDescription = "AI assist for $label",
-                                icon = OrbitIcons.AiMagic,
-                                onClick = { onAiMenuExpandedChange(!aiMenuExpanded) },
-                            )
-                            OrbitDescriptionAiMenu(
-                                expanded = aiMenuExpanded,
-                                onDismiss = { onAiMenuExpandedChange(false) },
-                                onRewrite = onAiRewrite,
-                                onTranslate = onAiTranslate,
-                            )
-                        }
+                        DescriptionToolbarIconButton(
+                            contentDescription = "AI assist for $label",
+                            icon = OrbitIcons.AiMagic,
+                            onClick = { onAiMenuExpandedChange(!aiMenuExpanded) },
+                        )
                     }
 
                     DescriptionToolbarIconButton(
@@ -222,7 +215,25 @@ fun OrbitDescriptionField(
             }
         }
 
-        aiPanel?.invoke()
+        // Full field width from the left rim — not inset to the AI glyph.
+        if (aiAssistEnabled && enabled) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(toolbarBlock)
+                    .align(Alignment.TopStart)
+                    .onSizeChanged { menuWidth = with(density) { it.width.toDp() } },
+            ) {
+                OrbitDescriptionAiMenu(
+                    expanded = aiMenuExpanded,
+                    onDismiss = { onAiMenuExpandedChange(false) },
+                    onRewrite = onAiRewrite,
+                    onTranslate = onAiTranslate,
+                    width = menuWidth,
+                )
+                aiPanel?.invoke(menuWidth)
+            }
+        }
     }
 }
 
@@ -231,7 +242,6 @@ private val DefaultExpandedHeight = 900.dp
 private val MinScrollViewport = 56.dp
 private const val SelectionAlpha = 0.28f
 private const val ExpandCollapseMs = 200
-private const val ToolbarPressAlpha = 0.55f
 
 @Composable
 private fun DescriptionToolbarIconButton(
@@ -240,15 +250,8 @@ private fun DescriptionToolbarIconButton(
     onClick: () -> Unit,
 ) {
     val sizing = OrbitTheme.sizing
-    val control = OrbitTheme.controlColors
     val content = OrbitTheme.contentColors
     val interactionSource = remember { MutableInteractionSource() }
-    val pressed by interactionSource.collectIsPressedAsState()
-    val pressAlpha by animateFloatAsState(
-        targetValue = if (pressed) 1f else 0f,
-        animationSpec = tween(90),
-        label = "orbit-description-toolbar-press",
-    )
 
     Box(
         modifier = Modifier
@@ -261,18 +264,9 @@ private fun DescriptionToolbarIconButton(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .indication(interactionSource, orbitCircularPressIndication())
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
     ) {
-        if (pressAlpha > 0f) {
-            Box(
-                modifier = Modifier
-                    .size(sizing.iconButtonSm)
-                    .clip(CircleShape)
-                    .background(control.interactiveContainer.copy(alpha = ToolbarPressAlpha * pressAlpha)),
-            )
-        }
         OrbitGlyph(
             icon = icon,
             size = sizing.iconSm,

@@ -204,6 +204,45 @@ class DateFormatTest {
     }
 
     @Test
+    fun `the ymd format is year first and zero padded`() {
+        assertEquals("2027/09/05", OrbitCalendarDate(2027, 9, 5).formatYmd())
+        assertEquals("2025/06/12", OrbitCalendarDate(2025, 6, 12).formatYmd())
+    }
+
+    @Test
+    fun `inclusive days count both ends`() {
+        val start = OrbitCalendarDate(2026, 9, 1)
+        assertEquals(1, start.inclusiveDaysUntil(start), "same day is one allocated day")
+        assertEquals(5, start.inclusiveDaysUntil(OrbitCalendarDate(2026, 9, 5)))
+        assertEquals(5, OrbitCalendarDate(2026, 9, 5).inclusiveDaysUntil(start), "order independent")
+    }
+
+    @Test
+    fun `a range formats both ends and refuses a reversed pair`() {
+        val range = OrbitDateRange(
+            start = OrbitCalendarDate(2026, 9, 1),
+            end = OrbitCalendarDate(2026, 9, 14),
+        )
+        assertEquals("01/09/2026 – 14/09/2026", range.format())
+        assertEquals(14, range.days)
+        assertFailsWith<IllegalArgumentException> {
+            OrbitDateRange(
+                start = OrbitCalendarDate(2026, 9, 14),
+                end = OrbitCalendarDate(2026, 9, 1),
+            )
+        }
+    }
+
+    @Test
+    fun `slashed dates parse back to the same day`() {
+        val date = OrbitCalendarDate(2026, 8, 27)
+        assertEquals(date, parseOrbitSlashedDate(date.formatSlashed()))
+        assertNull(parseOrbitSlashedDate(null))
+        assertNull(parseOrbitSlashedDate("27-08-2026"))
+        assertNull(parseOrbitSlashedDate("32/08/2026"))
+    }
+
+    @Test
     fun `a selection reads back as both halves`() {
         val selection = OrbitDateTimeSelection(
             date = OrbitCalendarDate(2025, 6, 12),

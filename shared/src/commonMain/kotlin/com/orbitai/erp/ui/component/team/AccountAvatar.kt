@@ -8,10 +8,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import com.orbitai.erp.core.designsystem.component.overlay.OrbitAccountPopover
 import com.orbitai.erp.core.designsystem.component.display.OrbitAvatar
 import com.orbitai.erp.core.designsystem.component.display.OrbitAvatarSize
-import com.orbitai.erp.core.designsystem.component.overlay.OrbitAccountPopover
-import com.orbitai.erp.core.designsystem.component.overlay.OrbitInfoField
 
 /**
  * Your own face in the app bar, and the account panel behind it.
@@ -69,13 +68,11 @@ fun AccountAvatar(
         OrbitAccountPopover(
             expanded = expanded,
             onDismiss = { expanded = false },
-            fields = listOf(
-                OrbitInfoField("Name", name),
-                OrbitInfoField("Role", role),
-                // The one value on the panel that exists to end up somewhere else.
-                OrbitInfoField("Phone", phone, copyable = true),
-                OrbitInfoField(tenancyLabel, tenancy),
-            ),
+            name = name,
+            role = role,
+            phone = phone,
+            tenancy = tenancy,
+            tenancyLabel = tenancyLabel,
             onSignOut = onSignOut,
             themeDark = themeDark,
             onThemeChange = onThemeChange,

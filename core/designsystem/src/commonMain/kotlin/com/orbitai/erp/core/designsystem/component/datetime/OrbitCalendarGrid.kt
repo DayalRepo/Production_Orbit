@@ -1,5 +1,6 @@
 package com.orbitai.erp.core.designsystem.component.datetime
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,10 +37,8 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
 /**
  * What the grid should highlight.
  *
- * A sealed interface around a single case, which is on purpose. It carried a second case for the
- * start-and-target picker; that picker is gone and the shape is kept because it is the seam a future
- * selection mode arrives on, and widening a sealed type is a change the compiler walks you through
- * whereas widening a bare nullable date is one it lets you get wrong.
+ * [Range] is the live case: a start day, an optional end, and a rail between them. [Single] remains
+ * so a one-day picker can still light one cell without pretending it is a span of length one.
  */
 @Immutable
 sealed interface OrbitCalendarSelection {
@@ -46,6 +46,13 @@ sealed interface OrbitCalendarSelection {
     /** One day, for a target-date picker. */
     @Immutable
     data class Single(val date: OrbitCalendarDate?) : OrbitCalendarSelection
+
+    /** A span. [end] is null while the user has tapped a start and not yet a finish. */
+    @Immutable
+    data class Range(
+        val start: OrbitCalendarDate?,
+        val end: OrbitCalendarDate?,
+    ) : OrbitCalendarSelection
 }
 
 /**
@@ -123,7 +130,6 @@ fun OrbitCalendarGrid(
                     } else {
                         DayCell(
                             date = month.day(dayNumber),
-                            month = month,
                             bounds = bounds,
                             selection = selection,
                             daySize = daySize,
@@ -140,7 +146,6 @@ fun OrbitCalendarGrid(
 @Composable
 private fun RowScope.DayCell(
     date: OrbitCalendarDate,
-    month: OrbitYearMonth,
     bounds: OrbitCalendarBounds,
     selection: OrbitCalendarSelection,
     daySize: Dp,
@@ -153,9 +158,19 @@ private fun RowScope.DayCell(
     val selectable = bounds.isSelectable(date)
     val isToday = date == bounds.today
 
-    val endpoint = when (selection) {
-        is OrbitCalendarSelection.Single -> date == selection.date
+    val rangeStart = when (selection) {
+        is OrbitCalendarSelection.Single -> selection.date
+        is OrbitCalendarSelection.Range -> selection.start
     }
+    val rangeEnd = when (selection) {
+        is OrbitCalendarSelection.Single -> selection.date
+        is OrbitCalendarSelection.Range -> selection.end
+    }
+    val isStart = date == rangeStart
+    val isEnd = rangeEnd != null && date == rangeEnd
+    val endpoint = isStart || isEnd
+    val inSpan = rangeStart != null && rangeEnd != null && date >= rangeStart && date <= rangeEnd
+    val showRail = inSpan && rangeStart != rangeEnd
 
     // One source per cell, so the press effect is bounded to the day the finger is on. Feeding all
     // 42 cells from a shared source would light up the whole grid on every tap.
@@ -186,6 +201,14 @@ private fun RowScope.DayCell(
             ),
         contentAlignment = Alignment.Center,
     ) {
+        if (showRail) {
+            RangeRail(
+                isStart = isStart,
+                isEnd = isEnd,
+                height = daySize,
+            )
+        }
+
         // The marker and its number sit inside the press effect, because on iOS that effect is a
         // shrink of whatever it wraps and these two *are* the day. Clipped to the marker so the
         // Android ripple is a circle on the day rather than a rectangle across the cell.
@@ -246,6 +269,39 @@ private fun RowScope.DayCell(
     }
 }
 
+@Composable
+private fun RangeRail(
+    isStart: Boolean,
+    isEnd: Boolean,
+    height: Dp,
+) {
+    val control = OrbitTheme.controlColors
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height),
+    ) {
+        val rail = Modifier
+            .fillMaxHeight()
+            .background(control.actionContainer.copy(alpha = RangeRailAlpha))
+        when {
+            isStart && isEnd -> Unit
+            isStart -> Box(
+                modifier = rail
+                    .fillMaxWidth(0.5f)
+                    .align(Alignment.CenterEnd),
+            )
+            isEnd -> Box(
+                modifier = rail
+                    .fillMaxWidth(0.5f)
+                    .align(Alignment.CenterStart),
+            )
+            else -> Box(modifier = rail.fillMaxWidth())
+        }
+    }
+}
+
 private val MarkerShape = RoundedCornerShape(percent = 50)
 
 private const val DaysPerWeek = 7
+private const val RangeRailAlpha = 0.18f

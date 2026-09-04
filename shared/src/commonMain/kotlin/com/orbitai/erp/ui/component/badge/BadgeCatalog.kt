@@ -82,7 +82,7 @@ enum class BadgeKind(val label: String, val tone: OrbitBadgeTone) {
             Pending -> OrbitIcons.Clock
             Review -> OrbitIcons.ListBullet
             Inspection -> OrbitIcons.NotepadDashed
-            Successful, Done, Approved -> OrbitIcons.CheckmarkBadge
+            Successful, Done, Approved -> OrbitIcons.CircleCheck
             Completed -> OrbitIcons.Tick
             Failed, Cancelled -> OrbitIcons.CancelCircle
             Issue -> OrbitIcons.BadgeAlert

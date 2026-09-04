@@ -106,20 +106,3 @@ data class OrbitDateTimeSelection(
     /** `12 Jun 2025 at 10:00 AM` — for the confirmation sentence under a picker. */
     fun formatSentence(): String = "${date.formatMedium()} at ${time.format12Hour()}"
 }
-
-/**
- * Days since 1970-01-01 for a proleptic Gregorian date.
- *
- * The shifted-year trick: by treating March as the first month, the leap day lands at the *end* of
- * the year, so the day-of-year formula needs no leap-year branch at all.
- */
-private fun epochDay(date: OrbitCalendarDate): Int {
-    val shiftedYear = if (date.month <= 2) date.year - 1 else date.year
-    val era = shiftedYear.floorDiv(400)
-    val yearOfEra = shiftedYear - era * 400
-    val shiftedMonth = if (date.month > 2) date.month - 3 else date.month + 9
-    val dayOfYear = (153 * shiftedMonth + 2) / 5 + date.day - 1
-    val dayOfEra = yearOfEra * 365 + yearOfEra / 4 - yearOfEra / 100 + dayOfYear
-    // 719468 shifts the origin from 0000-03-01 to 1970-01-01.
-    return era * 146097 + dayOfEra - 719468
-}

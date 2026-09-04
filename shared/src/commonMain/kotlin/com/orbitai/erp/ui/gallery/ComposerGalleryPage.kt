@@ -201,6 +201,7 @@ private fun SampleListenOnlyVoiceNote(
         playing = playing,
         onPlayPause = onPlayPause,
         listenOnly = true,
+        onDownload = {},
         modifier = Modifier.fillMaxWidth(),
     )
 }

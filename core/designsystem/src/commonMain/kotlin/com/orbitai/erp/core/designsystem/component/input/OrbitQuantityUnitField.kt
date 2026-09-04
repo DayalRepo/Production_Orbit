@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.container.OrbitVerticalDivider
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
@@ -71,6 +72,8 @@ fun OrbitQuantityUnitField(
     unitSearchPlaceholder: String = "Search units",
     unitAddLabel: String = "Add unit",
     onAddUnitRequest: (() -> Unit)? = null,
+    /** Override plus / minus / unit chevron size; defaults follow [size]. */
+    iconSize: Dp? = null,
 ) {
     val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
@@ -86,7 +89,8 @@ fun OrbitQuantityUnitField(
 
     val minHeight = size.pick(sizing.fieldHeightSm, sizing.fieldHeightMd, sizing.fieldHeightLg)
     val padding = size.pick(sizing.fieldPaddingSm, sizing.fieldPaddingMd, sizing.fieldPaddingLg)
-    val iconSize = size.pick(sizing.iconSm, sizing.iconSm, sizing.iconMd)
+    // Match [OrbitDropdownField] chevron sizes so material + unit menus read as one family.
+    val resolvedIconSize = iconSize ?: size.pick(sizing.iconSm, sizing.iconSm, sizing.iconMd)
     val textStyle = size.pick(
         OrbitTheme.typography.bodyMedium,
         OrbitTheme.typography.bodyLarge,
@@ -139,7 +143,7 @@ fun OrbitQuantityUnitField(
                     icon = OrbitIcons.MinusSign,
                     contentDescription = "Decrease $quantityLabel",
                     enabled = enabled && value > range.first,
-                    iconSize = iconSize,
+                    iconSize = resolvedIconSize,
                     onClick = { onValueChange((value - step).coerceIn(range)) },
                 )
 
@@ -204,7 +208,7 @@ fun OrbitQuantityUnitField(
                     icon = OrbitIcons.PlusSign,
                     contentDescription = "Increase $quantityLabel",
                     enabled = enabled && value < range.last,
-                    iconSize = iconSize,
+                    iconSize = resolvedIconSize,
                     onClick = { onValueChange((value + step).coerceIn(range)) },
                 )
             }
@@ -245,7 +249,7 @@ fun OrbitQuantityUnitField(
                 )
                 OrbitGlyph(
                     icon = OrbitIcons.ChevronDown,
-                    size = sizing.iconSm,
+                    size = resolvedIconSize,
                     tint = if (enabled) content.iconInactive else content.iconInactive.copy(OrbitAlpha.Disabled),
                     contentDescription = null,
                     minimumStroke = sizing.iconStrokeLight,

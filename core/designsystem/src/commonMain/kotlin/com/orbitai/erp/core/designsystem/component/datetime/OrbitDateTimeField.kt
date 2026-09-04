@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldShell
@@ -34,20 +35,22 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
  * action rather than as one of the form's values.
  *
  * @param value the formatted selection, or null for the empty state. Pass
- *   `selection?.format()` for a single moment or `range.format()` for a span; both include the
- *   weekday name and `dd/MM/yyyy`, with time when applicable.
- * @param placeholder shown when [value] is null. Should name what is being picked — "Target date"
+ *   `range.format()` for a span, or a countdown string for remaining time.
+ * @param placeholder shown when [value] is null. Should name what is being picked — "Target dates"
  *   rather than "Select" — because the field is the only label many forms give it.
+ * @param onClick opens the picker. Null for display-only fields (allocated days, remaining time)
+ *   so they keep the same chrome without advertising a tap they will not honour.
  */
 @Composable
 fun OrbitDateTimeField(
     value: String?,
     placeholder: String,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     label: String? = null,
     enabled: Boolean = true,
     state: OrbitFieldState = OrbitFieldState.Default,
+    leadingIcon: ImageVector = OrbitIcons.CalendarDate,
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
@@ -77,7 +80,7 @@ fun OrbitDateTimeField(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(
-                    if (enabled) {
+                    if (enabled && onClick != null) {
                         Modifier
                             .orbitHandCursor()
                             .clickable(
@@ -92,10 +95,7 @@ fun OrbitDateTimeField(
                 ),
         ) {
             OrbitGlyph(
-                // The grid-faced calendar rather than the generic one. At 16dp inside a field its
-                // ruled squares still read as a calendar, where the generic glyph's finer detail
-                // collapses into a box with a smudge in it.
-                icon = OrbitIcons.CalendarDate,
+                icon = leadingIcon,
                 size = sizing.iconSm,
                 tint = if (enabled) content.iconInactive else content.iconDisabled,
                 contentDescription = null,

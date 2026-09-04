@@ -25,6 +25,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
@@ -100,6 +101,8 @@ fun OrbitDropdownField(
     size: OrbitFieldSize = OrbitFieldSize.Medium,
     state: OrbitFieldState = OrbitFieldState.Default,
     enabled: Boolean = true,
+    /** Override chevron size; defaults follow [size]. */
+    iconSize: Dp? = null,
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
@@ -117,6 +120,7 @@ fun OrbitDropdownField(
 
     val minHeight = size.pick(sizing.fieldHeightSm, sizing.fieldHeightMd, sizing.fieldHeightLg)
     val padding = size.pick(sizing.fieldPaddingSm, sizing.fieldPaddingMd, sizing.fieldPaddingLg)
+    val chevronSize = iconSize ?: size.pick(sizing.iconSm, sizing.iconSm, sizing.iconMd)
 
     val base: TextStyle = size.pick(
         OrbitTheme.typography.bodyMedium,
@@ -179,7 +183,7 @@ fun OrbitDropdownField(
 
             OrbitGlyph(
                 icon = OrbitIcons.ChevronDown,
-                size = sizing.iconMd,
+                size = chevronSize,
                 tint = if (enabled) content.iconInactive else content.iconInactive.copy(OrbitAlpha.Disabled),
                 contentDescription = null,
                 minimumStroke = sizing.iconStrokeLight,

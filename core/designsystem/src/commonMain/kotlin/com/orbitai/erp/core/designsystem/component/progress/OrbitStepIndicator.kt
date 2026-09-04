@@ -54,6 +54,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
+import com.orbitai.erp.core.designsystem.component.datetime.parseOrbitSlashedDate
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
@@ -184,6 +185,29 @@ fun orbitStepProgressSummary(currentIndex: Int, total: Int): String {
 }
 
 /**
+ * Inclusive days from the earliest start to the latest end (or start, if still open).
+ *
+ * Null when no stage has a parseable date — the TOTAL row then shows a dash rather than `0 days`,
+ * which would look like the work took nothing.
+ */
+fun orbitStepTotalDays(steps: List<OrbitStep>): Int? {
+    val dated = steps.flatMap { step ->
+        listOfNotNull(
+            parseOrbitSlashedDate(step.startedOn),
+            parseOrbitSlashedDate(step.endedOn),
+        )
+    }
+    val first = dated.minOrNull() ?: return null
+    val last = dated.maxOrNull() ?: return null
+    return first.inclusiveDaysUntil(last)
+}
+
+fun orbitStepTotalDaysLabel(steps: List<OrbitStep>): String {
+    val days = orbitStepTotalDays(steps) ?: return "—"
+    return if (days == 1) "1 day" else "$days days"
+}
+
+/**
  * Vertical, collapsible workflow track.
  *
  * Header is always visible: `STAGES · sequence` with a progress summary and disclosure chevron.
@@ -272,6 +296,7 @@ fun OrbitStepIndicator(
             exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.xxs)) {
+                StageColumnHeadings(colors = colors)
                 steps.forEachIndexed { index, step ->
                     StepRow(
                         step = step,
@@ -281,6 +306,10 @@ fun OrbitStepIndicator(
                         showRailBelow = index < steps.lastIndex,
                     )
                 }
+                StageTotalRow(
+                    label = orbitStepTotalDaysLabel(steps),
+                    colors = colors,
+                )
             }
         }
     }
@@ -338,6 +367,95 @@ private fun StagesHeader(
         OrbitDivider(
             modifier = Modifier.padding(top = spacing.sm),
             color = OrbitTheme.controlColors.controlBorder,
+        )
+    }
+}
+
+@Composable
+private fun StageColumnHeadings(
+    colors: OrbitStepIndicatorColors,
+) {
+    val sizing = OrbitTheme.sizing
+    val spacing = OrbitTheme.spacing
+    val style = OrbitTheme.extendedTypography.reference.copy(fontWeight = FontWeight.SemiBold)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(modifier = Modifier.width(sizing.stepColumnWidth))
+        Text(
+            text = "STAGES",
+            style = style,
+            color = colors.headerLabel,
+            maxLines = 1,
+            modifier = Modifier
+                .weight(StageNameWeight)
+                .padding(start = spacing.sm, end = spacing.xxs),
+        )
+        Row(
+            modifier = Modifier.weight(StageDatesWeight),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "START",
+                style = style,
+                color = colors.headerLabel,
+                textAlign = TextAlign.Start,
+                maxLines = 1,
+                modifier = Modifier.weight(1f),
+            )
+            Box(modifier = Modifier.padding(horizontal = spacing.xxs))
+            Text(
+                text = "END",
+                style = style,
+                color = colors.headerLabel,
+                textAlign = TextAlign.Start,
+                maxLines = 1,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun StageTotalRow(
+    label: String,
+    colors: OrbitStepIndicatorColors,
+) {
+    val spacing = OrbitTheme.spacing
+    val sizing = OrbitTheme.sizing
+    val style = OrbitTheme.extendedTypography.reference.copy(fontWeight = FontWeight.SemiBold)
+
+    OrbitDivider(
+        modifier = Modifier.padding(top = spacing.sm, bottom = spacing.sm),
+        color = OrbitTheme.controlColors.controlBorder,
+    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(modifier = Modifier.width(sizing.stepColumnWidth))
+        Text(
+            text = "TOTAL",
+            style = style,
+            color = colors.headerLabel,
+            maxLines = 1,
+            modifier = Modifier
+                .weight(StageNameWeight)
+                .padding(start = spacing.sm, end = spacing.xxs),
+        )
+        Text(
+            text = label,
+            style = style,
+            color = colors.summaryLabel,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier = Modifier.weight(StageDatesWeight),
         )
     }
 }
@@ -434,7 +552,7 @@ private fun StepRow(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
-                        .weight(0.36f)
+                        .weight(StageNameWeight)
                         .padding(end = spacing.xxs),
                 )
                 StepDateTrail(
@@ -442,7 +560,7 @@ private fun StepRow(
                     endedOn = step.endedOn,
                     phase = phase,
                     color = colors.dateLabel,
-                    modifier = Modifier.weight(0.64f),
+                    modifier = Modifier.weight(StageDatesWeight),
                 )
             }
             Text(
@@ -581,7 +699,7 @@ private fun StepDateTrail(
     ) {
         Box(
             modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterEnd,
+            contentAlignment = Alignment.CenterStart,
         ) {
             Text(
                 text = startText,
@@ -590,7 +708,7 @@ private fun StepDateTrail(
                 maxLines = 1,
                 softWrap = false,
                 overflow = TextOverflow.Visible,
-                textAlign = TextAlign.End,
+                textAlign = TextAlign.Start,
             )
         }
         Text(
@@ -615,3 +733,6 @@ private fun StepDateTrail(
         }
     }
 }
+
+private const val StageNameWeight = 0.36f
+private const val StageDatesWeight = 0.64f

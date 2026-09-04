@@ -84,6 +84,7 @@ fun ComponentGalleryScreen(
         DisplayGalleryPage()
         StateGalleryPage()
         InputGalleryPage()
+        NavigationGalleryPage()
         AssignGalleryPage()
         ComposerGalleryPage()
         ButtonGalleryPage()

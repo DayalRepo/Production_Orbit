@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.input.OrbitDescriptionField
 import com.orbitai.erp.ui.component.input.ManagedDescriptionField
+import com.orbitai.erp.ui.component.input.ManagedMaterialUsageLog
 import com.orbitai.erp.ui.component.input.ManagedQuantityUnitField
 import com.orbitai.erp.core.designsystem.component.input.OrbitDropdownField
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldSize
@@ -22,6 +23,7 @@ import com.orbitai.erp.core.designsystem.component.input.OrbitQuantityField
 import com.orbitai.erp.core.designsystem.component.input.OrbitSearchField
 import com.orbitai.erp.core.designsystem.component.input.OrbitTextField
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.ui.component.dropdown.ManagedMaterialDropdown
 import com.orbitai.erp.ui.component.dropdown.ManagedMaterialsDropdown
 import com.orbitai.erp.ui.component.dropdown.ManagedStageDropdown
 import com.orbitai.erp.ui.component.dropdown.ManagedUnitsDropdown
@@ -272,8 +274,28 @@ internal fun InputGalleryPage() {
         }
     }
 
+    GallerySection("Dropdown · materials, single select") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
+            ManagedMaterialDropdown(
+                label = "Material",
+                initialSelection = "Cement (OPC 53)",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ManagedMaterialDropdown(
+                label = "Material, empty",
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
     GallerySection("Quantity + unit · single field") {
         ManagedQuantityUnitField(
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+
+    GallerySection("Materials used · site log") {
+        ManagedMaterialUsageLog(
             modifier = Modifier.fillMaxWidth(),
         )
     }

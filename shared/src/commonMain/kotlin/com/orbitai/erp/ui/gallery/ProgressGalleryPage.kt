@@ -9,7 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.component.display.OrbitDelta
+import com.orbitai.erp.core.designsystem.component.progress.OrbitDonutProgress
+import com.orbitai.erp.core.designsystem.component.progress.OrbitDonutProgressDefaults
+import com.orbitai.erp.core.designsystem.component.progress.OrbitFormPageBar
 import com.orbitai.erp.core.designsystem.component.progress.OrbitSegmentedProgress
+import com.orbitai.erp.core.designsystem.component.progress.OrbitStageProof
+import com.orbitai.erp.core.designsystem.component.progress.OrbitStageProofKind
+import com.orbitai.erp.core.designsystem.component.progress.OrbitStageProofStep
 import com.orbitai.erp.core.designsystem.component.progress.OrbitStep
 import com.orbitai.erp.core.designsystem.component.progress.OrbitStepIndicator
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -19,6 +25,53 @@ import com.orbitai.erp.ui.component.progress.ProgressCard
 internal fun ProgressGalleryPage() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
+
+    GallerySection("Donut progress · health and progress") {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing.md),
+        ) {
+            Text(
+                text = "20 segments · light-green Health, bar-blue Progress.",
+                style = OrbitTheme.typography.bodySmall,
+                color = content.textSecondary,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                OrbitDonutProgress(
+                    progress = 0.78f,
+                    colors = OrbitDonutProgressDefaults.greenColors,
+                    caption = "Health",
+                    contentDescription = "Health, 78 percent",
+                )
+                OrbitDonutProgress(
+                    progress = 0.62f,
+                    colors = OrbitDonutProgressDefaults.blueColors,
+                    caption = "Progress",
+                    contentDescription = "Progress, 62 percent",
+                )
+            }
+        }
+    }
+
+    GallerySection("Form page bar · wizard steps") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
+            Text(
+                text = "One bar per filling page. Corner-rounded glass strips with shadow — lit through the current page.",
+                style = OrbitTheme.typography.bodySmall,
+                color = content.textSecondary,
+            )
+            FormPageSample(pageCount = 2, currentPage = 0, caption = "2 pages · on first")
+            FormPageSample(pageCount = 3, currentPage = 1, caption = "3 pages · on second")
+            FormPageSample(pageCount = 4, currentPage = 2, caption = "4 pages · on third")
+            FormPageSample(pageCount = 5, currentPage = 4, caption = "5 pages · on last")
+            FormPageSample(pageCount = 7, currentPage = 3, caption = "7 pages · mid form")
+        }
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
         ProgressCard(
@@ -80,6 +133,40 @@ internal fun ProgressGalleryPage() {
                 value = -3f,
                 higherIsBetter = false,
                 contentDescription = "down 3 percent, better",
+            )
+        }
+    }
+
+    GallerySection("Stage proof · villa and building") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
+            Text(
+                text = "High-level unit sequence from the work chart. Villa omits CA/BS; building includes both.",
+                style = OrbitTheme.typography.bodySmall,
+                color = content.textSecondary,
+            )
+            OrbitStageProof(
+                kind = OrbitStageProofKind.Villa,
+                completedCount = 3,
+                stages = listOf(
+                    OrbitStageProofStep("SR", "Structure", "01/08/2026", "20/08/2026"),
+                    OrbitStageProofStep("UI", "Unit internal", "21/08/2026", "05/09/2026"),
+                    OrbitStageProofStep("UE", "Unit external", "06/09/2026", "18/09/2026"),
+                    OrbitStageProofStep("ED", "Ext. development", "19/09/2026", null),
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OrbitStageProof(
+                kind = OrbitStageProofKind.Building,
+                completedCount = 4,
+                stages = listOf(
+                    OrbitStageProofStep("SR", "Structure", "01/07/2026", "15/07/2026"),
+                    OrbitStageProofStep("CA", "Common area", "16/07/2026", "30/07/2026"),
+                    OrbitStageProofStep("UI", "Unit internal", "01/08/2026", "20/08/2026"),
+                    OrbitStageProofStep("UE", "Unit external", "21/08/2026", "10/09/2026"),
+                    OrbitStageProofStep("ED", "Ext. development", "11/09/2026", null),
+                    OrbitStageProofStep("BS", "Basement"),
+                ),
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
@@ -292,3 +379,23 @@ private val WorkflowComplete = listOf(
         endedOn = "23/08/2026",
     ),
 )
+
+@Composable
+private fun FormPageSample(
+    pageCount: Int,
+    currentPage: Int,
+    caption: String,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(OrbitTheme.spacing.xs)) {
+        OrbitFormPageBar(
+            pageCount = pageCount,
+            currentPage = currentPage,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            text = caption,
+            style = OrbitTheme.typography.bodySmall,
+            color = OrbitTheme.contentColors.textTertiary,
+        )
+    }
+}

@@ -4,8 +4,11 @@ import com.orbitai.erp.core.designsystem.component.datetime.OrbitCalendarDate
 import com.orbitai.erp.core.designsystem.component.datetime.OrbitTimeOfDay
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * The conversion between `kotlinx-datetime` and the design system's calendar types.
@@ -64,6 +67,23 @@ class OrbitClockTest {
         times.forEach { original ->
             assertEquals(original, original.toLocalTime().toOrbitTimeOfDay(), "time $original")
         }
+    }
+
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun `remaining countdown pairs allocated days with a live clock`() {
+        val end = OrbitCalendarDate(2026, 9, 4)
+        val zone = TimeZone.UTC
+        val after = Instant.parse("2026-09-06T00:00:00Z")
+        assertEquals(
+            "5 days · 00d 00h:00m:00s",
+            orbitRemainingCountdown(allocatedDays = 5, endDate = end, now = after, zone = zone),
+        )
+        val during = Instant.parse("2026-09-03T12:00:00Z")
+        assertEquals(
+            "5 days · 01d 12h:00m:00s",
+            orbitRemainingCountdown(allocatedDays = 5, endDate = end, now = during, zone = zone),
+        )
     }
 
     @Test

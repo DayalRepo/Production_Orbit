@@ -626,6 +626,60 @@ data class OrbitSizing(
 
     /** Cap on text measure so dashboards stay readable on wide screens. */
     val maxContentWidth: Dp = 1200.dp,
+
+    /**
+     * Floating role bottom nav — the full pill plus the separate circular action.
+     *
+     * Height is shared by both clusters so the row reads as one bar. The pill flexes; the circle
+     * stays square at the same diameter. Glyphs sit visually centred in both, with no labels.
+     */
+    val bottomNavHeight: Dp = 64.dp,
+    /** Scaled with [bottomNavHeight] so the glyph stays about half the container. */
+    val bottomNavGlyph: Dp = 30.dp,
+    /**
+     * Stroke floor/ceiling for nav glyphs.
+     *
+     * Thinner than the natural Hugeicons scale at [bottomNavGlyph] — at this size the authored
+     * 1.8-unit stroke would land near 2dp and look heavy in a floating glass bar. Cap it here so
+     * size can grow without the line weight growing with it.
+     */
+    val bottomNavIconStroke: Dp = 1.25.dp,
+    /**
+     * Inset from the pill's curved ends to the outer icon slots.
+     *
+     * Keeps SpaceEvenly icons optically centred in the glass rather than riding into the radius.
+     */
+    val bottomNavPillInset: Dp = 14.dp,
+    /**
+     * Outer horizontal inset for the floating bar.
+     *
+     * Tighter than [OrbitSpacing.screenHorizontal] so the pill and circle read wider on phone
+     * widths without touching the screen edge.
+     */
+    val bottomNavEdgeInset: Dp = 10.dp,
+    /** Gap between the primary pill and the circular action. */
+    val bottomNavClusterGap: Dp = 10.dp,
+    /**
+     * Active-destination glass disc drawn behind the selected glyph.
+     *
+     * Sized to nearly fill [bottomNavHeight] so it reads clearly inside both the pill slots and the
+     * separate action circle, with a few dp of air so it does not collide with the outer rim.
+     */
+    val bottomNavActiveSize: Dp = 54.dp,
+    /**
+     * Contact shadow under the pill and circle.
+     *
+     * Softer than [shadowIconButton] / `elevation.bottomBar` — those were tuned for small rings, and
+     * at bar size a 3dp shadow reads as a drop rather than as glass resting on the page.
+     */
+    val bottomNavShadow: Dp = 2.dp,
+    /**
+     * Air between the bar and the platform gesture / navigation bar.
+     *
+     * Small on purpose: enough to separate the glass from the system chrome without floating the
+     * bar halfway up the screen.
+     */
+    val bottomNavSystemGap: Dp = 8.dp,
 )
 
 internal val LocalOrbitSpacing = staticCompositionLocalOf { OrbitSpacing() }

@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -157,12 +158,13 @@ fun OrbitButton(
     iconPosition: OrbitButtonIconPosition = OrbitButtonIconPosition.Leading,
     state: OrbitButtonState = OrbitButtonState.Active,
     loading: Boolean = false,
+    shape: Shape? = null,
 ) {
     val sizing = OrbitTheme.sizing
     val typeScale = OrbitTheme.typeScale
     val spacing = OrbitTheme.spacing
     val control = OrbitTheme.controlColors
-    val shape = OrbitTheme.shapeTokens.button
+    val shape = shape ?: OrbitTheme.shapeTokens.button
     val isDark = OrbitTheme.isDark
 
     // The badge tone each tinted variant borrows. Blue for the affirmative, Red for backing out;

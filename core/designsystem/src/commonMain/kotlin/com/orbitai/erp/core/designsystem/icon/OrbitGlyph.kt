@@ -47,6 +47,8 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
  * @param minimumStroke the floor to clamp up to. Defaults to `sizing.iconStrokeWidth`, the weight an
  *   icon needs when it sits beside a label; pass `sizing.iconStrokeLight` for a glyph standing alone,
  *   which needs less.
+ * @param maximumStroke optional ceiling. Use when a larger glyph must stay light — e.g. the bottom
+ *   nav, where natural scale would thicken the stroke past what the glass bar wants.
  */
 @Composable
 fun OrbitGlyph(
@@ -56,8 +58,9 @@ fun OrbitGlyph(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     minimumStroke: Dp = orbitStrokeForTier(size),
+    maximumStroke: Dp? = null,
 ) {
-    val stroke = orbitGlyphStroke(size, minimumStroke)
+    val stroke = orbitGlyphStroke(size, minimumStroke, maximumStroke)
     val corrected = remember(icon, stroke) { icon.orbitRestroked(stroke) }
 
     Icon(
@@ -104,9 +107,10 @@ fun OrbitGlyph(
 fun orbitGlyphStroke(
     size: Dp,
     minimumStroke: Dp = orbitStrokeForTier(size),
+    maximumStroke: Dp? = null,
 ): Float {
-    val ceiling = OrbitTheme.sizing.borderStrong
-    val floor = minimumStroke
+    val ceiling = maximumStroke ?: OrbitTheme.sizing.borderStrong
+    val floor = minimumStroke.coerceAtMost(ceiling)
     val natural = size * (AuthoredStroke / Viewport)
     val target = natural.coerceIn(floor, ceiling)
     return Viewport * (target / size)

@@ -117,6 +117,18 @@ class OrbitStepIndicatorTest {
     }
 
     @Test
+    fun `total days span the earliest start and latest end`() {
+        val steps = listOf(
+            OrbitStep(label = "Scheduled", startedOn = "15/08/2026", endedOn = "16/08/2026"),
+            OrbitStep(label = "In progress", startedOn = "16/08/2026", endedOn = "20/08/2026"),
+            OrbitStep(label = "Completed", startedOn = "23/08/2026", endedOn = "23/08/2026"),
+        )
+        assertEquals(9, orbitStepTotalDays(steps))
+        assertEquals("9 days", orbitStepTotalDaysLabel(steps))
+        assertEquals("—", orbitStepTotalDaysLabel(listOf(OrbitStep(label = "Scheduled"))))
+    }
+
+    @Test
     fun `workflow complete fills every stage mark`() {
         val steps = listOf(
             OrbitStep(label = "Scheduled", statusLabel = "Started"),

@@ -6,9 +6,11 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * The bridge between `kotlinx-datetime` and the design system's calendar types.
@@ -49,3 +51,31 @@ fun LocalTime.toOrbitTimeOfDay(): OrbitTimeOfDay =
 
 fun OrbitTimeOfDay.toLocalTime(): LocalTime =
     LocalTime(hour = hour, minute = minute)
+
+/**
+ * A launch-style remaining clock until the end of [endDate] (midnight at the start of the next day).
+ *
+ * `27 days · 26d 23h:04m:33s` — allocated days, then the live remainder. Zeroed rather than
+ * negative once the span has elapsed, so the field never reads as a countdown running backwards.
+ */
+@OptIn(ExperimentalTime::class)
+fun orbitRemainingCountdown(
+    allocatedDays: Int,
+    endDate: OrbitCalendarDate,
+    now: Instant = Clock.System.now(),
+    zone: TimeZone = TimeZone.currentSystemDefault(),
+): String {
+    val deadline = LocalDate.fromEpochDays(endDate.toLocalDate().toEpochDays() + 1)
+        .atStartOfDayIn(zone)
+    val remaining = (deadline - now).inWholeSeconds.coerceAtLeast(0)
+    val days = remaining / SecondsPerDay
+    val hours = (remaining % SecondsPerDay) / 3600
+    val minutes = (remaining % 3600) / 60
+    val seconds = remaining % 60
+    val allocated = if (allocatedDays == 1) "1 day" else "$allocatedDays days"
+    return "$allocated · ${pad2(days)}d ${pad2(hours)}h:${pad2(minutes)}m:${pad2(seconds)}s"
+}
+
+private fun pad2(value: Long): String = value.toString().padStart(2, '0')
+
+private const val SecondsPerDay = 86_400L

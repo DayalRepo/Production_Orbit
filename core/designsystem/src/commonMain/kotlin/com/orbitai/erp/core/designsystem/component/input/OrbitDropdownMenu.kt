@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -103,12 +105,12 @@ internal fun OrbitDropdownMenu(
     onDismiss: () -> Unit,
     width: Dp,
     modifier: Modifier = Modifier,
+    embedded: Boolean = false,
+    /** Panel outline. AI assist menus pass [RectangleShape] for square corners. */
+    shape: Shape = OrbitTheme.shapeTokens.field,
     header: (@Composable ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    // Seeded closed so the panel plays its entrance on the first frame rather than snapping open,
-    // and kept composed while the exit runs — a `Popup` removed the instant its state flips has no
-    // frame left in which to animate away.
     val transition = remember { MutableTransitionState(false) }
     transition.targetState = expanded
     if (!expanded && transition.isIdle && !transition.currentState) return
@@ -116,49 +118,42 @@ internal fun OrbitDropdownMenu(
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
     val control = OrbitTheme.controlColors
-    val shape = OrbitTheme.shapeTokens.field
 
-    val density = LocalDensity.current
-    val gapPx = with(density) { OrbitDropdownGap.roundToPx() }
-    val edgeMarginPx = with(density) { OrbitDropdownEdgeMargin.roundToPx() }
-    val provider = remember(gapPx, edgeMarginPx) {
-        BelowAnchorPositionProvider(gapPx, edgeMarginPx)
-    }
-
-    Popup(
-        popupPositionProvider = provider,
-        onDismissRequest = onDismiss,
-        // Focusable, so the list takes the back gesture and the escape key, and so the search box
-        // inside it can hold focus at all. Without it the only way out of an open dropdown is a tap
-        // on empty space, and on a full-screen form there may not be any.
-        properties = PopupProperties(focusable = true),
-    ) {
+    val panel: @Composable () -> Unit = {
         AnimatedVisibility(
             visibleState = transition,
             enter = fadeIn(tween(OrbitDropdownOpenMs)) +
                 expandVertically(tween(OrbitDropdownOpenMs), expandFrom = Alignment.Top),
-            // Quicker away than out. Opening is information and the eye has to follow it; closing is
-            // an acknowledgement, and a slow one sits between the user and the next field.
             exit = fadeOut(tween(OrbitDropdownCloseMs)) +
                 shrinkVertically(tween(OrbitDropdownCloseMs), shrinkTowards = Alignment.Top),
         ) {
             Column(
                 modifier = modifier
-                    .then(if (width > Dp.Hairline) Modifier.width(width) else Modifier)
-                    // Level 2. The panel floats above the form, but it is still tethered to the
-                    // field that opened it — Level 4 is for things that have taken over the screen,
-                    // and a dropdown that casts a modal's shadow reads as one.
-                    .orbitDropShadow(shape = shape, level = OrbitShadow.Level2)
-                    .orbitGlass(
-                        fill = orbitElevatedFill(OrbitShadow.Level2),
-                        shape = shape,
-                        highlightAlpha = if (OrbitTheme.isDark) {
-                            OrbitGlass.SurfaceHighlightDark
-                        } else {
-                            OrbitGlass.SurfaceHighlightLight
+                    .then(
+                        when {
+                            embedded -> Modifier.fillMaxWidth()
+                            width > Dp.Hairline -> Modifier.width(width)
+                            else -> Modifier
                         },
-                        edge = control.controlBorder,
-                        edgeWidth = sizing.hairline,
+                    )
+                    .then(
+                        if (embedded) {
+                            Modifier
+                        } else {
+                            Modifier
+                                .orbitDropShadow(shape = shape, level = OrbitShadow.Level2)
+                                .orbitGlass(
+                                    fill = orbitElevatedFill(OrbitShadow.Level2),
+                                    shape = shape,
+                                    highlightAlpha = if (OrbitTheme.isDark) {
+                                        OrbitGlass.SurfaceHighlightDark
+                                    } else {
+                                        OrbitGlass.SurfaceHighlightLight
+                                    },
+                                    edge = control.controlBorder,
+                                    edgeWidth = sizing.hairline,
+                                )
+                        },
                     )
                     .padding(vertical = spacing.xs),
             ) {
@@ -167,7 +162,9 @@ internal fun OrbitDropdownMenu(
                 val listScroll = rememberScrollState()
 
                 Row(
-                    modifier = Modifier.heightIn(max = sizing.dropdownMaxHeight),
+                    modifier = Modifier.heightIn(
+                        max = if (embedded) sizing.dropdownMaxHeight / 2 else sizing.dropdownMaxHeight,
+                    ),
                 ) {
                     Column(
                         modifier = Modifier
@@ -184,6 +181,26 @@ internal fun OrbitDropdownMenu(
                 }
             }
         }
+    }
+
+    if (embedded) {
+        panel()
+        return
+    }
+
+    val density = LocalDensity.current
+    val gapPx = with(density) { OrbitDropdownGap.roundToPx() }
+    val edgeMarginPx = with(density) { OrbitDropdownEdgeMargin.roundToPx() }
+    val provider = remember(gapPx, edgeMarginPx) {
+        BelowAnchorPositionProvider(gapPx, edgeMarginPx)
+    }
+
+    Popup(
+        popupPositionProvider = provider,
+        onDismissRequest = onDismiss,
+        properties = PopupProperties(focusable = true),
+    ) {
+        panel()
     }
 }
 

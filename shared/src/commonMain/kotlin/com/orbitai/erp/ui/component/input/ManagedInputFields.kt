@@ -60,7 +60,10 @@ fun ManagedDescriptionField(
         onExpandedChange = { descriptionExpanded = it },
         aiAssistEnabled = true,
         aiMenuExpanded = aiMenuOpen,
-        onAiMenuExpandedChange = { aiMenuOpen = it },
+        onAiMenuExpandedChange = {
+            aiMenuOpen = it
+            if (it) translateOpen = false
+        },
         onAiRewrite = {
             aiMenuOpen = false
             if (value.isNotBlank()) {
@@ -75,18 +78,18 @@ fun ManagedDescriptionField(
             aiMenuOpen = false
             translateOpen = true
         },
-        aiPanel = {
-            if (translateOpen) {
-                OrbitDescriptionTranslatePanel(
-                    onLanguageSelect = { language ->
-                        if (value.isNotBlank()) {
-                            onValueChange("[$language] $value")
-                        }
-                        translateOpen = false
-                    },
-                    onDismiss = { translateOpen = false },
-                )
-            }
+        aiPanel = { width ->
+            OrbitDescriptionTranslatePanel(
+                expanded = translateOpen,
+                onLanguageSelect = { language ->
+                    if (value.isNotBlank()) {
+                        onValueChange("[$language] $value")
+                    }
+                    translateOpen = false
+                },
+                onDismiss = { translateOpen = false },
+                width = width,
+            )
         },
     )
 }

@@ -153,6 +153,16 @@ ICONS = {
     "FiveSquare": "FiveSquareIcon",
     # Chat message reply affordance on OrbitMessageBubble.
     "Reply": "ReplyIcon",
+    # Role bottom-nav glyphs (CEO first). Stroke-rounded free set.
+    "DashboardCircle": "DashboardCircleIcon",
+    "Layers01": "Layers01Icon",
+    "BubbleChat": "BubbleChatIcon",
+    "Brain03": "Brain03Icon",
+    "NoteAdd": "NoteAddIcon",
+    "NotepadText": "NotepadTextIcon",
+    "Warehouse": "WarehouseIcon",
+    "ShoppingCartAdd01": "ShoppingCartAdd01Icon",
+    "ShieldEllipsis": "ShieldEllipsisIcon",
 }
 
 

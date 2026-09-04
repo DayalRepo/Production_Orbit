@@ -48,9 +48,9 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
  * @param progress playback position, 0..1.
  * @param duration already formatted — "0:14". Formatting a duration needs a locale, which does not
  *   belong in the design system.
- * @param playing drives which glyph the leading button shows. Hoisted rather than held internally:
- *   only one clip in a list may play at a time, and a component that owned its own playing flag
- *   could not know that.
+ * @param listenOnly hides destructive controls. Download still appears when [onDownload] is set,
+ *   matching a read-only attachment thumbnail.
+ * @param onDownload save the clip locally. Typical on listen-only rows.
  */
 @Composable
 fun OrbitVoiceNoteRow(
@@ -64,6 +64,7 @@ fun OrbitVoiceNoteRow(
     listenOnly: Boolean = false,
     onRemove: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
+    onDownload: (() -> Unit)? = null,
 ) {
     val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
@@ -124,6 +125,15 @@ fun OrbitVoiceNoteRow(
             )
         }
 
+        if (onDownload != null) {
+            OrbitIconButton(
+                contentDescription = "Download $label",
+                onClick = onDownload,
+                icon = OrbitIcons.Download,
+                style = OrbitIconButtonStyle.Neutral,
+                size = OrbitIconButtonSize.Small,
+            )
+        }
         if (!listenOnly && onDelete != null) {
             OrbitIconButton(
                 contentDescription = "Delete $label",

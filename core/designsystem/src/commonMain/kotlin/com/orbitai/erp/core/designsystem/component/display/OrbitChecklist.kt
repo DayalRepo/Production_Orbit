@@ -98,6 +98,24 @@ fun orbitChecklistProgress(items: List<OrbitChecklistItem>): Float {
     return items.count { it.checked }.toFloat() / items.size.toFloat()
 }
 
+/** Next unchecked item, or null when every item is done (or the list is empty). */
+fun orbitChecklistNextOpen(items: List<OrbitChecklistItem>): OrbitChecklistItem? =
+    items.firstOrNull { !it.checked }
+
+fun orbitChecklistRemainingCount(items: List<OrbitChecklistItem>): Int =
+    items.count { !it.checked }
+
+/** `"2 left"` / `"All complete"` — collapsed-header copy that the progress bar does not say. */
+fun orbitChecklistRemainingLabel(items: List<OrbitChecklistItem>): String {
+    if (items.isEmpty()) return "No items"
+    val left = orbitChecklistRemainingCount(items)
+    return when (left) {
+        0 -> "All complete"
+        1 -> "1 left"
+        else -> "$left left"
+    }
+}
+
 /** Title and at least one item are required before a checklist can be created. */
 fun orbitChecklistCanCreate(title: String, items: List<OrbitChecklistItem>): Boolean =
     title.trim().isNotEmpty() && items.isNotEmpty()
@@ -209,7 +227,27 @@ fun OrbitChecklist(
                         contentDescription = orbitChecklistProgressLabel(items),
                     )
                 }
+                Text(
+                    text = orbitChecklistRemainingLabel(items),
+                    style = OrbitTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = content.textSecondary,
+                    maxLines = 1,
+                )
             }
+        }
+
+        if (!isExpanded && items.isNotEmpty()) {
+            OrbitDivider(color = control.controlBorder)
+            val next = orbitChecklistNextOpen(items)
+            if (next != null) {
+                ChecklistRow(
+                    item = next,
+                    onToggle = { onCheckedChange(next.id, !next.checked) },
+                )
+            } else {
+                ChecklistAllCompleteRow()
+            }
+            Spacer(modifier = Modifier.size(spacing.sm))
         }
 
         AnimatedVisibility(
@@ -507,6 +545,46 @@ private fun RequiredFieldLabel(text: String, starColor: Color) {
             text = " *",
             style = OrbitTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
             color = starColor,
+        )
+    }
+}
+
+@Composable
+private fun ChecklistAllCompleteRow() {
+    val sizing = OrbitTheme.sizing
+    val spacing = OrbitTheme.spacing
+    val content = OrbitTheme.contentColors
+    val dark = OrbitTheme.isDark
+    val active = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue50
+    val onActive = if (dark) OrbitPalette.Blue20 else Color.White
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = sizing.minTouchTarget)
+            .padding(horizontal = spacing.lg, vertical = spacing.sm)
+            .semantics { contentDescription = "All items complete" },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(sizing.iconMd)
+                .clip(CircleShape)
+                .background(active),
+            contentAlignment = Alignment.Center,
+        ) {
+            OrbitGlyph(
+                icon = OrbitIcons.Tick,
+                size = sizing.iconSm,
+                tint = onActive,
+                contentDescription = null,
+            )
+        }
+        Spacer(modifier = Modifier.width(spacing.md))
+        Text(
+            text = "All items complete",
+            style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+            color = content.textSecondary,
         )
     }
 }

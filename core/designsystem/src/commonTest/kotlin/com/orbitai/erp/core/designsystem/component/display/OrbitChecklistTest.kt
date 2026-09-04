@@ -23,6 +23,20 @@ class OrbitChecklistTest {
     }
 
     @Test
+    fun `next open item and remaining copy`() {
+        val items = listOf(
+            OrbitChecklistItem("1", "A", checked = true),
+            OrbitChecklistItem("2", "B", checked = false),
+            OrbitChecklistItem("3", "C", checked = false),
+        )
+        assertEquals("B", orbitChecklistNextOpen(items)?.label)
+        assertEquals(2, orbitChecklistRemainingCount(items))
+        assertEquals("2 left", orbitChecklistRemainingLabel(items))
+        assertEquals("All complete", orbitChecklistRemainingLabel(items.map { it.copy(checked = true) }))
+        assertEquals(null, orbitChecklistNextOpen(emptyList()))
+    }
+
+    @Test
     fun `create requires title and at least one item`() {
         assertEquals(false, orbitChecklistCanCreate("", emptyList()))
         assertEquals(false, orbitChecklistCanCreate("Title", emptyList()))

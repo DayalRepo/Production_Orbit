@@ -218,7 +218,7 @@ fun OrbitMultiSelectField(
 
             OrbitGlyph(
                 icon = OrbitIcons.ChevronDown,
-                size = sizing.iconMd,
+                size = sizing.iconSm,
                 tint = if (enabled) {
                     content.iconInactive
                 } else {
