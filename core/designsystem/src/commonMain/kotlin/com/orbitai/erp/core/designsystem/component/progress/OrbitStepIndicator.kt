@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,9 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
@@ -579,10 +578,10 @@ private fun StepRow(
 }
 
 /**
- * Numbered stage mark:
- * - Completed — filled blue square, light digit
- * - Current — dashed blue square border, blue digit
- * - Upcoming — dashed grey square border, grey digit
+ * Numbered stage mark — full circle:
+ * - Completed — filled disc, light digit
+ * - Current — dashed active border, active digit
+ * - Upcoming — dashed grey border, grey digit
  */
 @Composable
 private fun StepNumberMark(
@@ -592,11 +591,9 @@ private fun StepNumberMark(
     size: Dp,
 ) {
     val density = LocalDensity.current
-    val corner = with(density) { 5.dp.toPx() }
     val stroke = with(density) { 1.5.dp.toPx() }
     val dash = with(density) { 3.dp.toPx() }
     val gap = with(density) { 2.25.dp.toPx() }
-    val shape = RoundedCornerShape(5.dp)
 
     Box(
         modifier = Modifier.size(size),
@@ -606,17 +603,16 @@ private fun StepNumberMark(
             OrbitStepPhase.Completed -> Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .clip(shape)
+                    .clip(CircleShape)
                     .background(colors.active),
             )
             OrbitStepPhase.Current, OrbitStepPhase.Upcoming -> {
                 val border = if (phase == OrbitStepPhase.Current) colors.active else colors.inactive
                 Canvas(modifier = Modifier.matchParentSize()) {
-                    drawRoundRect(
+                    val radius = (this.size.minDimension - stroke) / 2f
+                    drawCircle(
                         color = border,
-                        topLeft = Offset(stroke / 2f, stroke / 2f),
-                        size = Size(this.size.width - stroke, this.size.height - stroke),
-                        cornerRadius = CornerRadius(corner, corner),
+                        radius = radius,
                         style = Stroke(
                             width = stroke,
                             pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash, gap), 0f),

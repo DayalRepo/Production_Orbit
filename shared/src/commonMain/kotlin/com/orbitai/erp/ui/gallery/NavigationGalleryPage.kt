@@ -36,18 +36,21 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
  * Navigation samples: floating role bottom navs, then underline pages bar.
  *
  * Role bars are library chrome — icons only — reviewed here before screens wire them above the
- * platform gesture / navigation bar.
+ * platform gesture / navigation bar. Tab bar and bottom nav share the same chrome edge inset so
+ * the column grid lines up on Android and iOS.
  */
 @Composable
 internal fun NavigationGalleryPage() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
+    val sizing = OrbitTheme.sizing
 
     GallerySection("Bottom nav · role bars") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
             Text(
                 text = "Full pill + separate assistant circle. Icons only; soft glass shadow; " +
-                    "sits above the system nav with a small gap.",
+                    "spring micro-animation on the active glyph. Edge inset ${sizing.bottomNavEdgeInset} " +
+                    "matches the tab bar column.",
                 style = OrbitTheme.typography.bodySmall,
                 color = content.textSecondary,
             )
@@ -115,7 +118,9 @@ internal fun NavigationGalleryPage() {
     GallerySection("Tab bar · pages bar") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
             Text(
-                text = "Underline tabs (pages bar): active label + thick underline; inactive muted.",
+                text = "Underline tabs (pages bar): active label + glass underline. Edge inset " +
+                    "${sizing.tabBarEdgeInset} and min height ${sizing.minTouchTarget} follow the " +
+                    "platform chrome grid with the bottom nav.",
                 style = OrbitTheme.typography.bodySmall,
                 color = content.textSecondary,
             )

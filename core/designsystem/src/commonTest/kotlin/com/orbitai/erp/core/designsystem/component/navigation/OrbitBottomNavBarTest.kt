@@ -43,7 +43,7 @@ class OrbitBottomNavBarTest {
         assertEquals(OrbitIconsName(OrbitContractorNavItems.Notes.icon), "NotepadText")
         assertEquals(OrbitIconsName(OrbitWarehouseManagerNavItems.Inventory.icon), "Warehouse")
         assertEquals(OrbitIconsName(OrbitProcurementManagerNavItems.Orders.icon), "ShoppingCartAdd01")
-        assertEquals(OrbitIconsName(OrbitQaQcNavItems.Inspections.icon), "ShieldEllipsis")
+        assertEquals(OrbitIconsName(OrbitQaQcNavItems.Inspections.icon), "BadgeCheck")
     }
 
     @Test
@@ -61,6 +61,10 @@ class OrbitBottomNavBarTest {
         assertTrue(tablet.activeSize <= tablet.height - 8.dp)
         assertEquals(560.dp, tablet.barMaxWidth)
         assertEquals(640.dp, desktop.barMaxWidth)
+        // Edge inset is platform chrome, not width-scaled — keeps tab/nav columns aligned.
+        assertEquals(sizing.bottomNavEdgeInset, phone.edgeInset)
+        assertEquals(sizing.bottomNavEdgeInset, tablet.edgeInset)
+        assertEquals(sizing.tabBarEdgeInset, phone.edgeInset)
     }
 }
 

@@ -33,7 +33,8 @@ internal fun ProgressGalleryPage() {
             verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
             Text(
-                text = "20 segments · light-green Health, bar-blue Progress.",
+                text = "16 monochrome segments · glass plate + shadow · percentage in the centre " +
+                    "(Normal · metricLarge). Theme tokens drive light and dark.",
                 style = OrbitTheme.typography.bodySmall,
                 color = content.textSecondary,
             )
@@ -44,13 +45,13 @@ internal fun ProgressGalleryPage() {
             ) {
                 OrbitDonutProgress(
                     progress = 0.78f,
-                    colors = OrbitDonutProgressDefaults.greenColors,
+                    colors = OrbitDonutProgressDefaults.monoColors,
                     caption = "Health",
                     contentDescription = "Health, 78 percent",
                 )
                 OrbitDonutProgress(
                     progress = 0.62f,
-                    colors = OrbitDonutProgressDefaults.blueColors,
+                    colors = OrbitDonutProgressDefaults.monoColors,
                     caption = "Progress",
                     contentDescription = "Progress, 62 percent",
                 )

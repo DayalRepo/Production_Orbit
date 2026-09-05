@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -35,9 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
@@ -410,6 +408,9 @@ private fun StageProofRow(
         OrbitStepPhase.Upcoming -> "-"
         else -> stage.endedOn?.takeIf { it.isNotBlank() } ?: "-"
     }
+    // Number column header matches the code-chip row height so the digit sits on the same
+    // baseline as the short form — only the mark moves, not the stage title.
+    val markRowHeight = maxOf(sizing.stepGlyphSize, CodeChipSize)
 
     Row(
         modifier = Modifier
@@ -425,7 +426,7 @@ private fun StageProofRow(
                 .fillMaxHeight(),
         ) {
             Box(
-                modifier = Modifier.size(sizing.stepColumnWidth, sizing.stepGlyphSize),
+                modifier = Modifier.size(sizing.stepColumnWidth, markRowHeight),
                 contentAlignment = Alignment.Center,
             ) {
                 StageProofNumberMark(
@@ -451,12 +452,13 @@ private fun StageProofRow(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = spacing.sm, end = spacing.sm)
-                .heightIn(min = sizing.stepGlyphSize),
+                .padding(start = spacing.sm, end = spacing.sm),
             verticalArrangement = Arrangement.spacedBy(spacing.xxs),
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = markRowHeight),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.xs),
             ) {
@@ -505,12 +507,11 @@ private fun StageProofRow(
 private fun StageProofCodeChip(code: String) {
     val control = OrbitTheme.controlColors
     val content = OrbitTheme.contentColors
-    val shape = RoundedCornerShape(CodeChipCorner)
 
     Box(
         modifier = Modifier
             .size(CodeChipSize)
-            .clip(shape)
+            .clip(CircleShape)
             .background(control.interactiveContainer),
         contentAlignment = Alignment.Center,
     ) {
@@ -576,11 +577,9 @@ private fun StageProofNumberMark(
     size: Dp,
 ) {
     val density = LocalDensity.current
-    val corner = with(density) { 5.dp.toPx() }
     val stroke = with(density) { 1.5.dp.toPx() }
     val dash = with(density) { 3.dp.toPx() }
     val gap = with(density) { 2.25.dp.toPx() }
-    val shape = RoundedCornerShape(5.dp)
 
     Box(
         modifier = Modifier.size(size),
@@ -590,17 +589,16 @@ private fun StageProofNumberMark(
             OrbitStepPhase.Completed -> Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .clip(shape)
+                    .clip(CircleShape)
                     .background(colors.active),
             )
             OrbitStepPhase.Current, OrbitStepPhase.Upcoming -> {
                 val border = if (phase == OrbitStepPhase.Current) colors.active else colors.inactive
                 Canvas(modifier = Modifier.matchParentSize()) {
-                    drawRoundRect(
+                    val radius = (this.size.minDimension - stroke) / 2f
+                    drawCircle(
                         color = border,
-                        topLeft = Offset(stroke / 2f, stroke / 2f),
-                        size = Size(this.size.width - stroke, this.size.height - stroke),
-                        cornerRadius = CornerRadius(corner, corner),
+                        radius = radius,
                         style = Stroke(
                             width = stroke,
                             pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash, gap), 0f),
@@ -655,6 +653,5 @@ private fun StageProofRail(
 /** Same name / dates split as [OrbitStepIndicator] (TOTAL row only). */
 private const val StageProofNameWeight = 0.36f
 private const val StageProofDatesWeight = 0.64f
-/** Fixed stamp for SR / CA / UI / … — same box on every row. */
+/** Fixed circular stamp for SR / CA / UI / … — same disc on every row. */
 private val CodeChipSize = 28.dp
-private val CodeChipCorner = 4.dp

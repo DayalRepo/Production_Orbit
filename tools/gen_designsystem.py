@@ -123,8 +123,16 @@ ICONS = {
     # rather than `pin-02`: a pin means "kept" or "stuck to the top", which is a different claim
     # from "attached to this record", and the row is already a list of attachments.
     "AttachmentFile": "Attachment02Icon",
-    # The trailing glyph on Open and Login — the two actions that take you somewhere else.
+    // The trailing glyph on Open and Login — the two actions that take you somewhere else.
     "ArrowRight": "ArrowRight01Icon",
+    # Back / up navigation on the mobile top bar.
+    "ArrowLeft": "ArrowLeft01Icon",
+    "Menu": "Menu01Icon",
+    "Notification": "Notification03Icon",
+    "FilterHorizontal": "FilterHorizontalIcon",
+    "SidebarLeft": "SidebarLeftIcon",
+    "BubbleChatAdd": "BubbleChatAddIcon",
+    "Share": "Share08Icon",
     # Copy to clipboard. Sits beside the phone number in the avatar cards, which is the one value in
     # this product that exists to be pasted somewhere else.
     "Copy": "Copy01Icon",
@@ -162,7 +170,7 @@ ICONS = {
     "NotepadText": "NotepadTextIcon",
     "Warehouse": "WarehouseIcon",
     "ShoppingCartAdd01": "ShoppingCartAdd01Icon",
-    "ShieldEllipsis": "ShieldEllipsisIcon",
+    "BadgeCheck": "BadgeCheckIcon",
 }
 
 

@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -28,7 +27,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
-import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -142,14 +140,7 @@ fun OrbitAvatar(
                 .size(diameter)
                 .orbitGlassShadow(shape = shape, elevation = sizing.shadowBadge)
                 .clip(shape)
-                .background(control.cardContainer, shape)
-                .then(
-                    if (onClick != null) {
-                        Modifier.indication(interactionSource, orbitCircularPressIndication())
-                    } else {
-                        Modifier
-                    },
-                ),
+                .background(control.cardContainer, shape),
             contentAlignment = Alignment.Center,
         ) {
             if (painter != null) {

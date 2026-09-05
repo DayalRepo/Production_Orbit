@@ -1,17 +1,17 @@
 package com.orbitai.erp.core.designsystem.component.progress
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -23,12 +23,16 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.orbitai.erp.core.designsystem.foundation.orbitGlass
+import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitPalette
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.core.designsystem.theme.controlColors
 import kotlin.math.roundToInt
 
 /**
@@ -63,39 +67,45 @@ object OrbitDonutProgressDefaults {
     /**
      * How many arc segments the ring is cut into.
      *
-     * Twenty makes each piece worth exactly **5%** of the ring (`100 / 20`). The figure in the centre
-     * is still the true rounded percentage; the segments only approximate that fraction visually —
-     * see [litSegments].
+     * Sixteen is the sweet spot for this diameter and stroke: each bar is still wide enough to read
+     * as a bar (not a tick), gaps stay open, and one segment is ~6.25% — close enough to the centre
+     * figure that the ring and the number agree at a glance. Twenty (5% each) is fine but denser;
+     * twelve looks chunky; twenty-four starts to close the gaps on a phone.
      */
-    const val SegmentCount = 20
+    const val SegmentCount = 16
 
     /**
      * Gap between neighbouring segments, as a fraction of one segment's slot.
-     * Modest so twenty bars stay wide enough to read.
+     * Tuned with [SegmentCount] so sixteen bars stay distinct without looking sparse.
      */
-    const val GapFraction = 0.14f
+    const val GapFraction = 0.16f
 
     /** First segment starts at 12 o'clock and the ring runs clockwise. */
     const val StartAngle = -90f
 
     /**
-     * Health — deep green on light (readable on white), soft green on dark.
+     * Monochrome ring for both Health and Progress — near-black fill on light, near-white on dark.
+     * Same pair for every caption so two rings in one row share one language.
      */
-    val greenColors: OrbitDonutProgressColors
-        @Composable @ReadOnlyComposable get() = colors(
-            filled = if (OrbitTheme.isDark) OrbitPalette.Green80 else OrbitPalette.Green40,
-            track = if (OrbitTheme.isDark) OrbitPalette.Neutral30 else OrbitPalette.Slate90,
-        )
-
-    /**
-     * Progress — same blue + track as [OrbitProgressDefaults] / [OrbitSegmentedProgress] (Blue50 on
-     * light, Blue80 on dark).
-     */
-    val blueColors: OrbitDonutProgressColors
+    val monoColors: OrbitDonutProgressColors
         @Composable @ReadOnlyComposable get() {
-            val bar = OrbitProgressDefaults.colors
-            return colors(filled = bar.filled, track = bar.track)
+            val content = OrbitTheme.contentColors
+            val dark = OrbitTheme.isDark
+            return OrbitDonutProgressColors(
+                filled = content.iconPrimary,
+                track = if (dark) OrbitPalette.Neutral30 else OrbitPalette.Slate90,
+                label = content.textPrimary,
+                caption = content.textSecondary,
+            )
         }
+
+    /** @deprecated Use [monoColors] — health and progress share the monochrome ring. */
+    val greenColors: OrbitDonutProgressColors
+        @Composable @ReadOnlyComposable get() = monoColors
+
+    /** @deprecated Use [monoColors] — health and progress share the monochrome ring. */
+    val blueColors: OrbitDonutProgressColors
+        @Composable @ReadOnlyComposable get() = monoColors
 
     @Composable
     @ReadOnlyComposable
@@ -118,23 +128,26 @@ object OrbitDonutProgressDefaults {
 }
 
 /**
- * A segmented donut progress ring: [OrbitDonutProgressDefaults.SegmentCount] curved bars with gaps,
- * a centred percentage, and an optional name beneath it.
+ * A segmented donut progress ring: [OrbitDonutProgressDefaults.SegmentCount] curved bars with gaps
+ * and a centred percentage.
+ *
+ * Draws as a glass object: contact shadow, translucent glass plate (no rim line), a glass lens in
+ * the hole, and sheened segment arcs — the same stack badges and icon rings use, so light and dark
+ * themes stay consistent without a second palette. Inner and outer hairlines are omitted on purpose:
+ * a continuous circle reads as a line joining the segment bars.
  *
  * Lit count uses the same rounding rules as [OrbitSegmentedProgress] (via [litSegments]): above zero
  * always lights at least one piece; below 100% always leaves at least one dark.
  *
- * Segments are stroked arcs with [StrokeCap.Butt] so they follow the ring and stay clearly separated
- * — no drop shadow, no round caps that merge the gaps.
- *
  * @param progress 0f..1f. Values outside are clamped.
- * @param caption optional line under the percent (e.g. `"Health"`, `"Progress"`).
+ * @param caption optional spoken name for accessibility (e.g. `"Health"`). Not drawn in the ring —
+ *   only the percentage sits in the centre.
  */
 @Composable
 fun OrbitDonutProgress(
     progress: Float,
     modifier: Modifier = Modifier,
-    colors: OrbitDonutProgressColors = OrbitDonutProgressDefaults.greenColors,
+    colors: OrbitDonutProgressColors = OrbitDonutProgressDefaults.monoColors,
     size: Dp = OrbitDonutProgressDefaults.Size,
     strokeWidth: Dp = OrbitDonutProgressDefaults.StrokeWidth,
     segmentCount: Int = OrbitDonutProgressDefaults.SegmentCount,
@@ -145,6 +158,8 @@ fun OrbitDonutProgress(
     val percent = OrbitDonutProgressDefaults.percentLabel(fraction)
     val count = segmentCount.coerceAtLeast(1)
     val lit = litSegments(fraction, count)
+    val sizing = OrbitTheme.sizing
+    val control = OrbitTheme.controlColors
     val dark = OrbitTheme.isDark
     val highlightAlpha = if (dark) {
         OrbitGlass.SurfaceHighlightDark
@@ -152,7 +167,7 @@ fun OrbitDonutProgress(
         OrbitGlass.SurfaceHighlightLight
     }
     val sheen = if (dark) 1f else OrbitGlass.Sheen
-    val spacing = OrbitTheme.spacing
+    val hole = (size - strokeWidth * 2).coerceAtLeast(0.dp)
     val spoken = contentDescription
         ?: buildString {
             if (!caption.isNullOrBlank()) {
@@ -166,6 +181,16 @@ fun OrbitDonutProgress(
     Box(
         modifier = modifier
             .size(size)
+            .orbitGlassShadow(shape = CircleShape, elevation = sizing.shadowButton)
+            .clip(CircleShape)
+            .orbitGlass(
+                fill = control.ringContainer,
+                shape = CircleShape,
+                // No edge/rim — a hairline circle reads as a line joining the segment bars.
+                highlightAlpha = highlightAlpha,
+                edge = null,
+                sheen = sheen,
+            )
             .semantics {
                 progressBarRangeInfo = ProgressBarRangeInfo(fraction, 0f..1f)
                 this.contentDescription = spoken
@@ -202,21 +227,32 @@ fun OrbitDonutProgress(
             }
         }
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(spacing.xxs),
-        ) {
-            Text(
-                text = "$percent%",
-                style = OrbitTheme.extendedTypography.metricMedium,
-                color = colors.label,
-                textAlign = TextAlign.Center,
-            )
-            if (!caption.isNullOrBlank()) {
+        // Glass lens in the hole — fill + highlight only, no circular edge line.
+        if (hole > 0.dp) {
+            Box(
+                modifier = Modifier
+                    .size(hole)
+                    .orbitGlassShadow(shape = CircleShape, elevation = sizing.shadowBadge)
+                    .clip(CircleShape)
+                    .orbitGlass(
+                        fill = control.ringContainer,
+                        shape = CircleShape,
+                        highlightAlpha = if (dark) {
+                            OrbitGlass.RingHighlightDark
+                        } else {
+                            OrbitGlass.RingHighlightLight
+                        },
+                        edge = null,
+                        sheen = sheen,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
                 Text(
-                    text = caption,
-                    style = OrbitTheme.typography.labelMedium,
-                    color = colors.caption,
+                    text = "$percent%",
+                    style = OrbitTheme.extendedTypography.metricLarge.copy(
+                        fontWeight = FontWeight.Normal,
+                    ),
+                    color = colors.label,
                     textAlign = TextAlign.Center,
                 )
             }

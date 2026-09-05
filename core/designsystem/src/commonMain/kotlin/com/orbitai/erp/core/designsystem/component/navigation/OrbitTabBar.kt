@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -59,6 +60,10 @@ data class OrbitTab(
  * Active label is theme primary ink (near-black / near-white); inactive is muted tertiary grey.
  * Weight and size stay the same — only colour changes. A thinner glass underline sits inset under
  * the active label, on the shared hairline track.
+ *
+ * Horizontal edge inset matches [OrbitSizing.tabBarEdgeInset] / bottom-nav edge so the tab row and
+ * floating nav share one column grid on Android and iOS. Label hit height uses the platform
+ * [OrbitSizing.minTouchTarget] (48dp Android / 44pt iOS).
  */
 @Composable
 fun OrbitTabBar(
@@ -77,6 +82,9 @@ fun OrbitTabBar(
     val density = LocalDensity.current
     val scroll = rememberScrollState()
     val underlineShape = RoundedCornerShape(sizing.progressSegmentRadius)
+    val edgeInset = sizing.tabBarEdgeInset
+    val itemGap = sizing.tabBarItemGap
+    val rowMinHeight = maxOf(sizing.tabBarMinHeight, sizing.minTouchTarget)
 
     val selected = tabs.firstOrNull { it.id == selectedId } ?: tabs.first()
     val widths = remember { mutableStateMapOf<String, Dp>() }
@@ -103,8 +111,10 @@ fun OrbitTabBar(
         Box(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier
+                    .padding(horizontal = edgeInset)
                     .horizontalScroll(scroll)
-                    .padding(bottom = spacing.sm),
+                    .padding(bottom = spacing.sm)
+                    .heightIn(min = rowMinHeight),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 tabs.forEachIndexed { index, tab ->
@@ -118,7 +128,8 @@ fun OrbitTabBar(
                         color = if (selectedTab) content.textPrimary else content.textTertiary,
                         maxLines = 1,
                         modifier = Modifier
-                            .padding(end = if (index < tabs.lastIndex) spacing.lg else spacing.none)
+                            .padding(end = if (index < tabs.lastIndex) itemGap else spacing.none)
+                            .heightIn(min = rowMinHeight)
                             .onGloballyPositioned { coords ->
                                 widths[tab.id] = with(density) { coords.size.width.toDp() }
                                 val x = coords.positionInParent().x
@@ -148,7 +159,7 @@ fun OrbitTabBar(
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .offset(x = indicatorOffset - scrolled + TabUnderlineInset)
+                        .offset(x = indicatorOffset - scrolled + edgeInset + TabUnderlineInset)
                         .width(insetWidth)
                         .height(TabUnderlineHeight)
                         .orbitGlassShadow(shape = underlineShape, elevation = sizing.shadowButton)

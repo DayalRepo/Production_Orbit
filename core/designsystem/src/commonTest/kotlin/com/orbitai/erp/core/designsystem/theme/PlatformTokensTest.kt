@@ -19,6 +19,14 @@ class PlatformTokensTest {
     }
 
     @Test
+    fun `tab bar and bottom nav share the same chrome edge inset`() {
+        assertEquals(android.sizing.bottomNavEdgeInset, android.sizing.tabBarEdgeInset)
+        assertEquals(ios.sizing.bottomNavEdgeInset, ios.sizing.tabBarEdgeInset)
+        assertEquals(10.dp, android.sizing.tabBarEdgeInset)
+        assertEquals(12.dp, ios.sizing.tabBarEdgeInset)
+    }
+
+    @Test
     fun `top bar titles follow native alignment conventions`() {
         assertEquals(OrbitTitleAlignment.Start, android.topBarTitleAlignment)
         assertEquals(OrbitTitleAlignment.Center, ios.topBarTitleAlignment)

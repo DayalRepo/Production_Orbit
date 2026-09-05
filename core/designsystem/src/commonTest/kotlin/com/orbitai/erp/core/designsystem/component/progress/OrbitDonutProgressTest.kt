@@ -20,7 +20,7 @@ class OrbitDonutProgressTest {
 
     @Test
     fun `ring is cut into twenty segments by default`() {
-        assertEquals(20, OrbitDonutProgressDefaults.SegmentCount)
+        assertEquals(16, OrbitDonutProgressDefaults.SegmentCount)
     }
 
     @Test

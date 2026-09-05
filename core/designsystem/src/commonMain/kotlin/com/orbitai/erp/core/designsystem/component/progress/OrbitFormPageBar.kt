@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
@@ -21,11 +22,25 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
+ * Monochrome fills for [OrbitFormPageBar] — near-black / near-white, not progress blue.
+ */
+object OrbitFormPageBarDefaults {
+    val colors: OrbitProgressColors
+        @Composable
+        @ReadOnlyComposable
+        get() = OrbitProgressColors(
+            filled = OrbitTheme.contentColors.iconPrimary,
+            track = OrbitTheme.controlColors.controlContainer,
+        )
+}
+
+/**
  * A **form page bar** (also called a wizard step bar / multi-step form indicator).
  *
- * Shows one separate corner-rounded bar per filling page. Bars through the current page use the
- * filled progress colour with glass + shadow; upcoming pages stay on the track colour with the same
- * treatment. Not a pill capsule — corner radius only.
+ * Shows one separate corner-rounded bar per filling page, with [OrbitSizing.formPageBarGap]
+ * between them. Bars through the current page use the monochrome filled colour with glass +
+ * shadow; upcoming pages stay on the track colour with the same treatment. Not a pill capsule —
+ * corner radius only.
  *
  * @param pageCount how many filling pages the form has (must be ≥ 1).
  * @param currentPage 0-based index of the page the user is on.
@@ -35,9 +50,9 @@ fun OrbitFormPageBar(
     pageCount: Int,
     currentPage: Int,
     modifier: Modifier = Modifier,
-    colors: OrbitProgressColors = OrbitProgressDefaults.colors,
+    colors: OrbitProgressColors = OrbitFormPageBarDefaults.colors,
     height: Dp = FormPageBarHeight,
-    gap: Dp = OrbitTheme.sizing.progressSegmentGap,
+    gap: Dp = OrbitTheme.sizing.formPageBarGap,
     contentDescription: String? = null,
 ) {
     val pages = pageCount.coerceAtLeast(1)

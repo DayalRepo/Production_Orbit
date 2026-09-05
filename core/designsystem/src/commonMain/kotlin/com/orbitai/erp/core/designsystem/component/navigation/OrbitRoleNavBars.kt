@@ -323,7 +323,7 @@ object OrbitQaQcNavIds {
  * QA/QC icon set.
  *
  * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
- * [shield-ellipsis](https://hugeicons.com/icon/shield-ellipsis?style=stroke-rounded),
+ * [badge-check](https://hugeicons.com/icon/badge-check?style=stroke-rounded),
  * [bubble-chat](https://hugeicons.com/icon/bubble-chat?style=stroke-rounded).
  * Circle: [brain-03](https://hugeicons.com/icon/brain-03?style=stroke-rounded).
  */
@@ -336,7 +336,7 @@ object OrbitQaQcNavItems {
     )
     val Inspections = OrbitNavItem(
         id = OrbitQaQcNavIds.Inspections,
-        icon = OrbitIcons.ShieldEllipsis,
+        icon = OrbitIcons.BadgeCheck,
         contentDescription = "Quality",
     )
     val Messages = OrbitNavItem(

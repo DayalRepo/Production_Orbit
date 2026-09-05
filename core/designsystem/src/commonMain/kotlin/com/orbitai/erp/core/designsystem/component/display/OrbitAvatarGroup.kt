@@ -3,7 +3,6 @@ package com.orbitai.erp.core.designsystem.component.display
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +27,6 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
-import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -161,6 +159,8 @@ fun OrbitAvatarGroup(
             append(if (overflow == 1) " other" else " others")
         }
     }
+    // Shared silent source — faces and expand/collapse intentionally have no press indication.
+    val silentInteraction = remember { MutableInteractionSource() }
 
     if (expanded) {
         FlowRow(
@@ -182,6 +182,8 @@ fun OrbitAvatarGroup(
                                     Modifier
                                         .orbitHandCursor()
                                         .clickable(
+                                            interactionSource = silentInteraction,
+                                            indication = null,
                                             role = Role.Button,
                                             onClick = { onMemberClick(index, member) },
                                         )
@@ -219,16 +221,14 @@ fun OrbitAvatarGroup(
             // the control appears. It flows with the faces, so on a group that wraps it ends up
             // after the final face on the last row rather than stranded.
             if (onToggle != null) {
-                val collapseInteraction = remember { MutableInteractionSource() }
                 Box(
                     modifier = Modifier
                         .size(tile)
                         .clip(CircleShape)
-                        .indication(collapseInteraction, orbitPressIndication())
                         .background(background, CircleShape)
                         .orbitHandCursor()
                         .clickable(
-                            interactionSource = collapseInteraction,
+                            interactionSource = silentInteraction,
                             indication = null,
                             role = Role.Button,
                             onClick = onToggle,
@@ -261,8 +261,6 @@ fun OrbitAvatarGroup(
         return
     }
 
-    val expandInteraction = remember { MutableInteractionSource() }
-
     Row(
         modifier = modifier
             .then(
@@ -270,13 +268,11 @@ fun OrbitAvatarGroup(
                     Modifier
                         // A stadium, not a rectangle: the collapsed row is exactly one face tall and
                         // capped by a circular face at each end, so this clip follows the silhouette
-                        // the eye sees. Unclipped, the ripple squares off the two rounded ends and
-                        // the group looks briefly like a rectangular button.
+                        // the eye sees.
                         .clip(RoundedCornerShape(percent = 50))
-                        .indication(expandInteraction, orbitPressIndication())
                         .orbitHandCursor()
                         .clickable(
-                            interactionSource = expandInteraction,
+                            interactionSource = silentInteraction,
                             indication = null,
                             role = Role.Button,
                             onClick = onToggle,

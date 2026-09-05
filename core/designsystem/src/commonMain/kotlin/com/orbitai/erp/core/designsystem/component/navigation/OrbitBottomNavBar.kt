@@ -1,5 +1,12 @@
 package com.orbitai.erp.core.designsystem.component.navigation
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +24,15 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
@@ -55,7 +66,8 @@ data class OrbitNavItem(
  * Resolved sizes for a floating bottom nav at a given available width.
  *
  * Scales height, glyph and active glass disc together so phones stay compact, tablets get roomier
- * targets, and the active lens always clears the outer rim.
+ * targets, and the active lens always clears the outer rim. Edge inset comes from [OrbitSizing] so
+ * it stays locked to the tab-bar column on each platform.
  */
 @Immutable
 internal data class OrbitBottomNavMetrics(
@@ -70,10 +82,14 @@ internal data class OrbitBottomNavMetrics(
 
 /**
  * Maps available width to bar metrics. Pure so host tests can lock the breakpoints without Compose.
+ *
+ * [minTouchTarget] floors the bar height so Android (48) and iOS (44) keep legal hit areas after
+ * scale.
  */
 internal fun orbitBottomNavMetrics(
     availableWidth: Dp,
     sizing: OrbitSizing,
+    minTouchTarget: Dp = sizing.minTouchTarget,
 ): OrbitBottomNavMetrics {
     val scale = when {
         availableWidth < 340.dp -> 0.90f
@@ -82,12 +98,15 @@ internal fun orbitBottomNavMetrics(
         availableWidth < WindowSize.ExpandedWidthBreakpoint -> 1.14f
         else -> 1.22f
     }
-    val height = (sizing.bottomNavHeight.value * scale).dp.coerceIn(56.dp, 76.dp)
+    val heightFloor = maxOf(56.dp, minTouchTarget)
+    val height = (sizing.bottomNavHeight.value * scale).dp.coerceIn(heightFloor, 76.dp)
     val glyph = (sizing.bottomNavGlyph.value * scale).dp.coerceIn(24.dp, 36.dp)
     val active = (sizing.bottomNavActiveSize.value * scale).dp
         .coerceIn(48.dp, 68.dp)
         .coerceAtMost(height - 8.dp)
-    val edgeInset = (sizing.bottomNavEdgeInset.value * scale).dp.coerceIn(8.dp, 20.dp)
+    // Edge inset is not width-scaled — it must match [OrbitSizing.tabBarEdgeInset] for a shared
+    // chrome column on Android and iOS.
+    val edgeInset = sizing.bottomNavEdgeInset
     val pillInset = (sizing.bottomNavPillInset.value * scale).dp.coerceIn(10.dp, 24.dp)
     val clusterGap = (sizing.bottomNavClusterGap.value * scale).dp.coerceIn(8.dp, 16.dp)
     val barMaxWidth = when {
@@ -118,8 +137,9 @@ internal fun orbitBottomNavMetrics(
  * height, glyph and active glass disc scale from the available screen width so phone and tablet
  * layouts stay readable and within touch-target comfort.
  *
- * The selected destination gets a translucent glass disc behind the glyph — no press ripple. Role
- * presets such as [OrbitCeoNavBar] wire a fixed icon set into this layout.
+ * The selected destination gets a translucent glass disc behind the glyph and a short dip-and-lift
+ * micro animation on the icon — no press ripple. Role presets such as [OrbitCeoNavBar] wire a fixed
+ * icon set into this layout.
  *
  * @param applyNavigationBarInset when true (default), pads for [WindowInsets.navigationBars] and
  *   then adds [OrbitSizing.bottomNavSystemGap] so the glass sits just above the system chrome.
@@ -157,7 +177,9 @@ fun OrbitBottomNavBar(
             .then(insetModifier)
             .semantics { contentDescription = "Navigation" },
     ) {
-        val metrics = remember(maxWidth, sizing) { orbitBottomNavMetrics(maxWidth, sizing) }
+        val metrics = remember(maxWidth, sizing) {
+            orbitBottomNavMetrics(maxWidth, sizing, sizing.minTouchTarget)
+        }
 
         Row(
             modifier = Modifier
@@ -246,12 +268,74 @@ private fun NavGlyph(
     val control = OrbitTheme.controlColors
     val content = OrbitTheme.contentColors
     val dark = OrbitTheme.isDark
+    val density = LocalDensity.current
     val interaction = remember(item.id) { MutableInteractionSource() }
     val tint = if (selected) content.iconPrimary else content.iconInactive
     val activeHighlight = if (dark) {
         OrbitGlass.RingHighlightDark * OrbitGlass.ButtonHoverLift
     } else {
         OrbitGlass.RingHighlightLight * OrbitGlass.ButtonHoverLift
+    }
+
+    // Soft disc: fade + expand from the centre — no bounce tilt.
+    val discAlpha by animateFloatAsState(
+        targetValue = if (selected) 1f else 0f,
+        animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
+        label = "nav-disc-alpha",
+    )
+    val discScale by animateFloatAsState(
+        targetValue = if (selected) 1f else 0.55f,
+        animationSpec = tween(durationMillis = 220, easing = FastOutSlowInEasing),
+        label = "nav-disc-scale",
+    )
+
+    // Dip-and-lift on select: press slightly down, then float up and settle. Same motion for every
+    // role icon — readable and quieter than a pop + tilt.
+    val scale = remember(item.id) { Animatable(1f) }
+    val offsetY = remember(item.id) { Animatable(0f) }
+    val dipPx = with(density) { 2.5.dp.toPx() }
+    val liftPx = with(density) { (-1.5).dp.toPx() }
+    LaunchedEffect(selected) {
+        if (selected) {
+            scale.snapTo(1f)
+            offsetY.snapTo(0f)
+            // Dip
+            scale.animateTo(0.86f, tween(70, easing = FastOutLinearInEasing))
+            offsetY.animateTo(dipPx, tween(70, easing = FastOutLinearInEasing))
+            // Lift past rest
+            scale.animateTo(
+                1.1f,
+                spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            )
+            offsetY.animateTo(
+                liftPx,
+                spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            )
+            // Settle
+            scale.animateTo(
+                1f,
+                spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow,
+                ),
+            )
+            offsetY.animateTo(
+                0f,
+                spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow,
+                ),
+            )
+        } else {
+            scale.animateTo(1f, tween(160, easing = FastOutSlowInEasing))
+            offsetY.animateTo(0f, tween(160, easing = FastOutSlowInEasing))
+        }
     }
 
     Box(
@@ -269,10 +353,15 @@ private fun NavGlyph(
             },
         contentAlignment = Alignment.Center,
     ) {
-        if (selected) {
+        if (discAlpha > 0.01f) {
             Box(
                 modifier = Modifier
                     .size(activeSize)
+                    .graphicsLayer {
+                        alpha = discAlpha
+                        scaleX = discScale
+                        scaleY = discScale
+                    }
                     .clip(CircleShape)
                     .orbitGlass(
                         fill = control.ringContainer,
@@ -291,6 +380,11 @@ private fun NavGlyph(
             minimumStroke = sizing.bottomNavIconStroke,
             maximumStroke = sizing.bottomNavIconStroke,
             contentDescription = null,
+            modifier = Modifier.graphicsLayer {
+                scaleX = scale.value
+                scaleY = scale.value
+                translationY = offsetY.value
+            },
         )
     }
 }

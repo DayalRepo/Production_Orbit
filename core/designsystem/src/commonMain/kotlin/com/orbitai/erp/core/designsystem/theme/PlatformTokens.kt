@@ -55,6 +55,12 @@ internal val AndroidPlatformTokens = OrbitPlatformTokens(
         // Six 48dp rows and a sliver of the seventh. Android's taller rows mean fewer options fit,
         // so the panel is given a little more room than iOS to land on a comparable option count.
         dropdownMaxHeight = 296.dp,
+
+        // Shared chrome column: tab bar and bottom nav use the same edge inset.
+        bottomNavEdgeInset = 10.dp,
+        tabBarEdgeInset = 10.dp,
+        tabBarItemGap = 20.dp,
+        bottomNavSystemGap = 8.dp,
     ),
     lightContentColors = AndroidLightContentColors,
     darkContentColors = AndroidDarkContentColors,
@@ -98,6 +104,12 @@ internal val IosPlatformTokens = OrbitPlatformTokens(
         // same number of options, which is the thing worth matching across platforms — an identical
         // dp height would show iOS users an extra half row for no reason other than arithmetic.
         dropdownMaxHeight = 272.dp,
+
+        // Same shared chrome column as Android, with a touch more edge air for the 44pt targets.
+        bottomNavEdgeInset = 12.dp,
+        tabBarEdgeInset = 12.dp,
+        tabBarItemGap = 22.dp,
+        bottomNavSystemGap = 8.dp,
     ),
     lightContentColors = IosLightContentColors,
     darkContentColors = IosDarkContentColors,

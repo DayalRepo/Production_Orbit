@@ -463,6 +463,14 @@ data class OrbitSizing(
     val progressSegmentGap: Dp = 1.25.dp,
 
     /**
+     * Gap between wizard / form page bars.
+     *
+     * Wider than [progressSegmentGap]: those are 50 KPI slats that share one track, while a form
+     * page bar is only a handful of segments and needs clear separation between pages.
+     */
+    val formPageBarGap: Dp = 4.dp,
+
+    /**
      * Floor for a slat's width, enforced by dropping the slat count rather than by overflowing.
      *
      * Equal to the gap beside it. Below that the bar inverts and the eye starts reading the gaps as
@@ -680,6 +688,23 @@ data class OrbitSizing(
      * bar halfway up the screen.
      */
     val bottomNavSystemGap: Dp = 8.dp,
+
+    /**
+     * Horizontal inset for [OrbitTabBar], kept equal to [bottomNavEdgeInset] so the pages bar and
+     * floating bottom nav share one column edge on phone widths.
+     */
+    val tabBarEdgeInset: Dp = 10.dp,
+
+    /** Gap between consecutive tab labels. */
+    val tabBarItemGap: Dp = 20.dp,
+
+    /**
+     * Minimum label-row height before [minTouchTarget] is applied.
+     *
+     * The composable takes `max(tabBarMinHeight, minTouchTarget)` so Android lands at 48dp and iOS
+     * at 44pt without a second platform branch in the layout.
+     */
+    val tabBarMinHeight: Dp = 44.dp,
 )
 
 internal val LocalOrbitSpacing = staticCompositionLocalOf { OrbitSpacing() }
