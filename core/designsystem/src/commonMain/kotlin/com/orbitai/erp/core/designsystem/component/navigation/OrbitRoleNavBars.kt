@@ -2,6 +2,7 @@ package com.orbitai.erp.core.designsystem.component.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 
@@ -19,8 +20,8 @@ object OrbitProjectManagerNavIds {
  *
  * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
  * [note-add](https://hugeicons.com/icon/note-add?style=stroke-rounded),
- * [bubble-chat](https://hugeicons.com/icon/bubble-chat?style=stroke-rounded).
- * Circle: [brain-03](https://hugeicons.com/icon/brain-03?style=stroke-rounded).
+ * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
+ * Circle: Orbit pixel brand mark (AI assistant).
  */
 @Immutable
 object OrbitProjectManagerNavItems {
@@ -36,13 +37,14 @@ object OrbitProjectManagerNavItems {
     )
     val Messages = OrbitNavItem(
         id = OrbitProjectManagerNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        contentDescription = "Messages",
+        icon = OrbitIcons.BellDot,
+        contentDescription = "Notifications",
     )
     val Assistant = OrbitNavItem(
         id = OrbitProjectManagerNavIds.Assistant,
         icon = OrbitIcons.Brain03,
         contentDescription = "Assistant",
+        brandMark = true,
     )
 
     val primary: List<OrbitNavItem> = listOf(Dashboard, Tasks, Messages)
@@ -55,9 +57,16 @@ fun OrbitProjectManagerNavBar(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
+    notificationCount: Int = 0,
 ) {
+    val primary = remember(notificationCount) {
+        OrbitProjectManagerNavItems.primary.withNotificationBadge(
+            messageId = OrbitProjectManagerNavIds.Messages,
+            count = notificationCount,
+        )
+    }
     OrbitBottomNavBar(
-        primaryItems = OrbitProjectManagerNavItems.primary,
+        primaryItems = primary,
         actionItem = OrbitProjectManagerNavItems.action,
         selectedId = selectedId,
         onSelect = onSelect,
@@ -80,8 +89,8 @@ object OrbitSiteEngineerNavIds {
  *
  * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
  * [notepad-text](https://hugeicons.com/icon/notepad-text?style=stroke-rounded),
- * [bubble-chat](https://hugeicons.com/icon/bubble-chat?style=stroke-rounded).
- * Circle: [brain-03](https://hugeicons.com/icon/brain-03?style=stroke-rounded).
+ * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
+ * Circle: Orbit pixel brand mark (AI assistant).
  */
 @Immutable
 object OrbitSiteEngineerNavItems {
@@ -97,13 +106,14 @@ object OrbitSiteEngineerNavItems {
     )
     val Messages = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        contentDescription = "Messages",
+        icon = OrbitIcons.BellDot,
+        contentDescription = "Notifications",
     )
     val Assistant = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Assistant,
         icon = OrbitIcons.Brain03,
         contentDescription = "Assistant",
+        brandMark = true,
     )
 
     val primary: List<OrbitNavItem> = listOf(Dashboard, Notes, Messages)
@@ -116,9 +126,16 @@ fun OrbitSiteEngineerNavBar(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
+    notificationCount: Int = 0,
 ) {
+    val primary = remember(notificationCount) {
+        OrbitSiteEngineerNavItems.primary.withNotificationBadge(
+            messageId = OrbitSiteEngineerNavIds.Messages,
+            count = notificationCount,
+        )
+    }
     OrbitBottomNavBar(
-        primaryItems = OrbitSiteEngineerNavItems.primary,
+        primaryItems = primary,
         actionItem = OrbitSiteEngineerNavItems.action,
         selectedId = selectedId,
         onSelect = onSelect,
@@ -141,8 +158,8 @@ object OrbitContractorNavIds {
  *
  * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
  * [notepad-text](https://hugeicons.com/icon/notepad-text?style=stroke-rounded),
- * [bubble-chat](https://hugeicons.com/icon/bubble-chat?style=stroke-rounded).
- * Circle: [brain-03](https://hugeicons.com/icon/brain-03?style=stroke-rounded).
+ * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
+ * Circle: Orbit pixel brand mark (AI assistant).
  */
 @Immutable
 object OrbitContractorNavItems {
@@ -158,13 +175,14 @@ object OrbitContractorNavItems {
     )
     val Messages = OrbitNavItem(
         id = OrbitContractorNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        contentDescription = "Messages",
+        icon = OrbitIcons.BellDot,
+        contentDescription = "Notifications",
     )
     val Assistant = OrbitNavItem(
         id = OrbitContractorNavIds.Assistant,
         icon = OrbitIcons.Brain03,
         contentDescription = "Assistant",
+        brandMark = true,
     )
 
     val primary: List<OrbitNavItem> = listOf(Dashboard, Notes, Messages)
@@ -177,9 +195,16 @@ fun OrbitContractorNavBar(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
+    notificationCount: Int = 0,
 ) {
+    val primary = remember(notificationCount) {
+        OrbitContractorNavItems.primary.withNotificationBadge(
+            messageId = OrbitContractorNavIds.Messages,
+            count = notificationCount,
+        )
+    }
     OrbitBottomNavBar(
-        primaryItems = OrbitContractorNavItems.primary,
+        primaryItems = primary,
         actionItem = OrbitContractorNavItems.action,
         selectedId = selectedId,
         onSelect = onSelect,
@@ -202,8 +227,8 @@ object OrbitWarehouseManagerNavIds {
  *
  * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
  * [warehouse](https://hugeicons.com/icon/warehouse?style=stroke-rounded),
- * [bubble-chat](https://hugeicons.com/icon/bubble-chat?style=stroke-rounded).
- * Circle: [brain-03](https://hugeicons.com/icon/brain-03?style=stroke-rounded).
+ * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
+ * Circle: Orbit pixel brand mark (AI assistant).
  */
 @Immutable
 object OrbitWarehouseManagerNavItems {
@@ -219,13 +244,14 @@ object OrbitWarehouseManagerNavItems {
     )
     val Messages = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        contentDescription = "Messages",
+        icon = OrbitIcons.BellDot,
+        contentDescription = "Notifications",
     )
     val Assistant = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Assistant,
         icon = OrbitIcons.Brain03,
         contentDescription = "Assistant",
+        brandMark = true,
     )
 
     val primary: List<OrbitNavItem> = listOf(Dashboard, Inventory, Messages)
@@ -238,9 +264,16 @@ fun OrbitWarehouseManagerNavBar(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
+    notificationCount: Int = 0,
 ) {
+    val primary = remember(notificationCount) {
+        OrbitWarehouseManagerNavItems.primary.withNotificationBadge(
+            messageId = OrbitWarehouseManagerNavIds.Messages,
+            count = notificationCount,
+        )
+    }
     OrbitBottomNavBar(
-        primaryItems = OrbitWarehouseManagerNavItems.primary,
+        primaryItems = primary,
         actionItem = OrbitWarehouseManagerNavItems.action,
         selectedId = selectedId,
         onSelect = onSelect,
@@ -263,8 +296,8 @@ object OrbitProcurementManagerNavIds {
  *
  * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
  * [shopping-cart-add-01](https://hugeicons.com/icon/shopping-cart-add-01?style=stroke-rounded),
- * [bubble-chat](https://hugeicons.com/icon/bubble-chat?style=stroke-rounded).
- * Circle: [brain-03](https://hugeicons.com/icon/brain-03?style=stroke-rounded).
+ * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
+ * Circle: Orbit pixel brand mark (AI assistant).
  */
 @Immutable
 object OrbitProcurementManagerNavItems {
@@ -280,13 +313,14 @@ object OrbitProcurementManagerNavItems {
     )
     val Messages = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        contentDescription = "Messages",
+        icon = OrbitIcons.BellDot,
+        contentDescription = "Notifications",
     )
     val Assistant = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Assistant,
         icon = OrbitIcons.Brain03,
         contentDescription = "Assistant",
+        brandMark = true,
     )
 
     val primary: List<OrbitNavItem> = listOf(Dashboard, Orders, Messages)
@@ -299,9 +333,16 @@ fun OrbitProcurementManagerNavBar(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
+    notificationCount: Int = 0,
 ) {
+    val primary = remember(notificationCount) {
+        OrbitProcurementManagerNavItems.primary.withNotificationBadge(
+            messageId = OrbitProcurementManagerNavIds.Messages,
+            count = notificationCount,
+        )
+    }
     OrbitBottomNavBar(
-        primaryItems = OrbitProcurementManagerNavItems.primary,
+        primaryItems = primary,
         actionItem = OrbitProcurementManagerNavItems.action,
         selectedId = selectedId,
         onSelect = onSelect,
@@ -324,8 +365,8 @@ object OrbitQaQcNavIds {
  *
  * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
  * [badge-check](https://hugeicons.com/icon/badge-check?style=stroke-rounded),
- * [bubble-chat](https://hugeicons.com/icon/bubble-chat?style=stroke-rounded).
- * Circle: [brain-03](https://hugeicons.com/icon/brain-03?style=stroke-rounded).
+ * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
+ * Circle: Orbit pixel brand mark (AI assistant).
  */
 @Immutable
 object OrbitQaQcNavItems {
@@ -341,13 +382,14 @@ object OrbitQaQcNavItems {
     )
     val Messages = OrbitNavItem(
         id = OrbitQaQcNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        contentDescription = "Messages",
+        icon = OrbitIcons.BellDot,
+        contentDescription = "Notifications",
     )
     val Assistant = OrbitNavItem(
         id = OrbitQaQcNavIds.Assistant,
         icon = OrbitIcons.Brain03,
         contentDescription = "Assistant",
+        brandMark = true,
     )
 
     val primary: List<OrbitNavItem> = listOf(Dashboard, Inspections, Messages)
@@ -360,9 +402,16 @@ fun OrbitQaQcNavBar(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
+    notificationCount: Int = 0,
 ) {
+    val primary = remember(notificationCount) {
+        OrbitQaQcNavItems.primary.withNotificationBadge(
+            messageId = OrbitQaQcNavIds.Messages,
+            count = notificationCount,
+        )
+    }
     OrbitBottomNavBar(
-        primaryItems = OrbitQaQcNavItems.primary,
+        primaryItems = primary,
         actionItem = OrbitQaQcNavItems.action,
         selectedId = selectedId,
         onSelect = onSelect,

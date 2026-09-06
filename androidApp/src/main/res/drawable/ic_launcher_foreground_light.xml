@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M48.65,29.42h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M56.35,29.42h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M40.96,33.27h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M64.04,33.27h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M37.12,37.12h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M44.81,37.12h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M60.19,37.12h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M67.88,37.12h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M33.27,40.96h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M40.96,40.96h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M64.04,40.96h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M71.73,40.96h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M37.12,44.81h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M67.88,44.81h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M29.42,48.65h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M75.58,48.65h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M29.42,52.50h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M75.58,52.50h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M29.42,56.35h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M75.58,56.35h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M37.12,60.19h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M67.88,60.19h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M33.27,64.04h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M40.96,64.04h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M64.04,64.04h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M71.73,64.04h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M37.12,67.88h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M44.81,67.88h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M60.19,67.88h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M67.88,67.88h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M40.96,71.73h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M64.04,71.73h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M48.65,75.58h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M56.35,75.58h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M52.50,44.81h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M48.65,48.65h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M56.35,48.65h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M44.81,52.50h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M60.19,52.50h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M48.65,56.35h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M56.35,56.35h3.00v3.00h-3.00z" />
+    <path
+        android:fillColor="@color/ic_launcher_mark_light"
+        android:pathData="M52.50,60.19h3.00v3.00h-3.00z" />
+</vector>

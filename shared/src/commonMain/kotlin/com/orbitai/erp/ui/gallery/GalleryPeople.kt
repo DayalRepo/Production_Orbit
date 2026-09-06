@@ -16,7 +16,7 @@ import com.orbitai.erp.ui.component.team.TeamMember
 import org.jetbrains.compose.resources.painterResource
 
 /**
- * Gallery people drawn from [MockDirectory] — same ids, phones, short roles and tenancy as OTP
+ * Gallery people drawn from [MockDirectory] — same ids, phones and short roles as OTP login.
  * mock login and the eventual API.
  */
 @Composable

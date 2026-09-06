@@ -607,7 +607,10 @@ private fun StepNumberMark(
                     .background(colors.active),
             )
             OrbitStepPhase.Current, OrbitStepPhase.Upcoming -> {
-                val border = if (phase == OrbitStepPhase.Current) colors.active else colors.inactive
+                // Current uses on-container ink (`onActive`), not the soft fill — that fill is for
+                // the completed disc and is too pale (light) / too deep (dark) for a digit on the
+                // page.
+                val border = if (phase == OrbitStepPhase.Current) colors.onActive else colors.inactive
                 Canvas(modifier = Modifier.matchParentSize()) {
                     val radius = (this.size.minDimension - stroke) / 2f
                     drawCircle(
@@ -626,7 +629,7 @@ private fun StepNumberMark(
             style = OrbitTheme.extendedTypography.reference.copy(fontWeight = FontWeight.SemiBold),
             color = when (phase) {
                 OrbitStepPhase.Completed -> colors.onActive
-                OrbitStepPhase.Current -> colors.active
+                OrbitStepPhase.Current -> colors.onActive
                 OrbitStepPhase.Upcoming -> colors.inactive
             },
             textAlign = TextAlign.Center,

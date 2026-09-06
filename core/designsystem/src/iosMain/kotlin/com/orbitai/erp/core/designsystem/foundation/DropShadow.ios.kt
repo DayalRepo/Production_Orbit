@@ -12,6 +12,9 @@ import org.jetbrains.skia.MaskFilter
  * point of doing this by hand rather than through each platform's own elevation system — a card at
  * Level 1 should cast the same shadow on an iPhone as on a Pixel.
  */
+@Suppress("DEPRECATION")
 internal actual fun Paint.orbitBlur(radiusPx: Float) {
+    // `asFrameworkPaint` is deprecated toward a Skia-specific accessor that is not yet stable
+    // across Compose Multiplatform releases; suppress until the replacement ships for iosMain.
     asFrameworkPaint().maskFilter = MaskFilter.makeBlur(FilterBlurMode.NORMAL, radiusPx / 2f)
 }

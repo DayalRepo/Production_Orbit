@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -22,33 +23,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.orbitai.erp.core.designsystem.component.brand.OrbitNavBrandMark
+import com.orbitai.erp.core.designsystem.component.display.OrbitCountBadge
 import com.orbitai.erp.core.designsystem.foundation.WindowSize
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
+import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitSizing
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
-
+import kotlin.math.roundToInt
 /**
  * One destination on an [OrbitBottomNavBar].
  *
  * Icons only — no label. [contentDescription] is required so TalkBack / VoiceOver still name the
  * destination; describe the place ("Dashboard"), not the picture ("four circles").
+ *
+ * Set [brandMark] for the Orbit pixel mark (AI circle action) instead of a stroke [icon].
+ * Set [badgeCount] for a numeric badge (e.g. on the bell) — zero hides it.
  */
 @Immutable
 data class OrbitNavItem(
     val id: String,
     val icon: ImageVector,
     val contentDescription: String,
+    val brandMark: Boolean = false,
+    val badgeCount: Int = 0,
+    val badgeLabel: String = "notifications",
 )
 
 /**
@@ -295,13 +307,89 @@ private fun NavGlyph(
                     ),
             )
         }
-        OrbitGlyph(
-            icon = item.icon,
-            size = glyphSize,
-            tint = tint,
-            minimumStroke = sizing.bottomNavIconStroke,
-            maximumStroke = sizing.bottomNavIconStroke,
-            contentDescription = null,
-        )
+        if (item.brandMark) {
+            OrbitNavBrandMark(
+                size = glyphSize,
+                color = tint,
+                contentDescription = null,
+            )
+        } else {
+            val showBadge = item.badgeCount > 0
+            // Badged: plain bell + count on the BellDot circle. Unbadged: full BellDot.
+            val glyph = if (showBadge && item.icon == OrbitIcons.BellDot) {
+                OrbitIcons.Bell
+            } else {
+                item.icon
+            }
+            Box(
+                modifier = Modifier.size(glyphSize),
+                contentAlignment = Alignment.Center,
+            ) {
+                OrbitGlyph(
+                    icon = glyph,
+                    size = glyphSize,
+                    tint = tint,
+                    minimumStroke = sizing.bottomNavIconStroke,
+                    maximumStroke = sizing.bottomNavIconStroke,
+                    contentDescription = null,
+                )
+                if (showBadge) {
+                    BellDotBadgeOverlay(
+                        glyphSize = glyphSize,
+                        count = item.badgeCount,
+                        label = item.badgeLabel,
+                    )
+                }
+            }
+        }
     }
 }
+
+/**
+ * Places [OrbitCountBadge] so its centre sits on the BellDot notification circle.
+ *
+ * A plain `offset` + `wrapContentSize` was anchoring the badge's top-start at the dot and reading
+ * as shifted; this layout measures the badge then places it by true centre.
+ */
+@Composable
+private fun BellDotBadgeOverlay(
+    glyphSize: Dp,
+    count: Int,
+    label: String,
+) {
+    Layout(
+        modifier = Modifier.fillMaxSize(),
+        content = {
+            OrbitCountBadge(count = count, label = label)
+        },
+    ) { measurables, constraints ->
+        val badge = measurables.first().measure(Constraints())
+        val width = constraints.maxWidth
+        val height = constraints.maxHeight
+        val cx = (glyphSize.toPx() * BellDotCenterX).roundToInt()
+        val cy = (glyphSize.toPx() * BellDotCenterY).roundToInt()
+        layout(width, height) {
+            badge.place(
+                x = cx - badge.width / 2,
+                y = cy - badge.height / 2,
+            )
+        }
+    }
+}
+
+/** BellDot notification-circle centre as a fraction of the 24×24 icon viewport. */
+private const val BellDotCenterX = 18f / 24f
+private const val BellDotCenterY = 5f / 24f
+
+/** Applies [count] to the notifications item so the bell can show a badge. */
+internal fun List<OrbitNavItem>.withNotificationBadge(
+    messageId: String,
+    count: Int,
+): List<OrbitNavItem> = map { item ->
+    if (item.id == messageId) {
+        item.copy(badgeCount = count, badgeLabel = "notifications")
+    } else {
+        item
+    }
+}
+

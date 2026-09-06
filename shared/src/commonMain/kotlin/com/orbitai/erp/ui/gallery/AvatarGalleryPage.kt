@@ -21,9 +21,8 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * The avatar, at every tier and in both of its states.
  *
- * Account samples use [GalleryAccountSamples] — the same ids, short roles, phones and tenancy
- * strings [com.orbitai.erp.core.data.session.FakeSessionRepository] and the eventual OTP session
- * will carry.
+ * Account samples use [GalleryAccountSamples] — the same ids, short roles and phones
+ * [com.orbitai.erp.core.data.session.FakeSessionRepository] and the eventual OTP session will carry.
  */
 @Composable
 internal fun AvatarGalleryPage(
@@ -74,7 +73,7 @@ internal fun AvatarGalleryPage(
         }
     }
 
-    GallerySection("Account menu · organisation and project") {
+    GallerySection("Account menu · name, role badge, mobile") {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.xl),
@@ -84,8 +83,6 @@ internal fun AvatarGalleryPage(
                 name = GalleryAccountSamples.CeoName,
                 role = GalleryAccountSamples.CeoRole,
                 phone = GalleryAccountSamples.CeoPhone,
-                tenancy = GalleryAccountSamples.OrgName,
-                tenancyLabel = "Organisation",
                 onSignOut = {},
                 avatar = painters.avatar01,
                 size = OrbitAvatarSize.Md,
@@ -96,8 +93,6 @@ internal fun AvatarGalleryPage(
                 name = GalleryAccountSamples.SiteName,
                 role = GalleryAccountSamples.SiteRole,
                 phone = GalleryAccountSamples.SitePhone,
-                tenancy = GalleryAccountSamples.ProjectName,
-                tenancyLabel = "Project",
                 onSignOut = {},
                 avatar = painters.avatar03,
                 size = OrbitAvatarSize.Md,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="app_name">OrbitAI</string>
+    <string name="app_name">Orbit.ai</string>
 
     <!-- Generic actions -->
     <string name="action_back">Back</string>

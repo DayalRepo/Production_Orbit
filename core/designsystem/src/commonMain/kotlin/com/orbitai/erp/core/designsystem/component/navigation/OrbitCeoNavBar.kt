@@ -2,6 +2,7 @@ package com.orbitai.erp.core.designsystem.component.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 
@@ -23,8 +24,8 @@ object OrbitCeoNavIds {
  *
  * Primary pill: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
  * [layers-01](https://hugeicons.com/icon/layers-01?style=stroke-rounded),
- * [bubble-chat](https://hugeicons.com/icon/bubble-chat?style=stroke-rounded).
- * Circle action: [brain-03](https://hugeicons.com/icon/brain-03?style=stroke-rounded).
+ * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
+ * Circle action: Orbit pixel brand mark (AI assistant).
  */
 @Immutable
 object OrbitCeoNavItems {
@@ -40,13 +41,14 @@ object OrbitCeoNavItems {
     )
     val Messages = OrbitNavItem(
         id = OrbitCeoNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        contentDescription = "Messages",
+        icon = OrbitIcons.BellDot,
+        contentDescription = "Notifications",
     )
     val Assistant = OrbitNavItem(
         id = OrbitCeoNavIds.Assistant,
         icon = OrbitIcons.Brain03,
         contentDescription = "Assistant",
+        brandMark = true,
     )
 
     val primary: List<OrbitNavItem> = listOf(Dashboard, Projects, Messages)
@@ -65,9 +67,16 @@ fun OrbitCeoNavBar(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
+    notificationCount: Int = 0,
 ) {
+    val primary = remember(notificationCount) {
+        OrbitCeoNavItems.primary.withNotificationBadge(
+            messageId = OrbitCeoNavIds.Messages,
+            count = notificationCount,
+        )
+    }
     OrbitBottomNavBar(
-        primaryItems = OrbitCeoNavItems.primary,
+        primaryItems = primary,
         actionItem = OrbitCeoNavItems.action,
         selectedId = selectedId,
         onSelect = onSelect,

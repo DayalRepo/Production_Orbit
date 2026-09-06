@@ -74,7 +74,7 @@ fun OrbitDialog(
     val sizing = OrbitTheme.sizing
     val control = OrbitTheme.controlColors
     val contentColors = OrbitTheme.contentColors
-    val shape = OrbitTheme.shapeTokens.card
+    val shape = OrbitTheme.shapeTokens.dialog
 
     Dialog(
         onDismissRequest = onDismiss,

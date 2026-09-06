@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -26,6 +25,7 @@ import com.orbitai.erp.core.designsystem.component.badge.OrbitRoleBadge
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.component.input.OrbitSwitch
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
+import com.orbitai.erp.core.designsystem.foundation.orbitPersonDisplayName
 import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
@@ -37,15 +37,11 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
 /**
  * Account identity card behind the app-bar avatar.
  *
- * Layout: identity (name + mobile) with [OrbitIcons.UserRound], tenancy (org/project + role short
- * form badge) with [OrbitIcons.Corporate], then theme toggle, then sign-out with
- * [OrbitIcons.Logout]. Same shell as [OrbitInfoPopover].
+ * Layout: name (caps) + role short-form badge + mobile with [OrbitIcons.UserRound], then theme
+ * toggle, then sign-out. Organisation / project lines live on the shell screens, not here.
  *
- * [role] is the capital short form (CEO, PM, SE, CONTR, QA/QC, WM, PROC), shown as a rounded
- * black/white chip under the organisation or project name.
- *
- * Type weights match [OrbitInfoPopover]: SemiBold for primary lines, Medium + charcoal for the
- * phone.
+ * Name and phone share Medium + charcoal so the identity block reads as one tone, matching
+ * [OrbitInfoPopover].
  */
 @Composable
 fun OrbitAccountPopover(
@@ -54,11 +50,9 @@ fun OrbitAccountPopover(
     name: String,
     role: String,
     phone: String,
-    tenancy: String,
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
     title: String = "Account",
-    tenancyLabel: String = "Organisation",
     signOutLabel: String = "Sign out",
     themeDark: Boolean? = null,
     onThemeChange: ((Boolean) -> Unit)? = null,
@@ -70,6 +64,7 @@ fun OrbitAccountPopover(
     val content = OrbitTheme.contentColors
     val danger = OrbitBadgeTone.Red.colors.label
     val charcoal = content.textSecondary
+    val displayName = orbitPersonDisplayName(name)
 
     OrbitBubblePopover(
         expanded = expanded,
@@ -79,31 +74,19 @@ fun OrbitAccountPopover(
         maxWidth = maxWidth,
         modifier = modifier,
     ) {
-        Column(
+        AccountIdentityBlock(
+            name = displayName,
+            roleBadge = role,
+            phone = phone,
+            ink = charcoal,
+            contentDescription = "Name, $displayName. Role, $role. Mobile, $phone",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = spacing.md),
-            verticalArrangement = Arrangement.spacedBy(spacing.md),
-        ) {
-            AccountIdentityBlock(
-                icon = OrbitIcons.UserRound,
-                name = name,
-                phone = phone,
-                phoneColor = charcoal,
-                contentDescription = "Name, $name. Mobile, $phone",
-            )
-            AccountTenancyBlock(
-                icon = OrbitIcons.Corporate,
-                tenancy = tenancy,
-                roleBadge = role,
-                contentDescription = "$tenancyLabel, $tenancy. Role, $role",
-            )
-        }
+        )
 
         if (themeDark != null && onThemeChange != null) {
             OrbitDivider(
-                // Theme section only: tighter than the identity / sign-out gaps so the switch sits
-                // closer to its flanking rules without compressing the rest of the card.
                 modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.xs),
                 color = OrbitTheme.controlColors.dividerElevated,
             )
@@ -191,78 +174,26 @@ fun OrbitAccountPopover(
 
 @Composable
 private fun AccountIdentityBlock(
-    icon: ImageVector,
     name: String,
-    phone: String,
-    phoneColor: androidx.compose.ui.graphics.Color,
-    contentDescription: String,
-) {
-    val spacing = OrbitTheme.spacing
-    val sizing = OrbitTheme.sizing
-    val content = OrbitTheme.contentColors
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics(mergeDescendants = true) {
-                this.contentDescription = contentDescription
-            },
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(spacing.sm),
-    ) {
-        OrbitGlyph(
-            icon = icon,
-            size = AccountGlyphSize,
-            tint = content.iconPrimary,
-            contentDescription = null,
-            minimumStroke = sizing.iconStrokeHairline,
-            maximumStroke = sizing.iconStrokeHairline,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(spacing.xxs),
-        ) {
-            Text(
-                text = name,
-                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = content.textPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = phone,
-                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                color = phoneColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-}
-
-@Composable
-private fun AccountTenancyBlock(
-    icon: ImageVector,
-    tenancy: String,
     roleBadge: String,
+    phone: String,
+    ink: androidx.compose.ui.graphics.Color,
     contentDescription: String,
+    modifier: Modifier = Modifier,
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
     val content = OrbitTheme.contentColors
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics(mergeDescendants = true) {
-                this.contentDescription = contentDescription
-            },
+        modifier = modifier.semantics(mergeDescendants = true) {
+            this.contentDescription = contentDescription
+        },
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
         OrbitGlyph(
-            icon = icon,
+            icon = OrbitIcons.UserRound,
             size = AccountGlyphSize,
             tint = content.iconPrimary,
             contentDescription = null,
@@ -275,19 +206,25 @@ private fun AccountTenancyBlock(
             verticalArrangement = Arrangement.spacedBy(spacing.xs),
         ) {
             Text(
-                text = tenancy,
-                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = content.textPrimary,
+                text = name,
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                color = ink,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             if (roleBadge.isNotBlank()) {
                 OrbitRoleBadge(label = roleBadge)
             }
+            Text(
+                text = phone,
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                color = ink,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
 
 private val AccountGlyphSize = 20.dp
-/** Wider than the shared popover so org/project names and the role chip breathe. */
-private const val AccountWidthRatio = 1.3f
+private const val AccountWidthRatio = 1.4f

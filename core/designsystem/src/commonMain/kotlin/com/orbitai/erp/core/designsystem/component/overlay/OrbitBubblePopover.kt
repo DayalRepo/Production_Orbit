@@ -108,12 +108,12 @@ import kotlin.math.roundToInt
  *   long — a full legal entity name, an equipment serial — can widen it rather than have it wrap.
  */
 @Composable
-internal fun OrbitBubblePopover(
+fun OrbitBubblePopover(
     expanded: Boolean,
     onDismiss: () -> Unit,
     title: String,
-    minWidth: Dp,
-    maxWidth: Dp,
+    minWidth: Dp = OrbitTheme.sizing.popoverMinWidth,
+    maxWidth: Dp = OrbitTheme.sizing.popoverMaxWidth,
     modifier: Modifier = Modifier,
     /** Close control action. Defaults to [onDismiss]; account panes use this to step back first. */
     onClose: (() -> Unit)? = null,

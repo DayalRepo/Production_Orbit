@@ -19,10 +19,12 @@ import com.orbitai.erp.ui.component.input.ManagedQuantityUnitField
 import com.orbitai.erp.core.designsystem.component.input.OrbitDropdownField
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldSize
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldState
+import com.orbitai.erp.core.designsystem.component.input.OrbitMultiSelectField
 import com.orbitai.erp.core.designsystem.component.input.OrbitQuantityField
 import com.orbitai.erp.core.designsystem.component.input.OrbitSearchField
 import com.orbitai.erp.core.designsystem.component.input.OrbitTextField
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.ui.component.dropdown.ConstructionMaterials
 import com.orbitai.erp.ui.component.dropdown.ManagedMaterialDropdown
 import com.orbitai.erp.ui.component.dropdown.ManagedMaterialsDropdown
 import com.orbitai.erp.ui.component.dropdown.ManagedStageDropdown
@@ -269,6 +271,42 @@ internal fun InputGalleryPage() {
             // and the check is that it does not start out grown.
             ManagedMaterialsDropdown(
                 label = "Materials, empty",
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
+    GallerySection("Multi-select field · raw OrbitMultiSelectField") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
+            var selected by remember {
+                mutableStateOf(
+                    listOf("Cement (OPC 53)", "River Sand"),
+                )
+            }
+            OrbitMultiSelectField(
+                selected = selected,
+                options = ConstructionMaterials,
+                onToggle = { item ->
+                    selected = if (item in selected) selected - item else selected + item
+                },
+                label = "Materials (raw)",
+                placeholder = "Add materials",
+                searchPlaceholder = "Search materials",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            var emptySelected by remember { mutableStateOf(emptyList<String>()) }
+            OrbitMultiSelectField(
+                selected = emptySelected,
+                options = ConstructionMaterials.take(8),
+                onToggle = { item ->
+                    emptySelected =
+                        if (item in emptySelected) emptySelected - item else emptySelected + item
+                },
+                label = "Tags (raw, empty)",
+                placeholder = "Select tags",
+                addLabel = null,
+                onAddRequest = null,
+                size = OrbitFieldSize.Small,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

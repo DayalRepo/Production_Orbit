@@ -60,6 +60,7 @@ internal fun NavigationGalleryPage() {
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
+                    notificationCount = 3,
                 )
             }
             RoleNavSample(label = "Project Manager") {
@@ -68,6 +69,7 @@ internal fun NavigationGalleryPage() {
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
+                    notificationCount = 12,
                 )
             }
             RoleNavSample(label = "Site Engineer") {
@@ -76,6 +78,7 @@ internal fun NavigationGalleryPage() {
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
+                    notificationCount = 1,
                 )
             }
             RoleNavSample(label = "Contractor") {
@@ -84,6 +87,7 @@ internal fun NavigationGalleryPage() {
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
+                    notificationCount = 99,
                 )
             }
             RoleNavSample(label = "Warehouse Manager") {
@@ -92,6 +96,7 @@ internal fun NavigationGalleryPage() {
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
+                    notificationCount = 5,
                 )
             }
             RoleNavSample(label = "Procurement Manager") {
@@ -102,6 +107,7 @@ internal fun NavigationGalleryPage() {
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
+                    notificationCount = 2,
                 )
             }
             RoleNavSample(label = "QA/QC") {
@@ -110,6 +116,7 @@ internal fun NavigationGalleryPage() {
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
+                    notificationCount = 0,
                 )
             }
         }

@@ -109,7 +109,7 @@ internal fun DisplayGalleryPage() {
         }
     }
 
-    GallerySection("File upload · drop zone and progress") {
+    GallerySection("OrbitFileUpload · drop zone and progress") {
         ManagedFileUpload(modifier = Modifier.fillMaxWidth())
     }
 
@@ -117,7 +117,7 @@ internal fun DisplayGalleryPage() {
     // removing one removes it, and renaming one renames it. Wired dead — `onRemove = {}` — the
     // dialogs could be opened but never answered, and the one thing worth reviewing here is what
     // happens *after* Yes.
-    GallerySection("Attachments · composer, remove with confirmation") {
+    GallerySection("OrbitAttachmentRow · composer, remove with confirmation") {
         ManagedAttachmentList(
             initial = listOf(
                 DemoFile("1.pdf", "2 MB"),
@@ -138,7 +138,7 @@ internal fun DisplayGalleryPage() {
     // the point of showing both, since the visual difference is two glyphs and the difference in
     // consequence is total. It is also where the two confirmations can be compared side by side:
     // remove is an ordinary question, delete is a red one that will not dismiss on a stray tap.
-    GallerySection("Attachments · library, rename and delete") {
+    GallerySection("OrbitAttachmentRow · library, rename and delete") {
         ManagedAttachmentList(
             initial = listOf(
                 DemoFile("1.pdf", "2 MB"),

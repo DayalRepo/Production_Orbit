@@ -330,6 +330,12 @@ data class OrbitSizing(
     val listRowMinHeight: Dp = 64.dp,
 
     /**
+     * Minimum height of [com.orbitai.erp.core.designsystem.component.navigation.OrbitTopAppBar].
+     * Matches the medium field tier so title rows and form fields share one vertical rhythm.
+     */
+    val appBarHeight: Dp = 56.dp,
+
+    /**
      * Visible badge heights. These are minimums applied with `heightIn`, never fixed heights: a
      * badge carries text, so at 200% font scale the pill has to grow rather than crop its label.
      *

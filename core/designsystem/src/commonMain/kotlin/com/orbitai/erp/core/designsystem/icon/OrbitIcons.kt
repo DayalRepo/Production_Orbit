@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
  * Every glyph is authored on a 24x24 viewport with a 1.5-unit stroke, round caps and round joins,
  * which is where the set's uniform stroke weight comes from. Because the stroke is in viewport
  * units it scales with the glyph: at `iconMd` (24dp) it draws 1.5dp, at a 16dp badge icon it draws
- * 1dp. That is intended ó holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
+ * 1dp. That is intended ù holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
  * counters and the icon turns into a blob.
  *
  * Colour is opaque black here and always overwritten: every call site renders through
@@ -886,6 +886,31 @@ object OrbitIcons {
         )
     }
 
+    val BellDot: ImageVector by lazy {
+        vector(
+            name = "BellDot",
+            stroke = listOf(
+                "M19 11V12.7558C19 13.5514 19.3161 14.3145 19.8787 14.8771L20.4819 15.4803C20.8136 15.8121 21 16.262 21 16.7311C21 17.708 20.208 18.5 19.2311 18.5H4.76887C3.79195 18.5 3 17.708 3 16.7311C3 16.262 3.18636 15.8121 3.51809 15.4803L4.12132 14.8771C4.68393 14.3145 5 13.5514 5 12.7558V10C5 6.13401 8.13401 3 12 3",
+                "M15.5 18.5C15.5 20.433 13.933 22 12 22C10.067 22 8.5 20.433 8.5 18.5",
+                "M21 5C21 3.34315 19.6568 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65684 16.3431 8 18 8C19.6568 8 21 6.65684 21 5Z",
+            ),
+        )
+    }
+
+    /**
+     * Same bell body as [BellDot] without the notification circle ó used when a count badge sits
+     * on that spot so the stroke dot is not drawn underneath the badge.
+     */
+    val Bell: ImageVector by lazy {
+        vector(
+            name = "Bell",
+            stroke = listOf(
+                "M19 11V12.7558C19 13.5514 19.3161 14.3145 19.8787 14.8771L20.4819 15.4803C20.8136 15.8121 21 16.262 21 16.7311C21 17.708 20.208 18.5 19.2311 18.5H4.76887C3.79195 18.5 3 17.708 3 16.7311C3 16.262 3.18636 15.8121 3.51809 15.4803L4.12132 14.8771C4.68393 14.3145 5 13.5514 5 12.7558V10C5 6.13401 8.13401 3 12 3",
+                "M15.5 18.5C15.5 20.433 13.933 22 12 22C10.067 22 8.5 20.433 8.5 18.5",
+            ),
+        )
+    }
+
     val Brain03: ImageVector by lazy {
         vector(
             name = "Brain03",
@@ -1053,9 +1078,9 @@ object OrbitIcons {
         vector(
             name = "UserAdd",
             stroke = listOf(
-                "M3 20.5002C3.28417 16.8058 6.3 13.7193 10.0008 13.5379C10.3134 13.5226 10.6446 13.5097 11 13.5L11.995 13.5663C12.6939 13.6129 13.3665 13.7543 14 13.9777",
-                "M18 15.5V21.5M21 18.5L15 18.5",
-                "M7.0 6.5A4.0 4.0 0 1 0 15.0 6.5A4.0 4.0 0 1 0 7.0 6.5Z",
+                "M15 8C15 5.23858 12.7614 3 10 3C7.23858 3 5 5.23858 5 8C5 10.7614 7.23858 13 10 13C12.7614 13 15 10.7614 15 8Z",
+                "M17.5 21L17.5 14M14 17.5H21",
+                "M3 20C3 16.134 6.13401 13 10 13C11.4872 13 12.8662 13.4638 14 14.2547",
             ),
         )
     }
@@ -1120,10 +1145,10 @@ private const val VIEWPORT = 24f
 /**
  * Stroke weight in viewport units, so 1.8dp once the glyph is rendered at 24dp.
  *
- * The stroke is in viewport units, which means it scales with the glyph ó and that is exactly why
- * this is 1.8 rather than 1.5. Almost nothing draws at 24dp: a badge glyph is 14ñ18dp and a small
- * button glyph is 16dp, so at 1.5 units those rendered at 0.9ñ1.1dp and looked hairline-thin beside
- * their labels. At 1.8 the same glyphs land at 1.05ñ1.35dp and a 24dp toolbar icon at 1.8dp, which
- * puts the whole set inside the 1.5ñ2dp band the design rules ask for at the sizes actually used.
+ * The stroke is in viewport units, which means it scales with the glyph ù and that is exactly why
+ * this is 1.8 rather than 1.5. Almost nothing draws at 24dp: a badge glyph is 14ù18dp and a small
+ * button glyph is 16dp, so at 1.5 units those rendered at 0.9ù1.1dp and looked hairline-thin beside
+ * their labels. At 1.8 the same glyphs land at 1.05ù1.35dp and a 24dp toolbar icon at 1.8dp, which
+ * puts the whole set inside the 1.5ù2dp band the design rules ask for at the sizes actually used.
  */
 private const val STROKE_WIDTH = 1.8f

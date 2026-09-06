@@ -14,10 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.badge.OrbitRoleBadge
 import com.orbitai.erp.core.designsystem.component.button.OrbitCopyButton
+import com.orbitai.erp.core.designsystem.foundation.orbitPersonDisplayName
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
 
@@ -31,9 +33,8 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
  * user has no such shape or formatting cue, which is exactly why the label survives in the
  * description — "Name, Priya Sharma" is what a sighted user infers in one glance.
  *
- * [OrbitAccountPopover] makes the opposite choice and draws its labels. The difference is that this
- * bubble carries two values a user already knows the shape of, and that one carries four, two of
- * which — a role and an organisation — are genuinely ambiguous next to each other.
+ * [OrbitAccountPopover] draws the same name / role / phone block with a person glyph beside it,
+ * plus theme and sign-out. This bubble stays identity-only.
  */
 @Immutable
 data class OrbitInfoField(
@@ -57,11 +58,14 @@ data class OrbitInfoField(
  *  -----------/  \-----------
  * | Info               [X]   |
  * |--------------------------|
- * |  Priya Sharma            |
- * |  [PM]                    |
- * |  +91 98200 41122   [copy]|
+ * |  ANANYA KRISHNAMUR…      |
+ * |  [CEO]                   |
+ * |  +91 98450 11001   [copy]|
  *  --------------------------
  * ```
+ *
+ * Name and phone share Medium + charcoal. Names are uppercased and capped at
+ * [com.orbitai.erp.core.designsystem.foundation.OrbitPersonNameMaxChars] (18).
  *
  * Built for the avatar group — tap a face, read who it is — but it takes an arbitrary list of
  * [OrbitInfoField]s precisely so it does not become "the avatar tooltip". A person, a piece of
@@ -124,18 +128,11 @@ fun OrbitInfoPopover(
                     Column(
                         verticalArrangement = Arrangement.spacedBy(spacing.xs),
                     ) {
-                        InfoRow(field = field, primary = true)
+                        InfoRow(field = field)
                         OrbitRoleBadge(label = roleBadge)
                     }
                 } else {
-                    InfoRow(
-                        field = field,
-                        // The first value is the subject — the name the user tapped a face to find —
-                        // and everything after it is supporting detail. Weight rather than size does
-                        // the separating, because a larger first line would push the bubble wider on
-                        // exactly the records with the longest names.
-                        primary = primary,
-                    )
+                    InfoRow(field = field)
                 }
             }
         }
@@ -144,33 +141,30 @@ fun OrbitInfoPopover(
 
 /** One unlabelled value, with a copy control when the field asks for one. */
 @Composable
-private fun InfoRow(field: OrbitInfoField, primary: Boolean) {
+private fun InfoRow(field: OrbitInfoField) {
     val content = OrbitTheme.contentColors
+    val display = if (field.label.equals("Name", ignoreCase = true)) {
+        orbitPersonDisplayName(field.value)
+    } else {
+        field.value
+    }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            // Every section the same height, whether or not it carries a copy button.
-            //
-            // Floored at the button's own size, because the button is what made the rows unequal: the
-            // number's row stood as tall as a 32dp control while the name's row was one line of text,
-            // so the rules either side of the number sat further from their content than the rule
-            // above the name did. The gaps were all `xs` and the *sections* were not the same height,
-            // which is what the eye actually reads.
             .heightIn(min = OrbitTheme.sizing.iconButtonSm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = field.value,
+            text = display,
             style = OrbitTheme.typography.bodyLarge,
-            fontWeight = if (primary) FontWeight.SemiBold else FontWeight.Medium,
-            color = if (primary) content.textPrimary else content.textSecondary,
-            // Restores the label for assistive technology. Sighted users read "which field is this"
-            // off position and weight; a screen reader user would otherwise get a run of bare
-            // strings.
+            fontWeight = FontWeight.Medium,
+            color = content.textSecondary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .weight(1f)
-                .semantics { contentDescription = "${field.label}, ${field.value}" },
+                .semantics { contentDescription = "${field.label}, $display" },
         )
 
         if (field.copyable) {

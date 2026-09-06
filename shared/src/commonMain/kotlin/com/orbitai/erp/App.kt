@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.orbitai.erp.core.designsystem.component.brand.OrbitSplashScreen
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.ui.gallery.ComponentGalleryScreen
 
@@ -16,13 +17,18 @@ fun App() {
     // a system setting; it is in-memory on purpose and resets on relaunch.
     var themeOverride by remember { mutableStateOf<Boolean?>(null) }
     val darkTheme = themeOverride ?: isSystemInDarkTheme()
+    var showSplash by remember { mutableStateOf(true) }
 
     OrbitTheme(darkTheme = darkTheme) {
-        // Placeholder landing surface until sign-in and the role dashboards exist. Session gating
-        // lives on the branch that adds authentication.
-        ComponentGalleryScreen(
-            isDark = darkTheme,
-            onToggleTheme = { themeOverride = !darkTheme },
-        )
+        if (showSplash) {
+            OrbitSplashScreen(onFinished = { showSplash = false })
+        } else {
+            // Placeholder landing surface until sign-in and the role dashboards exist. Session gating
+            // lives on the branch that adds authentication.
+            ComponentGalleryScreen(
+                isDark = darkTheme,
+                onToggleTheme = { themeOverride = !darkTheme },
+            )
+        }
     }
 }

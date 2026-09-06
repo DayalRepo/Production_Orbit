@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-      Compose draws the entire UI, so this theme only needs to cover the pre-Compose window:
-      no action bar, and a transparent system bar background for edge-to-edge.
+      Compose draws the entire UI. windowBackground is a solid themed fill only — the mark is drawn
+      once in OrbitSplashScreen so the logo does not flash twice on cold start.
     -->
     <style name="Theme.OrbitAI" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">@color/orbit_splash_background</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

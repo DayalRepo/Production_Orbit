@@ -77,11 +77,16 @@ fun ComponentGalleryScreen(
         }
 
         DateTimeGalleryPage()
+        BrandGalleryPage()
         ProgressGalleryPage()
         MessageBubbleGalleryPage()
         ChecklistGalleryPage()
         AvatarGalleryPage(isDark = isDark, onToggleTheme = onToggleTheme)
+        OverlayGalleryPage()
         DisplayGalleryPage()
+        ScrollbarGalleryPage()
+        FeedbackGalleryPage()
+        ShellGalleryPage()
         StateGalleryPage()
         InputGalleryPage()
         NavigationGalleryPage()

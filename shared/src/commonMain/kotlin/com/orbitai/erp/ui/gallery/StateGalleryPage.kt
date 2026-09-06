@@ -1,20 +1,26 @@
 package com.orbitai.erp.ui.gallery
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import com.orbitai.erp.core.designsystem.component.button.OrbitButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
 import com.orbitai.erp.core.designsystem.component.container.OrbitCard
 import com.orbitai.erp.core.designsystem.component.dialog.OrbitConfirmDialog
+import com.orbitai.erp.core.designsystem.component.dialog.OrbitCreateDialog
+import com.orbitai.erp.core.designsystem.component.dialog.OrbitDialog
 import com.orbitai.erp.core.designsystem.component.dialog.OrbitRenameDialog
 import com.orbitai.erp.core.designsystem.component.feedback.OrbitSkeletonList
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 
 /**
- * What a screen shows while it is still loading.
+ * Loading chrome and the dialog family built on [OrbitDialog].
  *
  * Worth watching rather than screenshotting. The skeleton's pulse is the only continuous animation
  * in the library, and the thing to check on a device is that it is slow enough to read as waiting
@@ -27,6 +33,7 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 @Composable
 internal fun StateGalleryPage() {
     val spacing = OrbitTheme.spacing
+    val content = OrbitTheme.contentColors
 
     GallerySection("Skeleton · a list still loading") {
         OrbitCard(padding = spacing.md) {
@@ -34,10 +41,7 @@ internal fun StateGalleryPage() {
         }
     }
 
-    // Three dialogs side by side, because the differences between them are the whole design and
-    // none of them are visible one at a time: the destructive one is red and refuses a scrim tap,
-    // the mild one is neither, and the rename one opens straight into a field with Save inert until
-    // the name has actually changed.
+    // Confirm / rename / create / bare shell side by side: the differences are the whole design.
     GallerySection("Dialogs · glass, over a dimmed screen") {
         GalleryFlow {
             var open by remember { mutableStateOf<String?>(null) }
@@ -55,6 +59,16 @@ internal fun StateGalleryPage() {
             OrbitButton(
                 label = "Rename file",
                 onClick = { open = "rename" },
+                variant = OrbitButtonVariant.Secondary,
+            )
+            OrbitButton(
+                label = "Add stage",
+                onClick = { open = "create" },
+                variant = OrbitButtonVariant.Secondary,
+            )
+            OrbitButton(
+                label = "Custom shell",
+                onClick = { open = "shell" },
                 variant = OrbitButtonVariant.Secondary,
             )
 
@@ -81,6 +95,41 @@ internal fun StateGalleryPage() {
                     label = "File name",
                     onConfirm = { open = null },
                     onDismiss = { open = null },
+                )
+
+                "create" -> OrbitCreateDialog(
+                    title = "Add stage",
+                    info = "Stages are shared across the project. Name it as it appears on the work sequence.",
+                    label = "Stage name",
+                    onCreate = { open = null },
+                    onDismiss = { open = null },
+                )
+
+                "shell" -> OrbitDialog(
+                    onDismiss = { open = null },
+                    title = "Dialog shell",
+                    content = {
+                        Text(
+                            text = "Bare OrbitDialog: glass pane, title, close, content slot, actions. " +
+                                "Confirm, rename and create are thin wrappers on this.",
+                            style = OrbitTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Normal,
+                            color = content.textSecondary,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    },
+                    actions = {
+                        OrbitButton(
+                            label = "Cancel",
+                            onClick = { open = null },
+                            variant = OrbitButtonVariant.Secondary,
+                        )
+                        OrbitButton(
+                            label = "Done",
+                            onClick = { open = null },
+                            variant = OrbitButtonVariant.Primary,
+                        )
+                    },
                 )
 
                 else -> Unit

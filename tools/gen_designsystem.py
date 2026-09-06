@@ -173,6 +173,7 @@ ICONS = {
     "DashboardCircle": "DashboardCircleIcon",
     "Layers01": "Layers01Icon",
     "BubbleChat": "BubbleChatIcon",
+    "BellDot": "BellDotIcon",
     "Brain03": "Brain03Icon",
     "NoteAdd": "NoteAddIcon",
     "NotepadText": "NotepadTextIcon",
@@ -189,7 +190,7 @@ ICONS = {
     "SquarePen": "SquarePenIcon",
     "Cells": "CellsIcon",
     "SixSquare": "SixSquareIcon",
-    "UserAdd": "UserAdd01Icon",
+    "UserAdd": "UserRoundPlusIcon",
     "ArrowMoveUpLeft": "ArrowMoveUpLeftIcon",
     "ArrowMoveDownLeft": "ArrowMoveDownLeftIcon",
 }

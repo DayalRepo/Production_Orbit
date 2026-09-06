@@ -12,6 +12,7 @@ import com.orbitai.erp.core.designsystem.component.display.OrbitDelta
 import com.orbitai.erp.core.designsystem.component.progress.OrbitDonutProgress
 import com.orbitai.erp.core.designsystem.component.progress.OrbitDonutProgressDefaults
 import com.orbitai.erp.core.designsystem.component.progress.OrbitFormPageBar
+import com.orbitai.erp.core.designsystem.component.progress.OrbitPillProgress
 import com.orbitai.erp.core.designsystem.component.progress.OrbitSegmentedProgress
 import com.orbitai.erp.core.designsystem.component.progress.OrbitStageProof
 import com.orbitai.erp.core.designsystem.component.progress.OrbitStageProofKind
@@ -111,6 +112,35 @@ internal fun ProgressGalleryPage() {
                     OrbitSegmentedProgress(
                         progress = value,
                         contentDescription = caption,
+                    )
+                }
+            }
+        }
+    }
+
+    GallerySection("Pill progress · continuous fraction") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
+            Text(
+                text = "Single capsule fill for checklist summaries — prefer over segmented when the reading is one fraction.",
+                style = OrbitTheme.typography.bodySmall,
+                color = content.textSecondary,
+            )
+            listOf(
+                0f to "0% · empty track",
+                0.35f to "35% · early",
+                0.72f to "72% · near complete",
+                1f to "100% · full capsule",
+            ).forEach { (value, caption) ->
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                    Text(
+                        text = caption,
+                        style = OrbitTheme.typography.bodySmall,
+                        color = content.textSecondary,
+                    )
+                    OrbitPillProgress(
+                        progress = value,
+                        contentDescription = caption,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
