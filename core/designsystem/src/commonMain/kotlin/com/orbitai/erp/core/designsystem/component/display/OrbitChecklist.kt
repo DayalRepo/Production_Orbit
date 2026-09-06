@@ -555,8 +555,8 @@ private fun ChecklistAllCompleteRow() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
     val dark = OrbitTheme.isDark
-    val active = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue50
-    val onActive = if (dark) OrbitPalette.Blue20 else Color.White
+    val active = if (dark) OrbitPalette.Blue30 else OrbitPalette.Blue90
+    val onActive = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue40
 
     Row(
         modifier = Modifier
@@ -598,8 +598,8 @@ private fun ChecklistRow(
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
     val dark = OrbitTheme.isDark
-    val active = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue50
-    val onActive = if (dark) OrbitPalette.Blue20 else Color.White
+    val active = if (dark) OrbitPalette.Blue30 else OrbitPalette.Blue90
+    val onActive = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue40
     val interaction = remember { MutableInteractionSource() }
 
     Row(

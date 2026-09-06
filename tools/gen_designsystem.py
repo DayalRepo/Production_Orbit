@@ -105,10 +105,18 @@ ICONS = {
     "BatteryFull": "BatteryFullIcon",
     "Sun": "Sun01Icon",
     "Moon": "Moon02Icon",
-    # Account-menu glyphs. `User` is the plain person rather than `UserCircleIcon`, because the menu
-    # row already sits beside a circular avatar and two concentric circles read as a duplicate.
+    # Account-menu glyphs. `UserRound` is the stroke-rounded person for Profile rows;
+    # `User` stays for places that still want the older plain mark.
     "User": "UserIcon",
-    "Logout": "Logout01Icon",
+    "UserRound": "UserRoundIcon",
+    "Settings": "Settings01Icon",
+    "Languages": "LanguagesIcon",
+    "Pen": "Pen01Icon",
+    # Sign-out row on the account card — logout-05 (door + arrow), not logout-01.
+    "Logout": "Logout05Icon",
+    # Tenancy / scope line on the account card (org or project).
+    "TableOfContents": "TableOfContentsIcon",
+    "Corporate": "CorporateIcon",
     # Delta arrows. Diagonal rather than vertical: a plain up arrow is also the "scroll to top" and
     # "sort ascending" glyph, and the diagonal is unambiguously a trend line. They are named for the
     # direction of the change rather than the direction the arrow points, since a falling metric is
@@ -123,7 +131,7 @@ ICONS = {
     # rather than `pin-02`: a pin means "kept" or "stuck to the top", which is a different claim
     # from "attached to this record", and the row is already a list of attachments.
     "AttachmentFile": "Attachment02Icon",
-    // The trailing glyph on Open and Login — the two actions that take you somewhere else.
+    # The trailing glyph on Open and Login — the two actions that take you somewhere else.
     "ArrowRight": "ArrowRight01Icon",
     # Back / up navigation on the mobile top bar.
     "ArrowLeft": "ArrowLeft01Icon",
@@ -171,6 +179,19 @@ ICONS = {
     "Warehouse": "WarehouseIcon",
     "ShoppingCartAdd01": "ShoppingCartAdd01Icon",
     "BadgeCheck": "BadgeCheckIcon",
+    # Restored glyphs used by assign, description AI, stage proof, checklists, reply threads.
+    "CircleCheck": "CircleCheckIcon",
+    "ChevronsDownUp": "ChevronsDownUpIcon",
+    "AiGenerate": "AiGenerateIcon",
+    "AiTranslate": "AiTranslateIcon",
+    "ArrowTurnDown": "ArrowTurnDownIcon",
+    "ArrowTurnUp": "ArrowTurnUpIcon",
+    "SquarePen": "SquarePenIcon",
+    "Cells": "CellsIcon",
+    "SixSquare": "SixSquareIcon",
+    "UserAdd": "UserAdd01Icon",
+    "ArrowMoveUpLeft": "ArrowMoveUpLeftIcon",
+    "ArrowMoveDownLeft": "ArrowMoveDownLeftIcon",
 }
 
 

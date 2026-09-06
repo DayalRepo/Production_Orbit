@@ -10,24 +10,26 @@ import androidx.compose.ui.graphics.Color
  * white-labelling keep working.
  */
 internal object OrbitPalette {
-    // Engineering blue — primary brand ramp.
+    // Engineering blue — primary brand ramp (soft container + ink pair).
     val Blue10 = Color(0xFF001B33)
     val Blue20 = Color(0xFF002F52)
-    val Blue30 = Color(0xFF0B4472)
-    val Blue40 = Color(0xFF0F4C81)
+    /** Dark-theme blue glass / stage container. */
+    val Blue30 = Color(0xFF105682)
+    /** Light-theme ink on blue glass, progress fill, and solid CTAs. */
+    val Blue40 = Color(0xFF004A77)
 
     /**
-     * The step between 40 and 60, added for the light theme's progress slats.
+     * Light-theme progress / stage active fill ink — same as [Blue40].
      *
-     * It exists because the gap between the two neighbours is unusually wide in the one place it
-     * matters: `Blue40` is a navy that reads as heavy on a white card, and `Blue60` cannot hold 3:1
-     * against a near-white track once the slat highlight is on it. This sits where a light blue is
-     * still readable, and `SegmentedProgressContrastTest` is what keeps it honest.
+     * Kept as its own step so progress and stage call sites stay on the ramp name they already use.
+     * `SegmentedProgressContrastTest` requires this darker than the near-white track.
      */
-    val Blue50 = Color(0xFF2E6DA8)
+    val Blue50 = Color(0xFF004A77)
     val Blue60 = Color(0xFF4A87BE)
-    val Blue80 = Color(0xFFA5C8E8)
-    val Blue90 = Color(0xFFD3E4F6)
+    /** Dark-theme progress fill and on-blue-container ink. */
+    val Blue80 = Color(0xFFC2E7FF)
+    /** Light-theme blue glass / stage container. */
+    val Blue90 = Color(0xFFB3DBF5)
     val Blue95 = Color(0xFFE9F1FB)
 
     // Slate — secondary, used for structural chrome and metadata.
@@ -161,7 +163,7 @@ internal fun orbitLightColorScheme(content: OrbitContentColors) = lightColorSche
     primary = OrbitPalette.Blue40,
     onPrimary = OrbitPalette.Neutral100,
     primaryContainer = OrbitPalette.Blue90,
-    onPrimaryContainer = OrbitPalette.Blue10,
+    onPrimaryContainer = OrbitPalette.Blue40,
     inversePrimary = OrbitPalette.Blue80,
 
     secondary = OrbitPalette.Slate40,
@@ -207,7 +209,7 @@ internal fun orbitDarkColorScheme(content: OrbitContentColors) = darkColorScheme
     primary = OrbitPalette.Blue80,
     onPrimary = OrbitPalette.Blue20,
     primaryContainer = OrbitPalette.Blue30,
-    onPrimaryContainer = OrbitPalette.Blue90,
+    onPrimaryContainer = OrbitPalette.Blue80,
     inversePrimary = OrbitPalette.Blue40,
 
     secondary = OrbitPalette.Slate80,

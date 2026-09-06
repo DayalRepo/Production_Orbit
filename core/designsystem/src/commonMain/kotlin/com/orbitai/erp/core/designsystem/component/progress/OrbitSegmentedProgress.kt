@@ -39,26 +39,16 @@ data class OrbitProgressColors(
 object OrbitProgressDefaults {
 
     /**
-     * Blue in both themes, pale on dark and mid on light — and that asymmetry is forced rather than
-     * chosen.
+     * Soft blue ink in both themes — `#004A77` on light, `#C2E7FF` on dark.
      *
      * A bar is only informative if the lit run is distinguishable from the unlit one, and that
      * distinction is a lightness gap against the track. The track is a translucent neutral, so it
      * takes the card's own lightness: near-white on light, near-black on dark. To open a gap against
      * a near-white track the fill has to come *down*; against a near-black one it has to go *up*.
-     * There is no single blue that does both — one colour for both themes lands in the middle, where
-     * it is a poor separation twice over instead of a good one once.
+     * The soft blue container pair supplies both ends: dark ink on light, pale ink on dark.
      *
-     * The consequence worth stating plainly, because it is the opposite of what most people expect
-     * when they ask for a light blue bar: a genuinely *pale* blue is only available on the dark
-     * theme. On a white card, `Blue60` at the top of a slat measures 2.55:1 against the track, which
-     * is a bar you cannot read without also reading the number beside it. `Blue50` is as light as
-     * the light theme goes while holding the floor, and it only gets there because the slat
-     * highlight is kept low — see [SlatHighlightLight].
-     *
-     * Both are ramp steps rather than hand-picked values, and `SegmentedProgressContrastTest` pins
-     * the gap at 3:1 or better at *both* ends of every slat — the WCAG 1.4.11 floor for a graphical
-     * object that carries meaning.
+     * `SegmentedProgressContrastTest` pins the gap at 3:1 or better at *both* ends of every slat —
+     * the WCAG 1.4.11 floor for a graphical object that carries meaning.
      */
     val colors: OrbitProgressColors
         @Composable @ReadOnlyComposable get() = OrbitProgressColors(

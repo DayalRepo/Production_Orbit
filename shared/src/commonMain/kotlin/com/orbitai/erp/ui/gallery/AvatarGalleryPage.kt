@@ -21,9 +21,9 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * The avatar, at every tier and in both of its states.
  *
- * Rows are bottom-aligned so the tier progression reads as a step up rather than as five circles
- * scattered around a centre line — the sizes come from a spreadsheet with different figures per
- * platform, and a misordered tier is far easier to spot against a shared baseline.
+ * Account samples use [GalleryAccountSamples] — the same ids, short roles, phones and tenancy
+ * strings [com.orbitai.erp.core.data.session.FakeSessionRepository] and the eventual OTP session
+ * will carry.
  */
 @Composable
 internal fun AvatarGalleryPage(
@@ -31,6 +31,7 @@ internal fun AvatarGalleryPage(
     onToggleTheme: () -> Unit,
 ) {
     val spacing = OrbitTheme.spacing
+    val painters = rememberGalleryPainters()
 
     val faces = listOf(
         Res.drawable.avatar_02,
@@ -79,30 +80,26 @@ internal fun AvatarGalleryPage(
             horizontalArrangement = Arrangement.spacedBy(spacing.xl),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // The two variants side by side, which is the only way to check the thing that matters
-            // about them: they are the same panel, and only the fourth line differs.
             AccountAvatar(
-                name = "Anita Kulkarni",
-                role = "Chief Executive",
-                phone = "+91 98200 41122",
-                tenancy = "Meridian Infra Pvt Ltd",
+                name = GalleryAccountSamples.CeoName,
+                role = GalleryAccountSamples.CeoRole,
+                phone = GalleryAccountSamples.CeoPhone,
+                tenancy = GalleryAccountSamples.OrgName,
                 tenancyLabel = "Organisation",
                 onSignOut = {},
-                avatar = painterResource(Res.drawable.avatar_01),
+                avatar = painters.avatar01,
                 size = OrbitAvatarSize.Md,
-                // Wired to the gallery's real theme state, not a local boolean. A switch that moves
-                // but changes nothing demonstrates the drawing and not the component.
                 themeDark = isDark,
                 onThemeChange = { onToggleTheme() },
             )
             AccountAvatar(
-                name = "Ravi Menon",
-                role = "Site Engineer",
-                phone = "+91 90040 77310",
-                tenancy = "Tower B, Andheri East",
+                name = GalleryAccountSamples.SiteName,
+                role = GalleryAccountSamples.SiteRole,
+                phone = GalleryAccountSamples.SitePhone,
+                tenancy = GalleryAccountSamples.ProjectName,
                 tenancyLabel = "Project",
                 onSignOut = {},
-                avatar = painterResource(Res.drawable.avatar_03),
+                avatar = painters.avatar03,
                 size = OrbitAvatarSize.Md,
                 themeDark = isDark,
                 onThemeChange = { onToggleTheme() },

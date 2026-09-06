@@ -5,6 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonSize
@@ -12,6 +16,7 @@ import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
+import com.orbitai.erp.core.designsystem.component.status.OrbitChip
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.ui.component.button.ActionButton
@@ -192,13 +197,30 @@ internal fun ButtonGalleryPage() {
                 }
             }
         }
+
+        GallerySection("Filter chips · label and count") {
+            // Selection is local state because this is a gallery; on a real screen it would be
+            // driven by the list's filter. The count is what makes a filter worth tapping.
+            var selected by remember { mutableStateOf("All") }
+            val chips = listOf(
+                "All" to 24,
+                "Open" to 8,
+                "Blocked" to 2,
+                "Done" to 14,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+            ) {
+                chips.forEach { (label, count) ->
+                    OrbitChip(
+                        label = label,
+                        selected = selected == label,
+                        onClick = { selected = label },
+                        count = count,
+                    )
+                }
+            }
+        }
     }
 }
-
-/**
- * A filter row of label-and-count chips.
- *
- * Selection is local state because this is a gallery; on a real screen it would be driven by the
- * list's filter. The point being shown is that the count is what makes a filter worth tapping —
- * "Blocked 2" tells you whether to bother before you do.
- */

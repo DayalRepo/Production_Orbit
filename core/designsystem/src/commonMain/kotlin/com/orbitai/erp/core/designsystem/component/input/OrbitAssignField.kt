@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -129,8 +130,17 @@ fun OrbitAssignField(
     val padding = size.pick(sizing.fieldPaddingSm, sizing.fieldPaddingMd, sizing.fieldPaddingLg)
     val glyph = size.pick(sizing.iconSm, sizing.iconMd, sizing.iconMd)
 
-    val selectedMembers = members.filter { it.id in selectedIds }
-    val visible = members.filterAssignByQuery(query).sortAssignSelectedFirst(selectedIds)
+    val selectedMembers = remember(members, selectedIds) {
+        members.filter { it.id in selectedIds }
+    }
+    val visible = remember(members, query, selectedIds) {
+        members.filterAssignByQuery(query).sortAssignSelectedFirst(selectedIds)
+    }
+    val selectedGroupMembers = remember(selectedMembers) {
+        selectedMembers.map {
+            OrbitAvatarGroupMember(name = it.name, painter = it.avatar, id = it.id)
+        }
+    }
 
     fun close() {
         expanded = false
@@ -192,9 +202,7 @@ fun OrbitAssignField(
                     )
                 } else {
                     OrbitAvatarGroup(
-                        members = selectedMembers.map {
-                            OrbitAvatarGroupMember(name = it.name, painter = it.avatar)
-                        },
+                        members = selectedGroupMembers,
                         size = OrbitAvatarSize.Sm,
                         max = avatarStackMax,
                         background = control.cardContainer,
@@ -209,6 +217,7 @@ fun OrbitAssignField(
                             OrbitInfoPopover(
                                 expanded = infoMemberId == member.id,
                                 onDismiss = { infoMemberId = null },
+                                roleBadge = member.role,
                                 fields = assignInfoFields(member),
                             )
                         },
@@ -256,12 +265,14 @@ fun OrbitAssignField(
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                         visible.forEach { member ->
-                            val picked = member.id in selectedIds
-                            AssignDropdownRow(
-                                member = member,
-                                selected = picked,
-                                onClick = { onToggle(member.id) },
-                            )
+                            key(member.id) {
+                                val picked = member.id in selectedIds
+                                AssignDropdownRow(
+                                    member = member,
+                                    selected = picked,
+                                    onClick = { onToggle(member.id) },
+                                )
+                            }
                         }
                     }
                 }
@@ -294,6 +305,7 @@ private fun AssignFieldAvatarTrigger(
             OrbitInfoPopover(
                 expanded = infoOpen,
                 onDismiss = onDismissInfo,
+                roleBadge = member.role,
                 fields = assignInfoFields(member),
             )
         }
@@ -360,5 +372,6 @@ private fun AssignDropdownRow(
 
 private fun assignInfoFields(member: OrbitAssignMember): List<OrbitInfoField> = buildList {
     add(OrbitInfoField("Name", orbitAssignDisplayName(member.name)))
+    member.username?.takeIf { it.isNotBlank() }?.let { add(OrbitInfoField("Username", it)) }
     add(OrbitInfoField("Mobile number", member.mobile, copyable = true))
 }

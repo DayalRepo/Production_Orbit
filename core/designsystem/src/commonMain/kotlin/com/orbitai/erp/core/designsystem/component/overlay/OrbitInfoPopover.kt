@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.orbitai.erp.core.designsystem.component.badge.OrbitRoleBadge
 import com.orbitai.erp.core.designsystem.component.button.OrbitCopyButton
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
@@ -57,7 +58,7 @@ data class OrbitInfoField(
  * | Info               [X]   |
  * |--------------------------|
  * |  Priya Sharma            |
- * |                          |
+ * |  [PM]                    |
  * |  +91 98200 41122   [copy]|
  *  --------------------------
  * ```
@@ -81,6 +82,8 @@ data class OrbitInfoField(
  *
  * @param fields drawn in order as plain values, most identifying first. See [OrbitInfoField] for why
  *   the labels are spoken but not shown.
+ * @param roleBadge capital short form under the name (CEO, PM, SE, CONTR, …). Null leaves the badge
+ *   out for non-person info bubbles.
  */
 @Composable
 fun OrbitInfoPopover(
@@ -89,6 +92,7 @@ fun OrbitInfoPopover(
     fields: List<OrbitInfoField>,
     modifier: Modifier = Modifier,
     title: String = "Info",
+    roleBadge: String? = null,
     minWidth: Dp = InfoMinWidth,
     maxWidth: Dp = InfoMaxWidth,
 ) {
@@ -114,15 +118,25 @@ fun OrbitInfoPopover(
             // there is now a rule between them doing the separating structurally.
             verticalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
-            fields.forEach { field ->
-                InfoRow(
-                    field = field,
-                    // The first value is the subject — the name the user tapped a face to find — and
-                    // everything after it is supporting detail. Weight rather than size does the
-                    // separating, because a larger first line would push the bubble wider on exactly
-                    // the records with the longest names.
-                    primary = field == fields.first(),
-                )
+            fields.forEachIndexed { index, field ->
+                val primary = index == 0
+                if (primary && !roleBadge.isNullOrBlank()) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(spacing.xs),
+                    ) {
+                        InfoRow(field = field, primary = true)
+                        OrbitRoleBadge(label = roleBadge)
+                    }
+                } else {
+                    InfoRow(
+                        field = field,
+                        // The first value is the subject — the name the user tapped a face to find —
+                        // and everything after it is supporting detail. Weight rather than size does
+                        // the separating, because a larger first line would push the bubble wider on
+                        // exactly the records with the longest names.
+                        primary = primary,
+                    )
+                }
             }
         }
     }

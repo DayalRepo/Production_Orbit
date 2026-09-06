@@ -29,10 +29,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
+import com.orbitai.erp.core.designsystem.theme.OrbitBadgeTone
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitPalette
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
+import com.orbitai.erp.core.designsystem.theme.colors
 import kotlin.math.roundToInt
 
 /**
@@ -84,28 +86,42 @@ object OrbitDonutProgressDefaults {
     const val StartAngle = -90f
 
     /**
-     * Monochrome ring for both Health and Progress — near-black fill on light, near-white on dark.
-     * Same pair for every caption so two rings in one row share one language.
+     * Green ring for Health — Done / delta badge solid fills
+     * (`#239552` light, `#8BE4B0` dark). Same opposite-direction rule as
+     * [blueColors]: darker fill on a light track, pale fill on a dark track.
      */
-    val monoColors: OrbitDonutProgressColors
+    val greenColors: OrbitDonutProgressColors
         @Composable @ReadOnlyComposable get() {
             val content = OrbitTheme.contentColors
             val dark = OrbitTheme.isDark
+            val green = OrbitBadgeTone.Green.colors
             return OrbitDonutProgressColors(
-                filled = content.iconPrimary,
+                filled = green.solidContainer,
                 track = if (dark) OrbitPalette.Neutral30 else OrbitPalette.Slate90,
                 label = content.textPrimary,
                 caption = content.textSecondary,
             )
         }
 
-    /** @deprecated Use [monoColors] — health and progress share the monochrome ring. */
-    val greenColors: OrbitDonutProgressColors
-        @Composable @ReadOnlyComposable get() = monoColors
-
-    /** @deprecated Use [monoColors] — health and progress share the monochrome ring. */
+    /**
+     * Blue ring for Progress — light/dark ink from the soft blue container pair
+     * (`#004A77` / `#C2E7FF`), matching segmented progress and primary CTAs.
+     */
     val blueColors: OrbitDonutProgressColors
-        @Composable @ReadOnlyComposable get() = monoColors
+        @Composable @ReadOnlyComposable get() {
+            val content = OrbitTheme.contentColors
+            val dark = OrbitTheme.isDark
+            return OrbitDonutProgressColors(
+                filled = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue50,
+                track = if (dark) OrbitPalette.Neutral30 else OrbitPalette.Slate90,
+                label = content.textPrimary,
+                caption = content.textSecondary,
+            )
+        }
+
+    /** @deprecated Prefer [greenColors] for Health and [blueColors] for Progress. */
+    val monoColors: OrbitDonutProgressColors
+        @Composable @ReadOnlyComposable get() = greenColors
 
     @Composable
     @ReadOnlyComposable
@@ -147,7 +163,7 @@ object OrbitDonutProgressDefaults {
 fun OrbitDonutProgress(
     progress: Float,
     modifier: Modifier = Modifier,
-    colors: OrbitDonutProgressColors = OrbitDonutProgressDefaults.monoColors,
+    colors: OrbitDonutProgressColors = OrbitDonutProgressDefaults.greenColors,
     size: Dp = OrbitDonutProgressDefaults.Size,
     strokeWidth: Dp = OrbitDonutProgressDefaults.StrokeWidth,
     segmentCount: Int = OrbitDonutProgressDefaults.SegmentCount,

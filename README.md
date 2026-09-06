@@ -1266,7 +1266,14 @@ tests are runnable on any host.
 
 ## Current status
 
-UI/UX foundation phase. The design system tokens, theming, responsive window sizing, domain roles
-and permissions, and the app shell are in place. The data layer is backed by in-memory fakes
-(`FakeSessionRepository`) so screens can be built and previewed before authentication and the
-backend exist. Reusable components and feature screens are being built next.
+UI/UX **component library** phase — reusable `:core:designsystem` components and the on-device
+gallery, not product role screens yet. Components stay props-driven and permission-agnostic;
+screens will compose them later and bind API data (ids, short roles, phones, tenancy).
+
+Demo tenancy lives in `MockDirectory`: **Prestige Estates Projects Limited**, with
+**Prestige Golfshire Villas** (villas) and **Prestige Lakeside Habitat** (apartment/community).
+CEO is organisation-wide; other roles are project-scoped. Login is mobile + fixed mock OTP
+(`FakeSessionRepository.signInWithOtp`) until real SMS OTP. Splash and auth screens land with
+role UI.
+
+Reusable components are reviewed via the gallery sign-off page before feature modules are added.

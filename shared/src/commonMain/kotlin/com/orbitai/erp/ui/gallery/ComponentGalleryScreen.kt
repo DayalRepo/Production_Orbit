@@ -89,6 +89,7 @@ fun ComponentGalleryScreen(
         ComposerGalleryPage()
         ButtonGalleryPage()
         BadgeGalleryPage()
+        SignOffGalleryPage()
 
         // On Android the gesture bar sits directly under the last row of badges.
         Spacer(modifier = Modifier.height(spacing.xxl))

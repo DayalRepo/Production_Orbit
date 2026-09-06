@@ -180,15 +180,16 @@ object OrbitStageProofDefaults {
         @Composable @ReadOnlyComposable get() {
             val content = OrbitTheme.contentColors
             val dark = OrbitTheme.isDark
-            val active = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue50
+            // Soft blue container + on-container ink (same pair as blue badges / CTAs).
+            val active = if (dark) OrbitPalette.Blue30 else OrbitPalette.Blue90
             val inactive = content.iconInactive
             return OrbitStageProofColors(
                 active = active,
                 inactive = inactive,
-                onActive = if (dark) OrbitPalette.Blue20 else Color.White,
+                onActive = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue40,
                 activeLabel = content.textPrimary,
                 inactiveLabel = content.textSecondary,
-                railCompleted = active,
+                railCompleted = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue50,
                 railUpcoming = inactive,
                 dateLabel = content.textTertiary,
                 chevron = content.iconPrimary,

@@ -17,17 +17,15 @@ import com.orbitai.erp.core.designsystem.component.overlay.OrbitInfoPopover
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 
 /**
- * A person on the project, as the avatar group needs to know them.
+ * A person on the project, shaped like the fields screens will get from the API.
  *
- * @param phone stored with its country code already attached rather than as a bare number plus a
- *   separate dialling code. Sites run on subcontractors from several states and the occasional
- *   overseas consultant, so the code is not a constant that can be added at render time — and a
- *   number displayed without one is a number that cannot be dialled from the field.
- * @param role the abbreviation people actually use out loud — "PM", "SE", "Contractor". Not the
- *   HR job title, which nobody says and which does not fit.
+ * @param id stable backend user id — required for list keys and assign payloads.
+ * @param phone E.164-style, country code included (OTP login uses the same field).
+ * @param role capital short form from [com.orbitai.erp.core.model.UserRole.shortLabel].
  */
 @Immutable
 data class TeamMember(
+    val id: String,
     val name: String,
     val phone: String,
     val role: String,
@@ -72,8 +70,14 @@ fun TeamAvatarGroup(
     var expanded by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf<Int?>(null) }
 
+    val groupMembers = remember(members) {
+        members.map {
+            OrbitAvatarGroupMember(name = it.name, painter = it.avatar, id = it.id)
+        }
+    }
+
     OrbitAvatarGroup(
-        members = members.map { OrbitAvatarGroupMember(name = it.name, painter = it.avatar) },
+        members = groupMembers,
         modifier = modifier,
         size = size,
         max = max,
@@ -94,10 +98,9 @@ fun TeamAvatarGroup(
             OrbitInfoPopover(
                 expanded = selected == index,
                 onDismiss = { selected = null },
-                // Name and number only. The role is deliberately left out: the bubble sits on top
-                // of the other faces, so it is kept to the two values somebody actually taps a face
-                // to find. Whoever needs the role is on their way to a profile screen, not a
-                // popover.
+                // Name, role short-form badge, then number. The badge sits under the name inside
+                // the popover; the number stays the copyable line.
+                roleBadge = member.role,
                 fields = listOf(
                     OrbitInfoField("Name", member.name),
                     // The number is the one value here worth copying: a name gets read and

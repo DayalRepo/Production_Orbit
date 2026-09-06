@@ -17,14 +17,19 @@ interface SessionRepository {
 }
 
 /**
- * Stand-in session source for the UI phase. Lets us preview every role's shell before auth exists;
- * replaced by a Supabase-backed implementation in the backend phase.
+ * Stand-in session source for the UI phase. Backed by [MockDirectory] (real-named roster, villas +
+ * apartment/community projects, fixed mock OTPs).
+ *
+ * Auth plan (with role screens): mobile + OTP only, no sign-up. CEO is organisation-wide; other
+ * roles are project-scoped.
  */
 class FakeSessionRepository(
     initialRole: UserRole = UserRole.ProjectManager,
 ) : SessionRepository {
 
-    private val state = MutableStateFlow<Session?>(Session.forUser(previewUser(initialRole)))
+    private val state = MutableStateFlow<Session?>(
+        Session.forUser(MockDirectory.previewUser(initialRole)),
+    )
 
     override val session: Flow<Session?> = state.asStateFlow()
 
@@ -38,72 +43,20 @@ class FakeSessionRepository(
 
     /** Switches the previewed role. Development affordance only. */
     fun switchRole(role: UserRole) {
-        state.value = Session.forUser(previewUser(role))
+        state.value = Session.forUser(MockDirectory.previewUser(role))
+    }
+
+    /**
+     * Mock OTP login. Returns false if the phone is not onboarded or the OTP does not match.
+     */
+    fun signInWithOtp(phone: String, otp: String): Boolean {
+        val user = MockDirectory.userByPhone(phone) ?: return false
+        if (user.otp != otp.trim()) return false
+        state.value = Session.forUser(user.toUser())
+        return true
     }
 
     companion object {
-        fun previewUser(role: UserRole): User = when (role) {
-            UserRole.Ceo -> User(
-                id = "u-ceo",
-                fullName = "Ananya Rao",
-                email = "ananya.rao@orbitai.example",
-                role = role,
-                jobTitle = "Chief Executive Officer",
-            )
-
-            UserRole.ProjectManager -> User(
-                id = "u-pm",
-                fullName = "Vikram Shah",
-                email = "vikram.shah@orbitai.example",
-                role = role,
-                jobTitle = "Senior Project Manager",
-                projectIds = listOf("p-metro-phase-2", "p-riverside-towers"),
-            )
-
-            UserRole.SiteEngineer -> User(
-                id = "u-eng",
-                fullName = "Rahul Menon",
-                email = "rahul.menon@orbitai.example",
-                role = role,
-                jobTitle = "Site Engineer",
-                projectIds = listOf("p-metro-phase-2"),
-            )
-
-            UserRole.Contractor -> User(
-                id = "u-con",
-                fullName = "Imran Qureshi",
-                email = "imran@buildwell.example",
-                role = role,
-                jobTitle = "Structural Subcontractor",
-                projectIds = listOf("p-metro-phase-2"),
-            )
-
-            UserRole.QaQc -> User(
-                id = "u-qa",
-                fullName = "Sneha Kulkarni",
-                email = "sneha.kulkarni@orbitai.example",
-                role = role,
-                jobTitle = "QA/QC Inspector",
-                projectIds = listOf("p-metro-phase-2", "p-riverside-towers"),
-            )
-
-            UserRole.WarehouseManager -> User(
-                id = "u-wh",
-                fullName = "Deepak Iyer",
-                email = "deepak.iyer@orbitai.example",
-                role = role,
-                jobTitle = "Warehouse Manager",
-                projectIds = listOf("p-metro-phase-2"),
-            )
-
-            UserRole.ProcurementManager -> User(
-                id = "u-proc",
-                fullName = "Fatima Sheikh",
-                email = "fatima.sheikh@orbitai.example",
-                role = role,
-                jobTitle = "Procurement Manager",
-                projectIds = listOf("p-metro-phase-2", "p-riverside-towers"),
-            )
-        }
+        fun previewUser(role: UserRole): User = MockDirectory.previewUser(role)
     }
 }

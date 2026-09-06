@@ -23,7 +23,6 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
 import com.orbitai.erp.ui.component.attachment.FileAttachmentRow
 import com.orbitai.erp.ui.component.attachment.ManagedFileUpload
 import com.orbitai.erp.ui.component.team.TeamAvatarGroup
-import com.orbitai.erp.ui.component.team.TeamMember
 import com.orbitai.erp.ui.component.attachment.ManagedAttachmentRow
 import com.orbitai.erp.resources.Res
 import com.orbitai.erp.resources.avatar_01
@@ -44,31 +43,22 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun DisplayGalleryPage() {
     val spacing = OrbitTheme.spacing
+    val painters = rememberGalleryPainters()
+    val crew = rememberGalleryCrew(painters)
 
-    val team = listOf(
-        OrbitAvatarGroupMember("Priya Sharma", painterResource(Res.drawable.avatar_02)),
-        OrbitAvatarGroupMember("Ravi Menon", painterResource(Res.drawable.avatar_03)),
-        OrbitAvatarGroupMember("Anita Desai", painterResource(Res.drawable.avatar_04)),
-        OrbitAvatarGroupMember("Sanjay Iyer", painterResource(Res.drawable.avatar_05)),
-        OrbitAvatarGroupMember("Meera Nair", painterResource(Res.drawable.avatar_01)),
-        OrbitAvatarGroupMember("Vikram Rao"),
-        OrbitAvatarGroupMember("Kavita Joshi"),
-        OrbitAvatarGroupMember("Arjun Pillai"),
-        OrbitAvatarGroupMember("Neha Gupta"),
-    )
-
-    // The same people with the details the popover shows. Phone numbers carry their country code,
-    // since a site runs on subcontractors from several states and a number without one cannot be
-    // dialled from the field.
-    val crew = listOf(
-        TeamMember("Priya Sharma", "+91 98200 41122", "PM", painterResource(Res.drawable.avatar_02)),
-        TeamMember("Ravi Menon", "+91 99400 77310", "SE", painterResource(Res.drawable.avatar_03)),
-        TeamMember("Anita Desai", "+91 98330 20984", "QS", painterResource(Res.drawable.avatar_04)),
-        TeamMember("Sanjay Iyer", "+91 90030 55817", "Contractor", painterResource(Res.drawable.avatar_05)),
-        TeamMember("Meera Nair", "+91 94470 66203", "Safety Officer", painterResource(Res.drawable.avatar_01)),
-        TeamMember("Vikram Rao", "+971 50 442 8890", "Consultant"),
-        TeamMember("Kavita Joshi", "+91 88790 13345", "SE"),
-    )
+    val team = remember(painters) {
+        listOf(
+            OrbitAvatarGroupMember("Priya Sharma", painters.avatar02, "u-pm"),
+            OrbitAvatarGroupMember("Ravi Menon", painters.avatar03, "u-eng"),
+            OrbitAvatarGroupMember("Anita Desai", painters.avatar04, "u-qa"),
+            OrbitAvatarGroupMember("Sanjay Iyer", painters.avatar05, "u-con"),
+            OrbitAvatarGroupMember("Meera Nair", painters.avatar01, "u-wh"),
+            OrbitAvatarGroupMember("Vikram Rao", id = "u-proc"),
+            OrbitAvatarGroupMember("Kavita Joshi", id = "u-eng-2"),
+            OrbitAvatarGroupMember("Arjun Pillai", id = "u-c4"),
+            OrbitAvatarGroupMember("Neha Gupta", id = "u-c5"),
+        )
+    }
 
     // The interactive version, and the one worth spending time on with a device in hand: tap the
     // stack to expand it into a wrapped grid, tap a face for its details, tap the same face again

@@ -115,6 +115,8 @@ internal fun OrbitBubblePopover(
     minWidth: Dp,
     maxWidth: Dp,
     modifier: Modifier = Modifier,
+    /** Close control action. Defaults to [onDismiss]; account panes use this to step back first. */
+    onClose: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     // Seeded closed even when `expanded` is already true on first composition, so the bubble plays
@@ -243,7 +245,7 @@ internal fun OrbitBubblePopover(
                     )
                     OrbitIconButton(
                         contentDescription = "Close $title",
-                        onClick = onDismiss,
+                        onClick = onClose ?: onDismiss,
                         icon = OrbitIcons.Cancel,
                         style = OrbitIconButtonStyle.Neutral,
                         size = OrbitIconButtonSize.Small,

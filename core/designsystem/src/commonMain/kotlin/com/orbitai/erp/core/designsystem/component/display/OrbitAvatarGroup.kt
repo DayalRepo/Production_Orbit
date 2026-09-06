@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,8 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
 data class OrbitAvatarGroupMember(
     val name: String,
     val painter: Painter? = null,
+    /** Stable identity for list keys when the same face appears in several stacks. */
+    val id: String? = null,
 ) {
     /**
      * First letters of the first two words. "Priya Sharma" gives PS, "Ravi" gives R.
@@ -172,41 +175,45 @@ fun OrbitAvatarGroup(
             verticalArrangement = Arrangement.spacedBy(spacing.xs),
         ) {
             members.forEachIndexed { index, member ->
-                Box(contentAlignment = Alignment.Center) {
-                    Box(
-                        modifier = Modifier
-                            .size(tile)
-                            .background(background, CircleShape)
-                            .then(
-                                if (onMemberClick != null) {
-                                    Modifier
-                                        .orbitHandCursor()
-                                        .clickable(
-                                            interactionSource = silentInteraction,
-                                            indication = null,
-                                            role = Role.Button,
-                                            onClick = { onMemberClick(index, member) },
-                                        )
-                                } else {
-                                    Modifier
+                key(member.id ?: "${member.name}-$index") {
+                    Box(contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .size(tile)
+                                .background(background, CircleShape)
+                                .then(
+                                    if (onMemberClick != null) {
+                                        Modifier
+                                            .orbitHandCursor()
+                                            .clickable(
+                                                interactionSource = silentInteraction,
+                                                indication = null,
+                                                role = Role.Button,
+                                                onClick = { onMemberClick(index, member) },
+                                            )
+                                    } else {
+                                        Modifier
+                                    },
+                                )
+                                .padding(ring)
+                                // Each face is its own named node now. Expanded, the group is no longer
+                                // one summary to be read in a breath — it is a list being chosen from,
+                                // and a screen reader user needs the same per-person granularity a
+                                // sighted user has just gained.
+                                .semantics(mergeDescendants = true) {
+                                    contentDescription = member.name
                                 },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            OrbitAvatar(
+                                contentDescription = null,
+                                painter = member.painter,
+                                initials = member.monogram,
+                                size = size,
                             )
-                            .padding(ring)
-                            // Each face is its own named node now. Expanded, the group is no longer
-                            // one summary to be read in a breath — it is a list being chosen from,
-                            // and a screen reader user needs the same per-person granularity a
-                            // sighted user has just gained.
-                            .semantics(mergeDescendants = true) { contentDescription = member.name },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        OrbitAvatar(
-                            contentDescription = null,
-                            painter = member.painter,
-                            initials = member.monogram,
-                            size = size,
-                        )
+                        }
+                        memberOverlay?.invoke(index, member)
                     }
-                    memberOverlay?.invoke(index, member)
                 }
             }
 
@@ -292,21 +299,23 @@ fun OrbitAvatarGroup(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(step),
     ) {
-        shown.forEach { member ->
-            Box(
-                modifier = Modifier
-                    .size(tile)
-                    .background(background, CircleShape)
-                    .padding(ring)
-                    .clearAndSetSemantics {},
-                contentAlignment = Alignment.Center,
-            ) {
-                OrbitAvatar(
-                    contentDescription = null,
-                    painter = member.painter,
-                    initials = member.monogram,
-                    size = size,
-                )
+        shown.forEachIndexed { index, member ->
+            key(member.id ?: "${member.name}-$index") {
+                Box(
+                    modifier = Modifier
+                        .size(tile)
+                        .background(background, CircleShape)
+                        .padding(ring)
+                        .clearAndSetSemantics {},
+                    contentAlignment = Alignment.Center,
+                ) {
+                    OrbitAvatar(
+                        contentDescription = null,
+                        painter = member.painter,
+                        initials = member.monogram,
+                        size = size,
+                    )
+                }
             }
         }
 

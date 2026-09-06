@@ -7,8 +7,8 @@ import kotlin.test.assertTrue
 class OrbitAssignFieldTest {
 
     private val roster = listOf(
-        OrbitAssignMember("1", "Priya Sharma", "Site Engineer", "+91 98200 41122", "priya.sharma"),
-        OrbitAssignMember("2", "Sanjay Iyer", "Contractor", "+91 90030 55817", "sanjay.iyer"),
+        OrbitAssignMember("1", "Priya Sharma", "SE", "+91 98200 41122", "priya.sharma"),
+        OrbitAssignMember("2", "Sanjay Iyer", "CONTR", "+91 90030 55817", "sanjay.iyer"),
         OrbitAssignMember("3", "Ravi Menon", "SE", "+91 99400 77310"),
     )
 
@@ -21,7 +21,7 @@ class OrbitAssignFieldTest {
     @Test
     fun `search matches name role mobile and username`() {
         assertEquals(listOf(roster[0]), roster.filterAssignByQuery("priya"))
-        assertEquals(listOf(roster[1]), roster.filterAssignByQuery("contractor"))
+        assertEquals(listOf(roster[1]), roster.filterAssignByQuery("contr"))
         assertEquals(listOf(roster[0]), roster.filterAssignByQuery("98200"))
         assertEquals(listOf(roster[1]), roster.filterAssignByQuery("sanjay.iyer"))
         assertTrue(roster.filterAssignByQuery("zzzz").isEmpty())

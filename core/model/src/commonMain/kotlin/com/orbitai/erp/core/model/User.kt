@@ -10,7 +10,13 @@ data class User(
     val role: UserRole,
     val avatarUrl: String? = null,
     val jobTitle: String? = null,
+    /**
+     * E.164-style mobile used for OTP login. Auth is mobile + OTP only (no sign-up); numbers are
+     * onboarded in the backend and linked to organisation / project.
+     */
     val phone: String? = null,
+    /** Organisation this user belongs to. Required for tenancy lines on the account menu. */
+    val organisationId: String? = null,
     /** Projects this user is assigned to. Empty for roles with organisation-wide scope. */
     val projectIds: List<String> = emptyList(),
     val isActive: Boolean = true,

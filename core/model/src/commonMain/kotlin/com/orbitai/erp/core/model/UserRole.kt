@@ -31,16 +31,21 @@ enum class UserRole {
     ProcurementManager,
     ;
 
-    /** Short label for chips and avatars. */
+    /**
+     * Capital short form for chips, avatar info cards and the account menu badge.
+     *
+     * Spoken abbreviations people actually use — not HR titles — so they stay readable at badge
+     * size: CEO, PM, SE, CONTR, QA/QC, WM, PROC.
+     */
     val shortLabel: String
         get() = when (this) {
             Ceo -> "CEO"
             ProjectManager -> "PM"
-            SiteEngineer -> "Engineer"
-            Contractor -> "Contractor"
+            SiteEngineer -> "SE"
+            Contractor -> "CONTR"
             QaQc -> "QA/QC"
-            WarehouseManager -> "Warehouse"
-            ProcurementManager -> "Procurement"
+            WarehouseManager -> "WM"
+            ProcurementManager -> "PROC"
         }
 
     /** Full label for profile screens and role pickers. */

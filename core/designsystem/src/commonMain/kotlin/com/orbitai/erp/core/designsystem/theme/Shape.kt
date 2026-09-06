@@ -55,6 +55,8 @@ data class OrbitShapeTokens(
      */
     val inputChip: CornerBasedShape = RoundedCornerShape(4.dp),
     val badge: CornerBasedShape = RoundedCornerShape(percent = 50),
+    /** Role short-form chip — rounded rectangle, not a full pill. */
+    val roleBadge: CornerBasedShape = RoundedCornerShape(6.dp),
     val avatar: CornerBasedShape = RoundedCornerShape(percent = 50),
     val sheet: CornerBasedShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
     val dialog: CornerBasedShape = RoundedCornerShape(16.dp),

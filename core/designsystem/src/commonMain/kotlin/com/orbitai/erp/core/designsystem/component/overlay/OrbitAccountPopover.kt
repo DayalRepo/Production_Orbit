@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.orbitai.erp.core.designsystem.component.badge.OrbitRoleBadge
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.component.input.OrbitSwitch
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
@@ -35,8 +37,15 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
 /**
  * Account identity card behind the app-bar avatar.
  *
- * Bubble title is **Account** with the close control. Body uses quiet uppercase field labels and
- * normal-case values. Theme row and red sign-out sit below rules. Same shell as [OrbitInfoPopover].
+ * Layout: identity (name + mobile) with [OrbitIcons.UserRound], tenancy (org/project + role short
+ * form badge) with [OrbitIcons.Corporate], then theme toggle, then sign-out with
+ * [OrbitIcons.Logout]. Same shell as [OrbitInfoPopover].
+ *
+ * [role] is the capital short form (CEO, PM, SE, CONTR, QA/QC, WM, PROC), shown as a rounded
+ * black/white chip under the organisation or project name.
+ *
+ * Type weights match [OrbitInfoPopover]: SemiBold for primary lines, Medium + charcoal for the
+ * phone.
  */
 @Composable
 fun OrbitAccountPopover(
@@ -60,6 +69,7 @@ fun OrbitAccountPopover(
     val sizing = OrbitTheme.sizing
     val content = OrbitTheme.contentColors
     val danger = OrbitBadgeTone.Red.colors.label
+    val charcoal = content.textSecondary
 
     OrbitBubblePopover(
         expanded = expanded,
@@ -70,27 +80,42 @@ fun OrbitAccountPopover(
         modifier = modifier,
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = spacing.md),
-            verticalArrangement = Arrangement.spacedBy(spacing.sm),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = spacing.md),
+            verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
-            AccountField(label = "Name", value = name)
-            AccountField(label = "Mobile", value = phone)
-            AccountField(label = "Role", value = role)
-            AccountField(label = tenancyLabel, value = tenancy)
+            AccountIdentityBlock(
+                icon = OrbitIcons.UserRound,
+                name = name,
+                phone = phone,
+                phoneColor = charcoal,
+                contentDescription = "Name, $name. Mobile, $phone",
+            )
+            AccountTenancyBlock(
+                icon = OrbitIcons.Corporate,
+                tenancy = tenancy,
+                roleBadge = role,
+                contentDescription = "$tenancyLabel, $tenancy. Role, $role",
+            )
         }
 
         if (themeDark != null && onThemeChange != null) {
             OrbitDivider(
-                modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.sm),
+                // Theme section only: tighter than the identity / sign-out gaps so the switch sits
+                // closer to its flanking rules without compressing the rest of the card.
+                modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.xs),
                 color = OrbitTheme.controlColors.dividerElevated,
             )
             val mode = if (themeDark) "Dark" else "Light"
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .heightIn(min = sizing.minTouchTarget)
                     .padding(horizontal = spacing.md)
-                    .heightIn(min = sizing.iconButtonSm)
-                    .semantics(mergeDescendants = true) { contentDescription = "$mode theme" },
+                    .semantics(mergeDescendants = true) {
+                        contentDescription = "$mode theme"
+                    },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.sm),
             ) {
@@ -99,10 +124,12 @@ fun OrbitAccountPopover(
                     size = AccountGlyphSize,
                     tint = content.iconPrimary,
                     contentDescription = null,
+                    minimumStroke = sizing.iconStrokeHairline,
+                    maximumStroke = sizing.iconStrokeHairline,
                 )
                 Text(
                     text = mode,
-                    style = OrbitTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                    style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                     color = content.textPrimary,
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
@@ -113,12 +140,16 @@ fun OrbitAccountPopover(
                     contentDescription = "$mode theme",
                 )
             }
+            OrbitDivider(
+                modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.xs),
+                color = OrbitTheme.controlColors.dividerElevated,
+            )
+        } else {
+            OrbitDivider(
+                modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.sm),
+                color = OrbitTheme.controlColors.dividerElevated,
+            )
         }
-
-        OrbitDivider(
-            modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.sm),
-            color = OrbitTheme.controlColors.dividerElevated,
-        )
 
         val signOutInteraction = remember { MutableInteractionSource() }
         Row(
@@ -134,9 +165,10 @@ fun OrbitAccountPopover(
                     onSignOut()
                     onDismiss()
                 }
-                .heightIn(min = sizing.iconButtonSm)
+                .heightIn(min = sizing.minTouchTarget)
                 .padding(horizontal = spacing.md)
-                .padding(bottom = spacing.xs),
+                .padding(bottom = spacing.xs)
+                .semantics { contentDescription = signOutLabel },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
@@ -145,10 +177,12 @@ fun OrbitAccountPopover(
                 size = AccountGlyphSize,
                 tint = danger,
                 contentDescription = null,
+                minimumStroke = sizing.iconStrokeHairline,
+                maximumStroke = sizing.iconStrokeHairline,
             )
             Text(
                 text = signOutLabel,
-                style = OrbitTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = danger,
             )
         }
@@ -156,38 +190,104 @@ fun OrbitAccountPopover(
 }
 
 @Composable
-private fun AccountField(
-    label: String,
-    value: String,
+private fun AccountIdentityBlock(
+    icon: ImageVector,
+    name: String,
+    phone: String,
+    phoneColor: androidx.compose.ui.graphics.Color,
+    contentDescription: String,
 ) {
     val spacing = OrbitTheme.spacing
+    val sizing = OrbitTheme.sizing
     val content = OrbitTheme.contentColors
-    val caption = OrbitTheme.extendedTypography.reference
 
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                contentDescription = "$label, $value"
+                this.contentDescription = contentDescription
             },
-        verticalArrangement = Arrangement.spacedBy(spacing.xxs),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
-        Text(
-            text = label.uppercase(),
-            style = caption,
-            color = content.textTertiary,
-            maxLines = 1,
+        OrbitGlyph(
+            icon = icon,
+            size = AccountGlyphSize,
+            tint = content.iconPrimary,
+            contentDescription = null,
+            minimumStroke = sizing.iconStrokeHairline,
+            maximumStroke = sizing.iconStrokeHairline,
+            modifier = Modifier.padding(top = 2.dp),
         )
-        Text(
-            text = value,
-            style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-            color = content.textPrimary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(spacing.xxs),
+        ) {
+            Text(
+                text = name,
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = content.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = phone,
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                color = phoneColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
-private val AccountGlyphSize = 18.dp
-private const val AccountWidthRatio = 1.3f
+@Composable
+private fun AccountTenancyBlock(
+    icon: ImageVector,
+    tenancy: String,
+    roleBadge: String,
+    contentDescription: String,
+) {
+    val spacing = OrbitTheme.spacing
+    val sizing = OrbitTheme.sizing
+    val content = OrbitTheme.contentColors
 
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                this.contentDescription = contentDescription
+            },
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+    ) {
+        OrbitGlyph(
+            icon = icon,
+            size = AccountGlyphSize,
+            tint = content.iconPrimary,
+            contentDescription = null,
+            minimumStroke = sizing.iconStrokeHairline,
+            maximumStroke = sizing.iconStrokeHairline,
+            modifier = Modifier.padding(top = 2.dp),
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(spacing.xs),
+        ) {
+            Text(
+                text = tenancy,
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = content.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (roleBadge.isNotBlank()) {
+                OrbitRoleBadge(label = roleBadge)
+            }
+        }
+    }
+}
+
+private val AccountGlyphSize = 20.dp
+/** Wider than the shared popover so org/project names and the role chip breathe. */
+private const val AccountWidthRatio = 1.3f

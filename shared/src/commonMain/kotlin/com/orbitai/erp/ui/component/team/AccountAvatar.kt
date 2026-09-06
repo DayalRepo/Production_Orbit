@@ -23,8 +23,8 @@ import com.orbitai.erp.core.designsystem.component.display.OrbitAvatarSize
  * role check inside a component whose job is to draw four lines of text. The third variant, whenever
  * it arrives, is a call site rather than an edit here.
  *
- * @param tenancyLabel what the fourth line is: "Organisation" for a CEO, "Project" for a site user.
- *   Spoken, not drawn, like every other label in these bubbles.
+ * @param role capital short form for the badge under organisation/project (CEO, PM, SE, CONTR, …).
+ * @param tenancyLabel spoken label for the tenancy line: "Organisation" or "Project".
  * @param onSignOut ending a session touches storage, navigation and whatever the platform does with
  *   credentials, none of which belongs in a shared component. It is raised to the caller.
  * @param themeDark current mode, for the panel's theme row. Omit along with [onThemeChange] to leave
