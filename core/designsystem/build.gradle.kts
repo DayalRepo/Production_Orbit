@@ -50,6 +50,7 @@ kotlin {
 // `orbitai.core.designsystem.generated.resources`. Pin it instead.
 compose.resources {
     packageOfResClass = "com.orbitai.erp.core.designsystem.resources"
+    generateResClass = always
 }
 
 dependencies {

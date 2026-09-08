@@ -92,6 +92,7 @@ fun OrbitVoiceNoteRow(
         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        val sizing = OrbitTheme.sizing
         OrbitIconButton(
             // Names the clip and its state, so a screen reader user is told what pressing this does
             // now rather than what the control is called in general.
@@ -100,6 +101,7 @@ fun OrbitVoiceNoteRow(
             icon = if (playing) OrbitIcons.Pause else OrbitIcons.Play,
             style = OrbitIconButtonStyle.Neutral,
             size = OrbitIconButtonSize.Small,
+            iconStroke = sizing.bottomNavIconStroke,
         )
 
         Column(
@@ -132,6 +134,7 @@ fun OrbitVoiceNoteRow(
                 icon = OrbitIcons.Download,
                 style = OrbitIconButtonStyle.Neutral,
                 size = OrbitIconButtonSize.Small,
+                iconStroke = sizing.bottomNavIconStroke,
             )
         }
         if (!listenOnly && onDelete != null) {
@@ -141,6 +144,7 @@ fun OrbitVoiceNoteRow(
                 icon = OrbitIcons.Delete,
                 style = OrbitIconButtonStyle.Destructive,
                 size = OrbitIconButtonSize.Small,
+                iconStroke = sizing.bottomNavIconStroke,
             )
         }
         if (!listenOnly && onRemove != null) {
@@ -152,6 +156,7 @@ fun OrbitVoiceNoteRow(
                 // re-recording; the red is reserved for the one that destroys it.
                 style = OrbitIconButtonStyle.Neutral,
                 size = OrbitIconButtonSize.Small,
+                iconStroke = sizing.bottomNavIconStroke,
             )
         }
     }

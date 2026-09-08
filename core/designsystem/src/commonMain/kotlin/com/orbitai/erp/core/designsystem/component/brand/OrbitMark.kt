@@ -23,6 +23,8 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
  * - [OrbitLauncherIcon] — home-screen / application icon plate
  * - [OrbitOpeningMark] — brand-intro splash letter O
  * - [OrbitNavBrandMark] — bottom-nav AI circle
+ *
+ * @param spread 0f packs every pixel into the grid centre; 1f is the default ring geometry.
  */
 @Composable
 fun OrbitMark(
@@ -30,8 +32,10 @@ fun OrbitMark(
     size: Dp = 96.dp,
     color: Color = OrbitMarkDefaults.color(),
     contentDescription: String? = "Orbit.ai",
+    spread: Float = 1f,
 ) {
     val cells = remember { OrbitMarkGeometry.Cells }
+    val clamped = spread.coerceIn(0f, 1f)
     Canvas(
         modifier = modifier
             .size(size)
@@ -43,7 +47,7 @@ fun OrbitMark(
                 },
             ),
     ) {
-        drawOrbitMark(cells = cells, color = color)
+        drawOrbitMark(cells = cells, color = color, spread = clamped)
     }
 }
 
@@ -95,22 +99,32 @@ object OrbitMarkGeometry {
     val Cells: List<Pair<Int, Int>> = Ring + Sparkle
 
     const val CellFill = 0.78f
+
+    /** Geometric centre of the 13×13 grid (between cells 6 and 6). */
+    const val Center = (Grid - 1) / 2f
 }
 
 internal fun DrawScope.drawOrbitMark(
     cells: List<Pair<Int, Int>>,
     color: Color,
+    spread: Float = 1f,
 ) {
     val cell = size.minDimension / OrbitMarkGeometry.Grid
     val square = cell * OrbitMarkGeometry.CellFill
     val inset = (cell - square) / 2f
     val originX = (size.width - cell * OrbitMarkGeometry.Grid) / 2f
     val originY = (size.height - cell * OrbitMarkGeometry.Grid) / 2f
+    val center = OrbitMarkGeometry.Center
 
     for ((col, row) in cells) {
+        val drawnCol = center + (col - center) * spread
+        val drawnRow = center + (row - center) * spread
         drawRect(
             color = color,
-            topLeft = Offset(originX + col * cell + inset, originY + row * cell + inset),
+            topLeft = Offset(
+                originX + drawnCol * cell + inset,
+                originY + drawnRow * cell + inset,
+            ),
             size = Size(square, square),
         )
     }

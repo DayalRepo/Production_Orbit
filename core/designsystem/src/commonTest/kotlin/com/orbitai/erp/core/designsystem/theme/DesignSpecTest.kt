@@ -130,15 +130,15 @@ class DesignSpecTest {
         assertEquals(Color(0xFFEBEBEF), light.interactiveContainer, "light interactive container")
 
         val dark = OrbitDarkControlColors
-        assertEquals(Color(0xFF3F3F46), dark.controlBorder, "dark standard border")
-        assertEquals(Color(0xFF2C2C2E), dark.dividerSubtle, "dark subtle divider")
+        assertEquals(Color(0xFF3F3F3F), dark.controlBorder, "dark standard border")
+        assertEquals(Color(0xFF2C2C2C), dark.dividerSubtle, "dark subtle divider")
         assertEquals(Color(0xFF0A84FF), dark.borderFocus, "dark focus border")
-        assertEquals(Color(0xFF1C1C1E), dark.cardContainer, "dark card")
-        assertEquals(Color(0xFF2C2C2E), dark.insetContainer, "dark inset box")
-        assertEquals(Color(0xFF3A3A3C), dark.interactiveContainer, "dark interactive container")
+        assertEquals(Color(0xFF1C1C1C), dark.cardContainer, "dark card")
+        assertEquals(Color(0xFF2C2C2C), dark.insetContainer, "dark inset box")
+        assertEquals(Color(0xFF3A3A3A), dark.interactiveContainer, "dark interactive container")
 
         assertEquals(Color(0xFFF9F9FB), OrbitPalette.LightBackground, "light app background")
-        assertEquals(Color(0xFF121214), OrbitPalette.DarkBackground, "dark app background")
+        assertEquals(Color(0xFF121212), OrbitPalette.DarkBackground, "dark app background")
     }
 
     @Test
@@ -150,7 +150,7 @@ class DesignSpecTest {
             "the light border is too strong against a white card",
         )
         assertTrue(
-            contrast(OrbitDarkControlColors.controlBorder, Color(0xFF1C1C1E)) < 2.0,
+            contrast(OrbitDarkControlColors.controlBorder, Color(0xFF1C1C1C)) < 2.0,
             "the dark border is too strong against a dark card",
         )
     }
@@ -159,11 +159,11 @@ class DesignSpecTest {
 
     @Test
     fun `the elevation ladder matches the spec matrix`() {
-        assertLevel("Level 0", OrbitShadow.Level0, 0, 0, 0f, 0xFF2C2C2E)
-        assertLevel("Level 1", OrbitShadow.Level1, 2, 4, 0.05f, 0xFF1C1C1E)
-        assertLevel("Level 2", OrbitShadow.Level2, 4, 8, 0.08f, 0xFF252528)
-        assertLevel("Level 3", OrbitShadow.Level3, 6, 14, 0.12f, 0xFF2C2C2E)
-        assertLevel("Level 4", OrbitShadow.Level4, 12, 24, 0.16f, 0xFF3A3A3C)
+        assertLevel("Level 0", OrbitShadow.Level0, 0, 0, 0f, 0xFF2C2C2C)
+        assertLevel("Level 1", OrbitShadow.Level1, 2, 4, 0.05f, 0xFF1C1C1C)
+        assertLevel("Level 2", OrbitShadow.Level2, 4, 8, 0.08f, 0xFF252525)
+        assertLevel("Level 3", OrbitShadow.Level3, 6, 14, 0.12f, 0xFF2C2C2C)
+        assertLevel("Level 4", OrbitShadow.Level4, 12, 24, 0.16f, 0xFF3A3A3A)
     }
 
     @Test
@@ -217,7 +217,7 @@ class DesignSpecTest {
     fun `every rung lightens in the dark theme rather than darkening`() {
         // The inversion that makes dark mode work at all: depth is a lighter surface, because there
         // is no light on a near-black page for a raised object to block.
-        val background = Color(0xFF121214)
+        val background = Color(0xFF121212)
         listOf(
             "Level 1" to OrbitShadow.Level1,
             "Level 2" to OrbitShadow.Level2,

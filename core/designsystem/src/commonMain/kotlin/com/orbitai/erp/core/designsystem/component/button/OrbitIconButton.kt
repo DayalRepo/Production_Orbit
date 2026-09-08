@@ -150,12 +150,16 @@ fun OrbitIconButton(
     state: OrbitButtonState = OrbitButtonState.Active,
     selected: Boolean = false,
     ringed: Boolean = false,
+    /** When set, clamps glyph stroke (e.g. [OrbitSizing.bottomNavIconStroke] for composers). */
+    iconStroke: Dp? = null,
 ) {
     val sizing = OrbitTheme.sizing
     val control = OrbitTheme.controlColors
     val contentColors = OrbitTheme.contentColors
     val shape = OrbitTheme.shapeTokens.avatar
     val isDark = OrbitTheme.isDark
+    val stroke = iconStroke ?: sizing.iconStrokeLight
+    val strokeCap = iconStroke
 
     val effective = style
     val tone = effective.tone?.colors
@@ -252,7 +256,8 @@ fun OrbitIconButton(
                     icon = icon,
                     size = glyphSize,
                     tint = tint,
-                    minimumStroke = sizing.iconStrokeLight,
+                    minimumStroke = stroke,
+                    maximumStroke = strokeCap,
                     contentDescription = null,
                 )
             }
@@ -304,7 +309,8 @@ fun OrbitIconButton(
                     icon = icon,
                     size = glyphSize,
                     tint = tint,
-                    minimumStroke = sizing.iconStrokeLight,
+                    minimumStroke = stroke,
+                    maximumStroke = strokeCap,
                     // The button itself carries the description; describing the glyph too would make
                     // screen readers announce the action twice.
                     contentDescription = null,

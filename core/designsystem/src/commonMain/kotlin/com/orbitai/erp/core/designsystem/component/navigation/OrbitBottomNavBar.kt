@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.Role
@@ -71,7 +72,7 @@ data class OrbitNavItem(
  * it stays locked to the tab-bar column on each platform.
  */
 @Immutable
-internal data class OrbitBottomNavMetrics(
+data class OrbitBottomNavMetrics(
     val height: Dp,
     val glyph: Dp,
     val activeSize: Dp,
@@ -87,7 +88,7 @@ internal data class OrbitBottomNavMetrics(
  * [minTouchTarget] floors the bar height so Android (48) and iOS (44) keep legal hit areas after
  * scale.
  */
-internal fun orbitBottomNavMetrics(
+fun orbitBottomNavMetrics(
     availableWidth: Dp,
     sizing: OrbitSizing,
     minTouchTarget: Dp = sizing.minTouchTarget,
@@ -160,7 +161,7 @@ fun OrbitBottomNavBar(
     val control = OrbitTheme.controlColors
     val dark = OrbitTheme.isDark
     val pillShape = OrbitTheme.shapeTokens.button
-    val highlight = if (dark) OrbitGlass.SurfaceHighlightDark else OrbitGlass.SurfaceHighlightLight
+    // highlight unused — light/dark glass alphas are set inline on the pill / action circle.
 
     val insetModifier = Modifier
         .then(
@@ -201,12 +202,22 @@ fun OrbitBottomNavBar(
                     )
                     .clip(pillShape)
                     .orbitGlass(
-                        fill = control.ringContainer,
+                        // Denser light fill + flat sheen so the pill reads as glass, not a bleached slab.
+                        fill = if (dark) {
+                            control.ringContainer
+                        } else {
+                            control.ringContainer.copy(alpha = 0.92f)
+                        },
                         shape = pillShape,
-                        highlightAlpha = highlight,
-                        edge = control.controlBorder,
+                        highlightAlpha = if (dark) {
+                            OrbitGlass.SurfaceHighlightDark
+                        } else {
+                            0.06f
+                        },
+                        edge = control.controlBorder.copy(alpha = 1f),
+                        // Thinner rim — hairline instead of borderStrong.
                         edgeWidth = sizing.hairline,
-                        sheen = if (dark) 1f else OrbitGlass.Sheen,
+                        sheen = 1f,
                     )
                     .padding(horizontal = metrics.pillInset),
                 // Left · middle · right — first at the start edge, last at the end, middle between.
@@ -234,12 +245,20 @@ fun OrbitBottomNavBar(
                     )
                     .clip(CircleShape)
                     .orbitGlass(
-                        fill = control.ringContainer,
+                        fill = if (dark) {
+                            control.ringContainer
+                        } else {
+                            control.ringContainer.copy(alpha = 0.92f)
+                        },
                         shape = CircleShape,
-                        highlightAlpha = highlight,
-                        edge = control.controlBorder,
+                        highlightAlpha = if (dark) {
+                            OrbitGlass.SurfaceHighlightDark
+                        } else {
+                            0.06f
+                        },
+                        edge = control.controlBorder.copy(alpha = 1f),
                         edgeWidth = sizing.hairline,
-                        sheen = if (dark) 1f else OrbitGlass.Sheen,
+                        sheen = 1f,
                     ),
                 contentAlignment = Alignment.Center,
             ) {
@@ -267,14 +286,14 @@ private fun NavGlyph(
 ) {
     val sizing = OrbitTheme.sizing
     val control = OrbitTheme.controlColors
-    val content = OrbitTheme.contentColors
     val dark = OrbitTheme.isDark
     val interaction = remember(item.id) { MutableInteractionSource() }
-    val tint = if (selected) content.iconPrimary else content.iconInactive
-    val activeHighlight = if (dark) {
-        OrbitGlass.RingHighlightDark * OrbitGlass.ButtonHoverLift
-    } else {
-        OrbitGlass.RingHighlightLight * OrbitGlass.ButtonHoverLift
+    // Stronger tints than global icon tokens so inactive tabs stay readable without thickening stroke.
+    val tint = when {
+        selected && dark -> Color(0xFFFFFFFF)
+        selected && !dark -> Color(0xFF000000)
+        dark -> Color(0xFFC7C7CC)
+        else -> Color(0xFF636366)
     }
 
     Box(
@@ -296,14 +315,23 @@ private fun NavGlyph(
             Box(
                 modifier = Modifier
                     .size(activeSize)
+                    .orbitGlassShadow(
+                        shape = CircleShape,
+                        elevation = sizing.shadowBadge,
+                    )
                     .clip(CircleShape)
                     .orbitGlass(
-                        fill = control.ringContainer,
+                        fill = if (dark) {
+                            control.ringContainer
+                        } else {
+                            // Stronger lens on light so the active disc is not lost on the pill.
+                            control.ringContainer.copy(alpha = 0.95f)
+                        },
                         shape = CircleShape,
-                        highlightAlpha = activeHighlight,
-                        edge = control.controlBorder,
+                        highlightAlpha = if (dark) 0f else 0.08f,
+                        edge = control.controlBorder.copy(alpha = 1f),
                         edgeWidth = sizing.hairline,
-                        sheen = if (dark) 1f else OrbitGlass.Sheen,
+                        sheen = 1f,
                     ),
             )
         }

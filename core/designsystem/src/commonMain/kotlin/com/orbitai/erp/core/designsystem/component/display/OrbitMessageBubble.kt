@@ -4,11 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -18,23 +17,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.orbitai.erp.core.designsystem.component.button.OrbitCopyButton
+import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.theme.OrbitPalette
-import com.orbitai.erp.core.designsystem.foundation.orbitGlass
-import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
-import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
-import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
- * Who sent the bubble. Every bubble is start-aligned for a single left column in threads.
+ * Who sent the bubble. [User] aligns end (right); [Ai] / [Other] align start (left).
  */
 enum class OrbitMessageBubbleRole {
     User,
@@ -52,7 +49,8 @@ data class OrbitMessageReply(
 )
 
 /**
- * A chat / AI message bubble: sender label, body and expand. Always start-aligned.
+ * Chat / AI message: plain text (no glass card). Sender, body, optional show more/less,
+ * timestamp + small copy control.
  */
 @Composable
 fun OrbitMessageBubble(
@@ -63,17 +61,24 @@ fun OrbitMessageBubble(
     timestamp: String? = null,
     collapsedMaxLines: Int = 4,
 ) {
-    MessageBubbleCard(
-        text = text,
-        role = role,
-        modifier = modifier,
-        senderLabel = senderLabel,
-        timestamp = timestamp,
-        collapsedMaxLines = collapsedMaxLines,
-    )
+    val isUser = role == OrbitMessageBubbleRole.User
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
+    ) {
+        MessageBubbleCard(
+            text = text,
+            role = role,
+            senderLabel = senderLabel,
+            timestamp = timestamp,
+            collapsedMaxLines = collapsedMaxLines,
+            contentAlign = if (isUser) Alignment.End else Alignment.Start,
+            textAlign = if (isUser) TextAlign.End else TextAlign.Start,
+        )
+    }
 }
 
-/** Parent message plus zero or more replies, all start-aligned. */
+/** Parent message plus zero or more replies. */
 @Composable
 fun OrbitMessageThread(
     text: String,
@@ -89,24 +94,21 @@ fun OrbitMessageThread(
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.xs),
-        horizontalAlignment = Alignment.Start,
     ) {
-        MessageBubbleCard(
+        OrbitMessageBubble(
             text = text,
             role = role,
             senderLabel = senderLabel,
             timestamp = timestamp,
             collapsedMaxLines = collapsedMaxLines,
-            modifier = Modifier.fillMaxWidth(MaxBubbleFillFraction),
         )
         replies.forEach { reply ->
-            MessageBubbleCard(
+            OrbitMessageBubble(
                 text = reply.text,
                 role = reply.role,
                 senderLabel = reply.senderLabel,
                 timestamp = reply.timestamp,
                 collapsedMaxLines = collapsedMaxLines,
-                modifier = Modifier.fillMaxWidth(MaxBubbleFillFraction),
             )
         }
     }
@@ -119,18 +121,17 @@ fun orbitMessageSenderLabel(raw: String): String = raw.trim().uppercase()
 private fun MessageBubbleCard(
     text: String,
     role: OrbitMessageBubbleRole,
-    modifier: Modifier = Modifier,
+    contentAlign: Alignment.Horizontal,
+    textAlign: TextAlign,
     senderLabel: String? = null,
     timestamp: String? = null,
     collapsedMaxLines: Int = 4,
 ) {
-    val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
-    val control = OrbitTheme.controlColors
     val content = OrbitTheme.contentColors
-    val shape = OrbitTheme.shapeTokens.card
     val dark = OrbitTheme.isDark
     val linkInk = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue50
+    val isUser = role == OrbitMessageBubbleRole.User
 
     var expanded by remember(text) { mutableStateOf(false) }
     var overflows by remember(text, collapsedMaxLines) { mutableStateOf(false) }
@@ -144,31 +145,23 @@ private fun MessageBubbleCard(
     }
 
     Column(
-        modifier = modifier
-            .widthIn(max = 360.dp)
-            .fillMaxWidth()
-            .orbitGlassShadow(shape = shape, elevation = sizing.shadowButton)
-            .clip(shape)
-            .orbitGlass(
-                fill = control.cardContainer,
-                shape = shape,
-                highlightAlpha = if (dark) 0f else OrbitGlass.SurfaceHighlightLight,
-                edge = control.controlBorder,
-                edgeWidth = sizing.hairline,
-                sheen = if (dark) 1f else OrbitGlass.Sheen,
-            )
-            .padding(spacing.md)
+        modifier = Modifier
+            .widthIn(max = 280.dp)
+            .wrapContentWidth(align = contentAlign)
+            .padding(horizontal = spacing.xxs, vertical = spacing.xs)
             .semantics { contentDescription = spoken },
-        verticalArrangement = Arrangement.spacedBy(spacing.sm),
-        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(spacing.xs),
+        horizontalAlignment = contentAlign,
     ) {
         if (displaySender != null) {
             Text(
                 text = displaySender,
-                style = OrbitTheme.extendedTypography.sectionLabel,
+                style = OrbitTheme.typography.labelSmall,
                 color = content.textTertiary,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                textAlign = textAlign,
             )
         }
 
@@ -178,6 +171,7 @@ private fun MessageBubbleCard(
             color = content.textPrimary,
             maxLines = if (expanded) Int.MAX_VALUE else collapsedMaxLines,
             overflow = TextOverflow.Ellipsis,
+            textAlign = textAlign,
             onTextLayout = { layout ->
                 if (!expanded) {
                     overflows = layout.hasVisualOverflow
@@ -188,7 +182,7 @@ private fun MessageBubbleCard(
         if (overflows || expanded) {
             Text(
                 text = if (expanded) "Show less" else "Show more",
-                style = OrbitTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                style = OrbitTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = linkInk,
                 modifier = Modifier
                     .orbitHandCursor()
@@ -201,18 +195,25 @@ private fun MessageBubbleCard(
 
         if (timestamp != null) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(
+                    spacing.xxs,
+                    if (isUser) Alignment.End else Alignment.Start,
+                ),
             ) {
                 Text(
                     text = timestamp,
                     style = OrbitTheme.extendedTypography.metricCaption,
                     color = content.textTertiary,
                     maxLines = 1,
+                    textAlign = textAlign,
+                )
+                OrbitCopyButton(
+                    value = text,
+                    label = "Message",
+                    size = OrbitIconButtonSize.Small,
                 )
             }
         }
     }
 }
-
-private const val MaxBubbleFillFraction = 0.92f

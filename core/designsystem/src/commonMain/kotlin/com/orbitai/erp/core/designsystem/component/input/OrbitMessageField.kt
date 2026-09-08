@@ -189,7 +189,7 @@ fun OrbitMessageField(
     val radius by animateDpAsState(
         // Half the min height is a true pill at one line. The card radius is where it lands once it
         // has grown; anything larger keeps scooping the corners into the text.
-        targetValue = if (multiline) CardRadius else sizing.fieldHeightLg / 2,
+        targetValue = if (multiline) CardRadius else sizing.bottomNavHeight / 2,
         animationSpec = tween(ShapeMs),
         label = "orbit-composer-radius",
     )
@@ -200,16 +200,25 @@ fun OrbitMessageField(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = sizing.fieldHeightLg)
-            .orbitGlassShadow(shape = shape, elevation = sizing.shadowBadge)
+            .heightIn(min = sizing.bottomNavHeight)
+            .orbitGlassShadow(shape = shape, elevation = sizing.bottomNavShadow)
             .clip(shape)
             .orbitGlass(
-                fill = control.cardContainer,
+                // Match floating nav glass chrome (height, rim, shadow, denser light fill).
+                fill = if (OrbitTheme.isDark) {
+                    control.ringContainer
+                } else {
+                    control.ringContainer.copy(alpha = 0.92f)
+                },
                 shape = shape,
-                highlightAlpha = if (OrbitTheme.isDark) 0f else OrbitGlass.SurfaceHighlightLight,
-                edge = control.controlBorder,
+                highlightAlpha = if (OrbitTheme.isDark) {
+                    OrbitGlass.SurfaceHighlightDark
+                } else {
+                    0.06f
+                },
+                edge = control.controlBorder.copy(alpha = 1f),
                 edgeWidth = sizing.hairline,
-                sheen = if (OrbitTheme.isDark) 1f else OrbitGlass.Sheen,
+                sheen = 1f,
             ),
     ) {
         Row(
@@ -234,6 +243,7 @@ fun OrbitMessageField(
                     // above belongs to this button rather than to the send button beside it.
                     selected = attachExpanded,
                     state = if (enabled) OrbitButtonState.Active else OrbitButtonState.Disabled,
+                    iconStroke = sizing.bottomNavIconStroke,
                     modifier = Modifier.padding(start = sizing.composerEdgeInset),
                 )
                 attachMenu?.invoke()
@@ -250,7 +260,7 @@ fun OrbitMessageField(
                     .padding(horizontal = spacing.xs, vertical = spacing.xs)
                     // Match the control row height so the placeholder centres against the plus and
                     // mic, not against an undersized text measure that sat high in the pill.
-                    .heightIn(min = if (multiline) 0.dp else sizing.fieldHeightLg - spacing.xs * 2),
+                    .heightIn(min = if (multiline) 0.dp else sizing.bottomNavHeight - spacing.xs * 2),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 when (mode) {
@@ -339,15 +349,17 @@ fun OrbitMessageField(
                         icon = OrbitIcons.Delete,
                         style = OrbitIconButtonStyle.Destructive,
                         size = OrbitIconButtonSize.Medium,
+                        iconStroke = sizing.bottomNavIconStroke,
                     )
                 } else {
                     OrbitIconButton(
                         contentDescription = "Record a voice message",
                         onClick = onMicClick,
-                        icon = OrbitIcons.MicRecord,
+                        icon = OrbitIcons.Mic,
                         style = OrbitIconButtonStyle.Neutral,
                         size = OrbitIconButtonSize.Medium,
                         state = if (enabled) OrbitButtonState.Active else OrbitButtonState.Disabled,
+                        iconStroke = sizing.bottomNavIconStroke,
                     )
                 }
 
@@ -361,9 +373,12 @@ fun OrbitMessageField(
                     icon = OrbitIcons.ArrowUp,
                     style = OrbitIconButtonStyle.Neutral,
                     size = OrbitIconButtonSize.Medium,
+                    // Glass circle + shadow so send reads as the primary action in the composer.
+                    ringed = true,
                     // Present but inert on an empty composer. See the class doc on why this is not
                     // simply hidden.
                     state = if (canSend) OrbitButtonState.Active else OrbitButtonState.Disabled,
+                    iconStroke = sizing.bottomNavIconStroke,
                 )
             }
         }
@@ -386,6 +401,7 @@ private fun RecordingMeter(
     onPauseRecording: () -> Unit,
 ) {
     val spacing = OrbitTheme.spacing
+    val sizing = OrbitTheme.sizing
     val content = OrbitTheme.contentColors
 
     Row(
@@ -399,6 +415,7 @@ private fun RecordingMeter(
             icon = if (mode.paused) OrbitIcons.Play else OrbitIcons.Pause,
             style = OrbitIconButtonStyle.Neutral,
             size = OrbitIconButtonSize.Small,
+            iconStroke = sizing.bottomNavIconStroke,
         )
         key(mode.amplitudes.size, mode.amplitudes.lastOrNull()) {
             OrbitAudioWave(

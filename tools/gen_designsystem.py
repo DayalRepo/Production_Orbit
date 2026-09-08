@@ -79,10 +79,9 @@ ICONS = {
     "Note": "Note01Icon",
     # Input-field glyphs.
     "Attachment": "Attachment01Icon",
+    # Composer mic: [mic-02](https://hugeicons.com/icon/mic-02?style=stroke-rounded) stroke-rounded.
+    # MicRecord (mic-01) remains for settings / other bare-capsule uses.
     "Mic": "Mic02Icon",
-    # The composer's own mic, and it is `mic-01` rather than the `mic-02` above. 02 is drawn on a
-    # stand, which reads as studio equipment; 01 is the bare capsule, which is what a "hold to talk"
-    # control means. The two coexist because the older one is still what a settings row wants.
     "MicRecord": "Mic01Icon",
     # The waveform on a voice clip. Used for the attachment's leading mark and, tiled, as the
     # resting shape of the live visualiser before any amplitude has arrived.

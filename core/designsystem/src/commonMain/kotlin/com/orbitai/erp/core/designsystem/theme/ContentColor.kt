@@ -102,7 +102,7 @@ internal val AndroidDarkContentColors = OrbitContentColors(
     iconInactive = Color(0xFF8E8E93),  //  5.74:1
     iconDisabled = Color(0xFF48484A),  //  1.94:1 — exempt
     avatarBorder = Color(0xFF2E2E2E),
-    referenceSurface = Color(0xFF121214),
+    referenceSurface = Color(0xFF121212),
 )
 
 internal val IosLightContentColors = OrbitContentColors(
@@ -130,7 +130,7 @@ internal val IosDarkContentColors = OrbitContentColors(
     iconInactive = Color(0xFF8E8E93),  //  5.74:1
     iconDisabled = Color(0xFF48484A),  //  1.94:1 — exempt
     avatarBorder = Color(0xFF2E2E2E),
-    referenceSurface = Color(0xFF121214),
+    referenceSurface = Color(0xFF121212),
 )
 
 internal val LocalOrbitContentColors = staticCompositionLocalOf { AndroidLightContentColors }

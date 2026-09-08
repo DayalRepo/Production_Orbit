@@ -159,6 +159,20 @@ fun OrbitButton(
     state: OrbitButtonState = OrbitButtonState.Active,
     loading: Boolean = false,
     shape: Shape? = null,
+    /**
+     * When true and [variant] is tonal (Primary / Destructive), use the opaque badge solid fill
+     * instead of the soft glass tint — for auth CTAs that must not wash out to white on light pages.
+     */
+    solid: Boolean = false,
+    /**
+     * Soft top-edge specular on glass fills. Set false on light auth CTAs to kill the white wash
+     * while keeping tint, rim, and shadow. Other screens leave the default.
+     */
+    glassHighlight: Boolean = true,
+    /**
+     * When false, skips press ripple / scale indication (useful for quiet Text actions like Resend).
+     */
+    pressIndication: Boolean = true,
 ) {
     val sizing = OrbitTheme.sizing
     val typeScale = OrbitTheme.typeScale
@@ -176,15 +190,18 @@ fun OrbitButton(
     }
 
     val container = when {
+        tone != null && solid -> tone.solidContainer
         tone != null -> tone.container
         variant == OrbitButtonVariant.Secondary -> control.controlContainer
         else -> Color.Transparent
     }
     val content = when {
+        tone != null && solid -> tone.onSolidContainer
         tone != null -> tone.label
         else -> control.controlContent
     }
     val ring = when {
+        tone != null && solid -> null
         tone != null -> tone.border
         variant == OrbitButtonVariant.Outline -> control.outlineBorder
         else -> null
@@ -250,12 +267,12 @@ fun OrbitButton(
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
 
-    // The badge highlight, not the button one, because these are badge tones on a badge fill — and
-    // the tone palette is tuned against this exact gradient. The generator verifies every label at
-    // both this level and this level lifted by ButtonHoverLift, so the hovered top edge, which is
-    // the brightest a button ever gets, is covered rather than assumed.
-    val baseHighlight =
-        if (isDark) OrbitGlass.BadgeHighlightDark else OrbitGlass.BadgeHighlightLight
+    // Soft specular on glass; solid CTAs and [glassHighlight]=false skip the white wash.
+    val baseHighlight = when {
+        solid || !glassHighlight -> 0f
+        isDark -> OrbitGlass.ButtonHighlightDark
+        else -> OrbitGlass.ButtonHighlightLight
+    }
     val highlight by animateFloatAsState(
         targetValue = when {
             !filled -> 0f
@@ -265,6 +282,7 @@ fun OrbitButton(
         animationSpec = tween(HoverMs),
         label = "orbit-button-highlight",
     )
+    val glassSheen = if (solid || !glassHighlight) 1f else OrbitGlass.Sheen
 
     // Two nodes, and the split is deliberate. The outer Box is the touch target and owns the click;
     // the inner Row is the visible button and owns the drawing and the press animation.
@@ -317,21 +335,16 @@ fun OrbitButton(
                         Modifier.orbitGlass(
                             fill = container.copy(alpha = container.alpha * dims.container),
                             shape = shape,
-                            highlightAlpha = highlight * dims.container,
-                            edge = (ring ?: control.controlBorder).let {
-                                it.copy(alpha = it.alpha * dims.container)
+                            highlightAlpha = if (solid) 0f else highlight * dims.container,
+                            edge = if (solid) {
+                                null
+                            } else {
+                                (ring ?: control.controlBorder).let {
+                                    it.copy(alpha = it.alpha * dims.container)
+                                }
                             },
-                            // A hairline, and on a pill that is enough. The rim is still where a
-                            // tonal chip gets its luminosity — which is why the fill is allowed to
-                            // stay deep in the dark theme, rather than being lightened, since the
-                            // label sits on that fill and brightening it bleaches every tone toward
-                            // white. But a pill has a long edge, so a hairline traces a lot of it;
-                            // at 2dp the same rim stopped reading as a lit edge and started reading
-                            // as an outline drawn around the button. The icon button's ring is much
-                            // shorter and keeps the heavier stroke for exactly that reason.
                             edgeWidth = sizing.hairline,
-                            // Every fill here is translucent, so all of them take the badge sheen.
-                            sheen = OrbitGlass.Sheen,
+                            sheen = glassSheen,
                         )
                     } else {
                         Modifier
@@ -350,7 +363,13 @@ fun OrbitButton(
                         )
                     },
                 )
-                .indication(interactionSource, orbitPressIndication())
+                .then(
+                    if (pressIndication) {
+                        Modifier.indication(interactionSource, orbitPressIndication())
+                    } else {
+                        Modifier
+                    },
+                )
                 .padding(horizontal = endPadding, vertical = spacing.xs),
             horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,

@@ -34,10 +34,8 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.orbitai.erp.core.designsystem.component.container.OrbitVerticalScrollbar
-import com.orbitai.erp.core.designsystem.foundation.orbitDropShadow
-import com.orbitai.erp.core.designsystem.foundation.orbitElevatedFill
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
-import com.orbitai.erp.core.designsystem.theme.OrbitShadow
+import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
@@ -141,9 +139,18 @@ internal fun OrbitDropdownMenu(
                             Modifier
                         } else {
                             Modifier
-                                .orbitDropShadow(shape = shape, level = OrbitShadow.Level2)
+                                .orbitGlassShadow(
+                                    shape = shape,
+                                    elevation = sizing.shadowOverlay,
+                                )
                                 .orbitGlass(
-                                    fill = orbitElevatedFill(OrbitShadow.Level2),
+                                    // Frosted panel: near-opaque card fill so list rows stay readable
+                                    // over the auth form (ringContainer alone was too translucent).
+                                    fill = if (OrbitTheme.isDark) {
+                                        control.cardContainer.copy(alpha = 0.92f)
+                                    } else {
+                                        control.cardContainer.copy(alpha = 0.94f)
+                                    },
                                     shape = shape,
                                     highlightAlpha = if (OrbitTheme.isDark) {
                                         OrbitGlass.SurfaceHighlightDark
@@ -152,6 +159,7 @@ internal fun OrbitDropdownMenu(
                                     },
                                     edge = control.controlBorder,
                                     edgeWidth = sizing.hairline,
+                                    sheen = OrbitGlass.Sheen,
                                 )
                         },
                     )

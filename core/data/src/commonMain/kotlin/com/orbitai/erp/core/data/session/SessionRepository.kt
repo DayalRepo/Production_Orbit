@@ -22,13 +22,16 @@ interface SessionRepository {
  *
  * Auth plan (with role screens): mobile + OTP only, no sign-up. CEO is organisation-wide; other
  * roles are project-scoped.
+ *
+ * @param initialRole when non-null, starts already signed in as that role (gallery / previews).
+ *   Product cold start passes null so splash → auth → role shell.
  */
 class FakeSessionRepository(
-    initialRole: UserRole = UserRole.ProjectManager,
+    initialRole: UserRole? = null,
 ) : SessionRepository {
 
     private val state = MutableStateFlow<Session?>(
-        Session.forUser(MockDirectory.previewUser(initialRole)),
+        initialRole?.let { Session.forUser(MockDirectory.previewUser(it)) },
     )
 
     override val session: Flow<Session?> = state.asStateFlow()

@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -22,6 +23,7 @@ import com.orbitai.erp.core.designsystem.component.brand.OrbitLauncherIcon
 import com.orbitai.erp.core.designsystem.component.brand.OrbitNavBrandMark
 import com.orbitai.erp.core.designsystem.component.brand.OrbitOpeningMark
 import com.orbitai.erp.core.designsystem.component.brand.OrbitSplashScreen
+import com.orbitai.erp.core.designsystem.component.brand.OrbitLauncherIconDefaults
 import com.orbitai.erp.core.designsystem.component.button.OrbitButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -33,6 +35,8 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 internal fun BrandGalleryPage() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
+    val openingColor = OrbitLauncherIconDefaults.LightMark
+
 
     GallerySection("Brand · marks") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
@@ -50,7 +54,7 @@ internal fun BrandGalleryPage() {
                     OrbitLauncherIcon(size = 64.dp)
                 }
                 BrandSample(label = "Opening") {
-                    OrbitOpeningMark()
+                    OrbitOpeningMark(color = openingColor)
                 }
                 BrandSample(label = "Nav AI") {
                     OrbitNavBrandMark(
@@ -72,9 +76,11 @@ internal fun BrandGalleryPage() {
 
     GallerySection("Splash screen · replay") {
         var generation by remember { mutableIntStateOf(0) }
+        var playing by remember { mutableStateOf(false) }
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
             Text(
-                text = "Full opening beat in a clipped preview. Tap Replay after it finishes.",
+                text = "Tap Replay to run the opening beat. Idle preview is a static mark — " +
+                    "auto-play here after the real splash was a crash path on cold start.",
                 style = OrbitTheme.typography.bodySmall,
                 color = content.textSecondary,
             )
@@ -83,17 +89,25 @@ internal fun BrandGalleryPage() {
                     .fillMaxWidth()
                     .height(160.dp)
                     .clip(OrbitTheme.shapeTokens.card),
+                contentAlignment = Alignment.Center,
             ) {
-                key(generation) {
-                    OrbitSplashScreen(
-                        onFinished = {},
-                        modifier = Modifier.fillMaxSize(),
-                    )
+                if (playing) {
+                    key(generation) {
+                        OrbitSplashScreen(
+                            onFinished = { playing = false },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
+                } else {
+                    OrbitOpeningMark(color = openingColor, spread = 1f)
                 }
             }
             OrbitButton(
-                label = "Replay splash",
-                onClick = { generation += 1 },
+                label = if (playing) "Playing…" else "Replay splash",
+                onClick = {
+                    generation += 1
+                    playing = true
+                },
                 variant = OrbitButtonVariant.Secondary,
             )
         }

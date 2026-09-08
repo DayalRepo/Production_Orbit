@@ -3,23 +3,22 @@ package com.orbitai.erp.core.designsystem.component.input
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import com.orbitai.erp.core.designsystem.foundation.orbitGlass
-import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
-import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
 import com.orbitai.erp.core.designsystem.theme.OrbitPalette
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -47,10 +46,12 @@ enum class OrbitFieldState {
 }
 
 /**
- * The pane every input field is drawn on: glass fill, rim, contact shadow, focus response.
+ * The pane every input field is drawn on: solid white (light) / black (dark) fill with an opaque
+ * colour border — no glass sheen and no contact shadow on the rim.
  *
- * Fields share the same raised glass treatment as attachment rows — white on light, near-black on
- * dark — so every input reads as a first-class surface rather than a grey recess in the page.
+ * Focus does **not** restyle the rim — a thickening border on tap read as a flash and fought the
+ * caret. Error / success still colour the edge. [interactionSource] stays on the signature so
+ * callers can observe focus for IME / a11y.
  */
 @Composable
 internal fun OrbitFieldShell(
@@ -66,12 +67,14 @@ internal fun OrbitFieldShell(
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable RowScope.() -> Unit,
 ) {
+    // Retained for API stability; focus no longer drives the rim.
+    @Suppress("UNUSED_PARAMETER")
+    val unusedInteraction = interactionSource
+
     val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
     val control = OrbitTheme.controlColors
     val isDark = OrbitTheme.isDark
-
-    val focused by interactionSource.collectIsFocusedAsState()
 
     val errorRim = if (isDark) OrbitPalette.Red70 else OrbitPalette.Red40
     val successRim = if (isDark) OrbitPalette.Green70 else OrbitPalette.Green40
@@ -80,13 +83,12 @@ internal fun OrbitFieldShell(
         !enabled -> control.controlBorder.copy(alpha = control.controlBorder.alpha * OrbitAlpha.Disabled)
         state == OrbitFieldState.Error -> errorRim
         state == OrbitFieldState.Success -> successRim
-        focused -> control.controlContent
         else -> control.controlBorder
     }
     val rim by animateColorAsState(targetRim, tween(FocusMs), label = "orbit-field-rim")
 
     val width by animateDpAsState(
-        targetValue = if (focused || state != OrbitFieldState.Default) {
+        targetValue = if (state != OrbitFieldState.Default) {
             sizing.borderFocus
         } else {
             sizing.hairline
@@ -95,20 +97,15 @@ internal fun OrbitFieldShell(
         label = "orbit-field-rim-width",
     )
 
-    val highlight = if (isDark) OrbitGlass.SurfaceHighlightDark else OrbitGlass.SurfaceHighlightLight
+    val solidFill = if (isDark) Color.Black else Color.White
+    val fill = if (enabled) solidFill else solidFill.copy(alpha = OrbitAlpha.Disabled)
 
     Row(
         modifier = modifier
             .heightIn(min = minHeight)
-            .orbitGlassShadow(shape = shape, elevation = sizing.shadowBadge)
             .clip(shape)
-            .orbitGlass(
-                fill = control.cardContainer,
-                shape = shape,
-                highlightAlpha = highlight,
-                edge = rim,
-                edgeWidth = width,
-            )
+            .background(fill, shape)
+            .border(width = width, color = rim, shape = shape)
             .padding(
                 start = horizontalPadding,
                 end = trailingPadding ?: horizontalPadding,

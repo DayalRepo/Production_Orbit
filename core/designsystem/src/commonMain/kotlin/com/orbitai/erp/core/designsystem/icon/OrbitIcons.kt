@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
  * Every glyph is authored on a 24x24 viewport with a 1.5-unit stroke, round caps and round joins,
  * which is where the set's uniform stroke weight comes from. Because the stroke is in viewport
  * units it scales with the glyph: at `iconMd` (24dp) it draws 1.5dp, at a 16dp badge icon it draws
- * 1dp. That is intended ù holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
+ * 1dp. That is intended ? holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
  * counters and the icon turns into a blob.
  *
  * Colour is opaque black here and always overwritten: every call site renders through
@@ -746,21 +746,25 @@ object OrbitIcons {
         )
     }
 
+    /** [Ellipsis vertical](https://hugeicons.com/icon/ellipsis-vertical?style=stroke-rounded) ? stroke-rounded. */
+    val MoreVertical: ImageVector by lazy {
+        vector(
+            name = "MoreVertical",
+            stroke = listOf(
+                "M12 12V11.5M12 5V4.5M12 19V18.5M13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13C12.5523 13 13 12.5523 13 12ZM13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6C12.5523 6 13 5.55228 13 5ZM13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19Z",
+            ),
+        )
+    }
+
+    val EllipsisVertical: ImageVector get() = MoreVertical
+
+    /** [Download 01](https://hugeicons.com/icon/download-01?style=stroke-rounded) ? stroke-rounded. */
     val Download: ImageVector by lazy {
         vector(
             name = "Download",
             stroke = listOf(
                 "M2.99969 17.0002C2.99969 17.9302 2.99969 18.3952 3.10192 18.7767C3.37932 19.8119 4.18796 20.6206 5.22324 20.898C5.60474 21.0002 6.06972 21.0002 6.99969 21.0002L16.9997 21.0002C17.9297 21.0002 18.3947 21.0002 18.7762 20.898C19.8114 20.6206 20.6201 19.8119 20.8975 18.7767C20.9997 18.3952 20.9997 17.9302 20.9997 17.0002",
                 "M16.4998 11.5002C16.4998 11.5002 13.1856 16.0002 11.9997 16.0002C10.8139 16.0002 7.49976 11.5002 7.49976 11.5002M11.9997 15.0002V3.00016",
-            ),
-        )
-    }
-
-    val MoreVertical: ImageVector by lazy {
-        vector(
-            name = "MoreVertical",
-            stroke = listOf(
-                "M11.9967 12.5V12M11.9967 6.5V6M11.9967 18.5V18M12.9967 12.5C12.9967 11.9477 12.549 11.5 11.9967 11.5C11.4444 11.5 10.9967 11.9477 10.9967 12.5C10.9967 13.0523 11.4444 13.5 11.9967 13.5C12.549 13.5 12.9967 13.0523 12.9967 12.5ZM12.9967 6.5C12.9967 5.94772 12.549 5.5 11.9967 5.5C11.4444 5.5 10.9967 5.94772 10.9967 6.5C10.9967 7.05228 11.4444 7.5 11.9967 7.5C12.549 7.5 12.9967 7.05228 12.9967 6.5ZM12.9967 18.5C12.9967 17.9477 12.549 17.5 11.9967 17.5C11.4444 17.5 10.9967 17.9477 10.9967 18.5C10.9967 19.0523 11.4444 19.5 11.9967 19.5C12.549 19.5 12.9967 19.0523 12.9967 18.5Z",
             ),
         )
     }
@@ -898,7 +902,7 @@ object OrbitIcons {
     }
 
     /**
-     * Same bell body as [BellDot] without the notification circle ó used when a count badge sits
+     * Same bell body as [BellDot] without the notification circle ? used when a count badge sits
      * on that spot so the stroke dot is not drawn underneath the badge.
      */
     val Bell: ImageVector by lazy {
@@ -1104,6 +1108,28 @@ object OrbitIcons {
             ),
         )
     }
+
+    /** [Reload](https://hugeicons.com/icon/reload?style=stroke-rounded) ? stroke-rounded. */
+    val Reload: ImageVector by lazy {
+        vector(
+            name = "Reload",
+            stroke = listOf(
+                "M16.5 7.99976H18C19.4142 7.99976 20.1213 7.99976 20.5607 7.56042C21 7.12108 21 6.41397 21 4.99976V3.49976",
+                "M3 11.9998C3 7.02919 7.0293 2.99976 12 2.99976C15.571 2.99976 18.0948 4.73029 20 7.08347M21 11.9998C21 16.9703 16.9707 20.9998 12 20.9998C8.42904 20.9998 5.90524 19.2692 4 16.916",
+                "M7.5 15.9998H6C4.58579 15.9998 3.87868 15.9998 3.43934 16.4391C3 16.8784 3 17.5855 3 18.9998V20.4998",
+            ),
+        )
+    }
+
+    /** [Heart](https://hugeicons.com/icon/heart?style=stroke-rounded) ? stroke-rounded. */
+    val Heart: ImageVector by lazy {
+        vector(
+            name = "Heart",
+            stroke = listOf(
+                "M10.4107 19.9677C7.58942 17.858 2 13.0348 2 8.69444C2 5.82563 4.10526 3.5 7 3.5C8.5 3.5 10 4 12 6C14 4 15.5 3.5 17 3.5C19.8947 3.5 22 5.82563 22 8.69444C22 13.0348 16.4106 17.858 13.5893 19.9677C12.6399 20.6776 11.3601 20.6776 10.4107 19.9677Z",
+            ),
+        )
+    }
 }
 
 /**
@@ -1145,10 +1171,10 @@ private const val VIEWPORT = 24f
 /**
  * Stroke weight in viewport units, so 1.8dp once the glyph is rendered at 24dp.
  *
- * The stroke is in viewport units, which means it scales with the glyph ù and that is exactly why
- * this is 1.8 rather than 1.5. Almost nothing draws at 24dp: a badge glyph is 14ù18dp and a small
- * button glyph is 16dp, so at 1.5 units those rendered at 0.9ù1.1dp and looked hairline-thin beside
- * their labels. At 1.8 the same glyphs land at 1.05ù1.35dp and a 24dp toolbar icon at 1.8dp, which
- * puts the whole set inside the 1.5ù2dp band the design rules ask for at the sizes actually used.
+ * The stroke is in viewport units, which means it scales with the glyph ? and that is exactly why
+ * this is 1.8 rather than 1.5. Almost nothing draws at 24dp: a badge glyph is 14?18dp and a small
+ * button glyph is 16dp, so at 1.5 units those rendered at 0.9?1.1dp and looked hairline-thin beside
+ * their labels. At 1.8 the same glyphs land at 1.05?1.35dp and a 24dp toolbar icon at 1.8dp, which
+ * puts the whole set inside the 1.5?2dp band the design rules ask for at the sizes actually used.
  */
 private const val STROKE_WIDTH = 1.8f

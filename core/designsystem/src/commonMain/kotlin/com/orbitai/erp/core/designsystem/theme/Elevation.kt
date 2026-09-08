@@ -33,7 +33,7 @@ internal val LocalOrbitElevation = staticCompositionLocalOf { OrbitElevation() }
  * ### Two parameter sets, because the two themes achieve depth differently
  *
  * A drop shadow is light that a raised object blocks. That works on a pale page, where the blocked
- * light is visibly missing. On a `#121214` page there is no light to block — a black shadow on a
+ * light is visibly missing. On a `#121212` page there is no light to block — a black shadow on a
  * near-black background is *nothing*, and turning up its opacity only produces a slightly different
  * shade of nothing. Dark themes therefore convey height the other way round: a raised surface is
  * *lighter*, as if it were closer to the light rather than casting away from it.
@@ -94,7 +94,7 @@ object OrbitShadow {
         offsetY = 0.dp,
         blur = 0.dp,
         opacity = 0f,
-        darkSurface = Color(0xFF2C2C2E),
+        darkSurface = Color(0xFF2C2C2C),
         darkBorder = true,
     )
 
@@ -103,7 +103,7 @@ object OrbitShadow {
         offsetY = 2.dp,
         blur = 4.dp,
         opacity = 0.05f,
-        darkSurface = Color(0xFF1C1C1E),
+        darkSurface = Color(0xFF1C1C1C),
         darkBorder = true,
     )
 
@@ -112,7 +112,7 @@ object OrbitShadow {
         offsetY = 4.dp,
         blur = 8.dp,
         opacity = 0.08f,
-        darkSurface = Color(0xFF252528),
+        darkSurface = Color(0xFF252525),
         darkBorder = true,
     )
 
@@ -121,7 +121,7 @@ object OrbitShadow {
         offsetY = 6.dp,
         blur = 14.dp,
         opacity = 0.12f,
-        darkSurface = Color(0xFF2C2C2E),
+        darkSurface = Color(0xFF2C2C2C),
         darkBorder = false,
     )
 
@@ -133,14 +133,14 @@ object OrbitShadow {
      * merely continued the progression would put a dialog one rung above a card, when the thing the
      * user has to understand is that the dialog is somewhere else entirely.
      *
-     * No rim in the dark theme. At `#3A3A3C` the tonal step off a `#1C1C1E` card is large enough to
+     * No rim in the dark theme. At `#3A3A3A` the tonal step off a `#1C1C1C` card is large enough to
      * carry the edge on its own, and a rim on top of that reads as a stroke rather than as depth.
      */
     val Level4 = OrbitElevationLevel(
         offsetY = 12.dp,
         blur = 24.dp,
         opacity = 0.16f,
-        darkSurface = Color(0xFF3A3A3C),
+        darkSurface = Color(0xFF3A3A3A),
         darkBorder = false,
     )
 }

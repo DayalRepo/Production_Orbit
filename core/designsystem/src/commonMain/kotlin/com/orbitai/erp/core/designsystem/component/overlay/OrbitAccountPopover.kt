@@ -112,8 +112,9 @@ fun OrbitAccountPopover(
                 )
                 Text(
                     text = mode,
-                    style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = content.textPrimary,
+                    // Same weight/size as the account name so Light/Dark does not shout louder.
+                    style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                    color = charcoal,
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
                 )

@@ -185,7 +185,7 @@ internal val OrbitDarkControlColors = OrbitControlColors(
     actionContainer = Color(0xFFE3E2E6),
     onActionContainer = Color(0xFF16191D),
     controlContainer = Color(0x1FE3E2E6),
-    controlBorder = Color(0xFF3F3F46),
+    controlBorder = Color(0xFF3F3F3F),
     controlContent = Color(0xFFE3E2E6),
     // Black, not grey — the dark ring deepens where the light one lightens.
     //
@@ -201,13 +201,13 @@ internal val OrbitDarkControlColors = OrbitControlColors(
     // to match the glyph — and by the contact shadow, both of which are position and material cues
     // rather than a wash.
     ringContainer = Color(0x33000000),
-    cardContainer = Color(0xFF1C1C1E),
+    cardContainer = Color(0xFF1C1C1C),
     outlineBorder = Color(0x5CE3E2E6),
-    insetContainer = Color(0xFF2C2C2E),
-    dividerSubtle = Color(0xFF2C2C2E),
-    dividerElevated = Color(0xFF55555A),
+    insetContainer = Color(0xFF2C2C2C),
+    dividerSubtle = Color(0xFF2C2C2C),
+    dividerElevated = Color(0xFF555555),
     borderFocus = Color(0xFF0A84FF),
-    interactiveContainer = Color(0xFF3A3A3C),
+    interactiveContainer = Color(0xFF3A3A3A),
 )
 
 val OrbitTheme.controlColors: OrbitControlColors

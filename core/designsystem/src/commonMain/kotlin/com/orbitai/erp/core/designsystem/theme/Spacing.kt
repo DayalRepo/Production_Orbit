@@ -657,7 +657,7 @@ data class OrbitSizing(
      * 1.8-unit stroke would land near 2dp and look heavy in a floating glass bar. Cap it here so
      * size can grow without the line weight growing with it.
      */
-    val bottomNavIconStroke: Dp = 1.25.dp,
+    val bottomNavIconStroke: Dp = 1.45.dp,
     /**
      * Inset from the pill's curved ends to the outer icon slots.
      *

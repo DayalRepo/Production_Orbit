@@ -11,19 +11,23 @@ import androidx.compose.ui.unit.sp
 /**
  * Pixel letter O for the brand-intro / opening splash — sized to the horizontal lockup next to
  * `rbit.ai` (see [OrbitOpeningLockup]).
+ *
+ * @param spread 0f = dots packed at the O centre; 1f = default mark geometry.
  */
 @Composable
 fun OrbitOpeningMark(
     modifier: Modifier = Modifier,
     size: Dp = OrbitOpeningLockup.MarkSize,
-    color: Color = OrbitMarkDefaults.color(),
+    color: Color = OrbitLauncherIconDefaults.LightMark,
     contentDescription: String? = "Orbit.ai",
+    spread: Float = 1f,
 ) {
     OrbitMark(
         modifier = modifier,
         size = size,
         color = color,
         contentDescription = contentDescription,
+        spread = spread,
     )
 }
 

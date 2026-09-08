@@ -97,6 +97,59 @@ fun Modifier.orbitGlassScrollbar(
 }
 
 /**
+ * Horizontal twin of [orbitGlassScrollbar] — thumb along the bottom edge when content overflows.
+ */
+@Composable
+fun Modifier.orbitGlassHorizontalScrollbar(
+    scrollState: ScrollState,
+    visible: Boolean = true,
+    color: Color = OrbitTheme.controlColors.controlContent,
+    height: Dp = OrbitGlassScrollbarDefaults.Width,
+    inset: Dp = OrbitGlassScrollbarDefaults.Inset,
+    minThumbLength: Dp = OrbitGlassScrollbarDefaults.MinThumbLength,
+): Modifier {
+    val alpha by animateFloatAsState(
+        targetValue = if (visible && scrollState.maxValue > 0) 1f else 0f,
+        animationSpec = tween(OrbitGlassScrollbarDefaults.FadeMs),
+        label = "orbit-glass-h-scrollbar",
+    )
+
+    return this.drawWithContent {
+        drawContent()
+        if (alpha <= 0.01f) return@drawWithContent
+
+        val viewport = size.width
+        val content = viewport + scrollState.maxValue
+        if (content <= viewport) return@drawWithContent
+
+        val trackInset = inset.toPx()
+        val trackLength = viewport - trackInset * 2
+        val thumbLength = (trackLength * (viewport / content))
+            .coerceAtLeast(minThumbLength.toPx())
+            .coerceAtMost(trackLength)
+        val progress = scrollState.value.toFloat() / scrollState.maxValue.toFloat()
+        val thumbLeft = trackInset + (trackLength - thumbLength) * progress
+        val thumbHeight = height.toPx()
+
+        drawRoundRect(
+            brush = Brush.horizontalGradient(
+                startX = thumbLeft,
+                endX = thumbLeft + thumbLength,
+                colors = listOf(
+                    color.copy(alpha = color.alpha * OrbitGlassScrollbarDefaults.ThumbTopAlpha * alpha),
+                    color.copy(
+                        alpha = color.alpha * OrbitGlassScrollbarDefaults.ThumbBottomAlpha * alpha,
+                    ),
+                ),
+            ),
+            topLeft = Offset(thumbLeft, size.height - thumbHeight - trackInset),
+            size = Size(thumbLength, thumbHeight),
+            cornerRadius = CornerRadius(thumbHeight / 2f),
+        )
+    }
+}
+
+/**
  * Viewport box with an [orbitGlassScrollbar] overlay. Caller scrolls the content inside.
  *
  * ```
