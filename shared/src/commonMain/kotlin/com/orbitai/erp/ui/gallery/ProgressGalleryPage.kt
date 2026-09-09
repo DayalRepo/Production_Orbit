@@ -35,7 +35,7 @@ internal fun ProgressGalleryPage() {
         ) {
             Text(
                 text = "16 segments · Health = Done/delta green · Progress = soft blue · " +
-                    "glass plate + centre percent.",
+                    "glass plate + centre percent (optional caption under it).",
                 style = OrbitTheme.typography.bodySmall,
                 color = content.textSecondary,
             )

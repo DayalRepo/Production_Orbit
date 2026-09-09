@@ -29,7 +29,6 @@ import com.orbitai.erp.core.designsystem.component.button.OrbitCopyButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
-import com.orbitai.erp.core.designsystem.component.container.OrbitCard
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.component.markdown.OrbitMarkdown
 import com.orbitai.erp.core.designsystem.component.markdown.orbitMarkdownPlainText
@@ -50,10 +49,10 @@ data class OrbitAiBriefAction(
 )
 
 /**
- * Glass AI brief: `[Orbit mark] [markdown…]` with show more / show less.
+ * Freestyle AI brief (no glass card container): `[Orbit mark] [markdown…]` with show more / show less.
  *
  * Expanded footer: divider → `Updated … ·` copy → Show less. Collapsed: Show more only (no copy).
- * Close sits at the card’s top-right while expanded and collapses the open brief.
+ * Close sits at the top-right while expanded and collapses the open brief.
  *
  * Markdown: `#`/`##`/`###`, bullets, `**bold**`, `*italic*`, `__underline__`, `~~strike~~`, tables.
  */
@@ -61,7 +60,7 @@ data class OrbitAiBriefAction(
 fun OrbitAiBriefCard(
     markdown: String,
     modifier: Modifier = Modifier,
-    collapsedMaxLines: Int = 3,
+    collapsedMaxLines: Int = 4,
     updatedLabel: String = "Updated 21m ago",
     @Suppress("UNUSED_PARAMETER")
     actions: List<OrbitAiBriefAction> = emptyList(),
@@ -84,110 +83,108 @@ fun OrbitAiBriefCard(
     var textExpanded by remember(markdown) { mutableStateOf(false) }
     var overflows by remember(markdown, collapsedMaxLines) { mutableStateOf(false) }
 
-    OrbitCard(
-        modifier = modifier.fillMaxWidth(),
-        padding = spacing.md,
-        contentDescription = plain,
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics { contentDescription = plain },
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            if (textExpanded) {
-                OrbitIconButton(
-                    contentDescription = "Close brief",
-                    onClick = { textExpanded = false },
-                    icon = OrbitIcons.Cancel,
-                    style = OrbitIconButtonStyle.Neutral,
-                    size = OrbitIconButtonSize.Small,
-                    ringed = false,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = spacing.xs, y = (-spacing.xs)),
-                )
-            }
-
-            Row(
+        if (textExpanded) {
+            OrbitIconButton(
+                contentDescription = "Close brief",
+                onClick = { textExpanded = false },
+                icon = OrbitIcons.Cancel,
+                style = OrbitIconButtonStyle.Neutral,
+                size = OrbitIconButtonSize.Small,
+                ringed = false,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = if (textExpanded) spacing.xxl else 0.dp),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(spacing.sm),
-            ) {
-                OrbitMark(
-                    size = 28.dp,
-                    color = markColor,
-                    contentDescription = "Orbit AI",
-                )
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(spacing.sm),
-                ) {
-                    if (textExpanded) {
-                        OrbitMarkdown(
-                            source = markdown,
-                            centered = false,
-                        )
-                    } else {
-                        Text(
-                            text = plain,
-                            style = bodyStyle,
-                            color = content.textSecondary,
-                            maxLines = collapsedMaxLines,
-                            overflow = TextOverflow.Ellipsis,
-                            onTextLayout = { layout ->
-                                overflows = layout.hasVisualOverflow
-                            },
-                        )
-                    }
+                    .align(Alignment.TopEnd)
+                    .offset(x = spacing.xs, y = (-spacing.xs)),
+            )
+        }
 
-                    if (textExpanded) {
-                        OrbitDivider(color = control.controlBorder)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(spacing.xs),
-                        ) {
-                            Text(
-                                text = updatedLabel,
-                                style = OrbitTheme.extendedTypography.metricCaption,
-                                color = content.textTertiary,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f, fill = false),
-                            )
-                            Text(
-                                text = "·",
-                                style = OrbitTheme.extendedTypography.metricCaption,
-                                color = content.textTertiary,
-                            )
-                            OrbitCopyButton(
-                                value = markdown,
-                                label = "Brief",
-                                size = OrbitIconButtonSize.Small,
-                            )
-                        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = if (textExpanded) spacing.xxl else 0.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+        ) {
+            OrbitMark(
+                size = 28.dp,
+                color = markColor,
+                contentDescription = "Orbit AI",
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(spacing.sm),
+            ) {
+                if (textExpanded) {
+                    OrbitMarkdown(
+                        source = markdown,
+                        centered = false,
+                    )
+                } else {
+                    Text(
+                        text = plain,
+                        style = bodyStyle,
+                        color = content.textSecondary,
+                        maxLines = collapsedMaxLines,
+                        overflow = TextOverflow.Ellipsis,
+                        onTextLayout = { layout ->
+                            overflows = layout.hasVisualOverflow
+                        },
+                    )
+                }
+
+                if (textExpanded) {
+                    OrbitDivider(color = control.controlBorder)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(spacing.xs),
+                    ) {
                         Text(
-                            text = "Show less",
-                            style = OrbitTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Medium,
-                            ),
-                            color = linkInk,
-                            modifier = Modifier
-                                .orbitHandCursor()
-                                .clickable(role = Role.Button) { textExpanded = false }
-                                .semantics { contentDescription = "Show less brief" },
+                            text = updatedLabel,
+                            style = OrbitTheme.extendedTypography.metricCaption,
+                            color = content.textTertiary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false),
                         )
-                    } else if (overflows) {
                         Text(
-                            text = "Show more",
-                            style = OrbitTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Medium,
-                            ),
-                            color = linkInk,
-                            modifier = Modifier
-                                .orbitHandCursor()
-                                .clickable(role = Role.Button) { textExpanded = true }
-                                .semantics { contentDescription = "Show more brief" },
+                            text = "·",
+                            style = OrbitTheme.extendedTypography.metricCaption,
+                            color = content.textTertiary,
+                        )
+                        OrbitCopyButton(
+                            value = markdown,
+                            label = "Brief",
+                            size = OrbitIconButtonSize.Small,
                         )
                     }
+                    Text(
+                        text = "Show less",
+                        style = OrbitTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                        ),
+                        color = linkInk,
+                        modifier = Modifier
+                            .orbitHandCursor()
+                            .clickable(role = Role.Button) { textExpanded = false }
+                            .semantics { contentDescription = "Show less brief" },
+                    )
+                } else if (overflows) {
+                    Text(
+                        text = "Show more",
+                        style = OrbitTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                        ),
+                        color = linkInk,
+                        modifier = Modifier
+                            .orbitHandCursor()
+                            .clickable(role = Role.Button) { textExpanded = true }
+                            .semantics { contentDescription = "Show more brief" },
+                    )
                 }
             }
         }

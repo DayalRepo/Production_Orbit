@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.component.display.OrbitAiBriefCard
 
 /**
- * CEO AI brief — Orbit mark inline with markdown body + show more / show less.
+ * Ceo AI brief — freestyle (no glass container), Orbit mark + markdown + show more / less.
  */
 @Composable
 fun CeoAiBriefCard(
@@ -16,7 +16,7 @@ fun CeoAiBriefCard(
     OrbitAiBriefCard(
         markdown = markdown,
         modifier = modifier,
-        collapsedMaxLines = 3,
+        collapsedMaxLines = 4,
         updatedLabel = updatedLabel,
     )
 }

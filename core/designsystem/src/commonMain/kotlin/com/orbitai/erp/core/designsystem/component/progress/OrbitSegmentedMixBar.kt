@@ -72,6 +72,8 @@ data class OrbitMixSegment(
     val label: String,
     val shortLabel: String = label,
     val statusPhrase: String = label.lowercase(),
+    /** When set, shown under the bracket instead of the default “N projects …” line. */
+    val detailLabel: String? = null,
 )
 
 private val BracketFadeMs = 280
@@ -118,9 +120,9 @@ fun OrbitSegmentedMixBar(
     val spoken = contentDescription ?: segments.joinToString { "${it.label} ${it.weight.toInt()}" }
     val trackShape = RoundedCornerShape(sizing.progressSegmentRadius)
     val bracketStroke = if (dark) {
-        content.textTertiary.copy(alpha = 0.85f)
+        content.textTertiary.copy(alpha = 0.9f)
     } else {
-        control.controlBorder.copy(alpha = 0.9f)
+        content.textSecondary.copy(alpha = 0.72f)
     }
 
     Column(
@@ -254,7 +256,8 @@ fun OrbitSegmentedMixBar(
                 val centerFrac = (startFrac + endFrac) / 2f
                 val count = segment.weight.roundToIntSafe()
                 val noun = if (count == 1) "project" else "projects"
-                val label = "$count $noun ${segment.statusPhrase}"
+                val label = segment.detailLabel
+                    ?: "$count $noun ${segment.statusPhrase}"
                 val density = LocalDensity.current
                 var labelWidthPx by remember(label) { mutableStateOf(0) }
 
@@ -276,7 +279,7 @@ fun OrbitSegmentedMixBar(
                                     .width(segmentWidth)
                                     .height(14.dp),
                             ) {
-                                val strokeWidth = 1.25.dp.toPx()
+                                val strokeWidth = if (dark) 1.25.dp.toPx() else 1.6.dp.toPx()
                                 val stroke = Stroke(
                                     width = strokeWidth,
                                     cap = StrokeCap.Round,

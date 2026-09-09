@@ -8,11 +8,12 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
@@ -31,6 +32,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.feedback.OrbitLoadingIcon
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
@@ -161,7 +165,8 @@ fun OrbitButton(
     shape: Shape? = null,
     /**
      * When true and [variant] is tonal (Primary / Destructive), use the opaque badge solid fill
-     * instead of the soft glass tint — for auth CTAs that must not wash out to white on light pages.
+     * instead of frosted / soft glass. Prefer the default: light theme already frosts the tint so
+     * the page does not show through as white.
      */
     solid: Boolean = false,
     /**
@@ -170,16 +175,28 @@ fun OrbitButton(
      */
     glassHighlight: Boolean = true,
     /**
+     * Contact shadow under filled variants. Auth CTAs pass [OrbitSizing.bottomNavShadow] so Continue /
+     * Verify match the floating nav weight.
+     */
+    shadowElevation: Dp? = null,
+    /**
      * When false, skips press ripple / scale indication (useful for quiet Text actions like Resend).
      */
     pressIndication: Boolean = true,
+    /**
+     * Optional visible height override. Defaults to the [size] token (`buttonHeightSm` / Md / Lg).
+     * Touch target stays [OrbitSizing.minTouchTarget] either way.
+     */
+    minHeight: Dp? = null,
 ) {
     val sizing = OrbitTheme.sizing
     val typeScale = OrbitTheme.typeScale
     val spacing = OrbitTheme.spacing
     val control = OrbitTheme.controlColors
-    val shape = shape ?: OrbitTheme.shapeTokens.button
+    val shapeTokens = OrbitTheme.shapeTokens
+    val shape = shape ?: shapeTokens.button
     val isDark = OrbitTheme.isDark
+    val glassElevation = shadowElevation ?: sizing.shadowButton
 
     // The badge tone each tinted variant borrows. Blue for the affirmative, Red for backing out;
     // everything else stays neutral and takes the control palette below.
@@ -189,8 +206,14 @@ fun OrbitButton(
         else -> null
     }
 
+    // Light-theme see-through glass (~26% alpha) over a pale page washes to white — the page shows
+    // through the hole. Frost keeps the glass stack (sheen + highlight + rim) but lifts the tint to
+    // near-opaque so it reads as frosted glass, not a transparent window onto white.
+    // Dark theme keeps the soft translucent container (it already reads as glass on dark pages).
+    // [solid] remains an explicit override for opaque brand fill + on-solid ink.
     val container = when {
         tone != null && solid -> tone.solidContainer
+        tone != null && !isDark -> frostedTonalFill(tone.container)
         tone != null -> tone.container
         variant == OrbitButtonVariant.Secondary -> control.controlContainer
         else -> Color.Transparent
@@ -207,8 +230,10 @@ fun OrbitButton(
         else -> null
     }
     val filled = container != Color.Transparent
+    val resolvedSolid = solid
 
-    val minHeight = size.pick(sizing.buttonHeightSm, sizing.buttonHeightMd, sizing.buttonHeightLg)
+    val resolvedMinHeight = minHeight
+        ?: size.pick(sizing.buttonHeightSm, sizing.buttonHeightMd, sizing.buttonHeightLg)
     val minWidth = size.pick(
         sizing.buttonMinWidthSm, sizing.buttonMinWidthMd, sizing.buttonMinWidthLg,
     )
@@ -269,7 +294,7 @@ fun OrbitButton(
 
     // Soft specular on glass; solid CTAs and [glassHighlight]=false skip the white wash.
     val baseHighlight = when {
-        solid || !glassHighlight -> 0f
+        resolvedSolid || !glassHighlight -> 0f
         isDark -> OrbitGlass.ButtonHighlightDark
         else -> OrbitGlass.ButtonHighlightLight
     }
@@ -282,21 +307,23 @@ fun OrbitButton(
         animationSpec = tween(HoverMs),
         label = "orbit-button-highlight",
     )
-    val glassSheen = if (solid || !glassHighlight) 1f else OrbitGlass.Sheen
+    val glassSheen = if (resolvedSolid || !glassHighlight) 1f else OrbitGlass.Sheen
+
+    // Compact painted heights need less vertical pad or the label overflows the surface.
+    val verticalPad = when {
+        resolvedMinHeight <= 24.dp -> spacing.none
+        resolvedMinHeight <= 28.dp -> 2.dp
+        else -> spacing.xs
+    }
 
     // Two nodes, and the split is deliberate. The outer Box is the touch target and owns the click;
     // the inner Row is the visible button and owns the drawing and the press animation.
     //
-    // Doing it on one node does not work. The visible height can be 32dp while the target must be
-    // 48dp, and any modifier that only grows the reported layout size leaves the extra 8dp above
-    // and below outside the clickable's pointer bounds — a control that looks compliant and is not.
-    // Conversely, hanging the ripple off the outer node would draw it across the full 48dp square
-    // instead of inside the rounded rectangle.
-    //
-    // `propagateMinConstraints` is what keeps `Modifier.fillMaxWidth()` working on a caller's
-    // `modifier`: the width lands on the wrapper and is handed down, rather than leaving the button
-    // centred at its content width inside a full-width box.
-    Box(
+    // `propagateMinConstraints` must stay false for height: the outer node is at least
+    // `minTouchTarget` (48dp) for a11y, and if that min were propagated the painted row could never
+    // shrink below 48dp — which is why [minHeight] previously looked like a no-op.
+    // Width still stretches when the caller passed `fillMaxWidth()` (tight width constraints).
+    BoxWithConstraints(
         modifier = modifier
             .heightIn(min = sizing.minTouchTarget)
             .orbitHandCursor()
@@ -309,11 +336,24 @@ fun OrbitButton(
             )
             .semantics(mergeDescendants = true) {},
         contentAlignment = Alignment.Center,
-        propagateMinConstraints = true,
+        propagateMinConstraints = false,
     ) {
+        val stretchWidth = constraints.hasBoundedWidth &&
+            constraints.minWidth == constraints.maxWidth &&
+            constraints.maxWidth != Constraints.Infinity
+
         Row(
             modifier = Modifier
-                .heightIn(min = minHeight)
+                .then(if (stretchWidth) Modifier.fillMaxWidth() else Modifier)
+                .then(
+                    // Exact height when the caller overrides (compact CTAs). Otherwise `heightIn`
+                    // so large font scale can still grow the painted surface (WCAG 1.4.4).
+                    if (minHeight != null) {
+                        Modifier.height(resolvedMinHeight)
+                    } else {
+                        Modifier.heightIn(min = resolvedMinHeight)
+                    },
+                )
                 .widthIn(min = minWidth)
                 // Before the clip, so the shadow falls outside the pill. Only filled variants get
                 // one: Outline, Text and Plain draw no pane, and a shadow under a bare label reads as
@@ -322,7 +362,7 @@ fun OrbitButton(
                     if (filled) {
                         Modifier.orbitGlassShadow(
                             shape = shape,
-                            elevation = sizing.shadowButton,
+                            elevation = glassElevation,
                             alpha = dims.container,
                         )
                     } else {
@@ -335,8 +375,8 @@ fun OrbitButton(
                         Modifier.orbitGlass(
                             fill = container.copy(alpha = container.alpha * dims.container),
                             shape = shape,
-                            highlightAlpha = if (solid) 0f else highlight * dims.container,
-                            edge = if (solid) {
+                            highlightAlpha = if (resolvedSolid) 0f else highlight * dims.container,
+                            edge = if (resolvedSolid) {
                                 null
                             } else {
                                 (ring ?: control.controlBorder).let {
@@ -370,7 +410,7 @@ fun OrbitButton(
                         Modifier
                     },
                 )
-                .padding(horizontal = endPadding, vertical = spacing.xs),
+                .padding(horizontal = endPadding, vertical = verticalPad),
             horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -395,7 +435,13 @@ fun OrbitButton(
                 }
 
                 if (iconPosition == OrbitButtonIconPosition.Leading) glyph?.invoke()
-                Text(text = label, style = textStyle, color = tint, textAlign = TextAlign.Center)
+                Text(
+                    text = label,
+                    style = textStyle,
+                    color = tint,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                )
                 if (iconPosition == OrbitButtonIconPosition.Trailing) glyph?.invoke()
             }
         }
@@ -411,7 +457,15 @@ private fun <T> OrbitButtonSize.pick(small: T, medium: T, large: T): T = when (t
 /** The per-layer opacity a state applies. See the comment where it is built. */
 private data class Dim(val container: Float, val ring: Float, val content: Float)
 
-/** Ring alpha for Destructive — present enough to bound the target, faint enough to stay a ring. */
-private const val DestructiveRingAlpha = 0.5f
-
+/** Hover animation duration for glass highlight lift. */
 private const val HoverMs = 120
+
+/**
+ * Near-opaque frost of a translucent tonal fill.
+ *
+ * Keeps the RGB of the soft glass tint but raises alpha so a pale page cannot show through as
+ * white. True backdrop blur is not used (no cross-platform frosted-glass API at minSdk 24); this
+ * is the frosted-pane read the glass stack was designed around.
+ */
+private fun frostedTonalFill(tint: Color): Color =
+    Color(red = tint.red, green = tint.green, blue = tint.blue, alpha = 0.92f)

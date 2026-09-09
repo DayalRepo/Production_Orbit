@@ -683,10 +683,10 @@ data class OrbitSizing(
     /**
      * Contact shadow under the pill and circle.
      *
-     * Softer than [shadowIconButton] / `elevation.bottomBar` — those were tuned for small rings, and
-     * at bar size a 3dp shadow reads as a drop rather than as glass resting on the page.
+     * Raised a step so the floating nav casts a soft, centred fall below the bar rather than a
+     * hairline Material rim. Auth Continue / Verify reuse this token so CTAs match the nav weight.
      */
-    val bottomNavShadow: Dp = 2.dp,
+    val bottomNavShadow: Dp = 6.dp,
     /**
      * Air between the bar and the platform gesture / navigation bar.
      *

@@ -2,6 +2,7 @@ package com.orbitai.erp.core.designsystem.component.progress
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -144,20 +145,18 @@ object OrbitDonutProgressDefaults {
 }
 
 /**
- * A segmented donut progress ring: [OrbitDonutProgressDefaults.SegmentCount] curved bars with gaps
- * and a centred percentage.
+ * A donut progress ring with a centred percentage (optional caption under it).
  *
  * Draws as a glass object: contact shadow, translucent glass plate (no rim line), a glass lens in
- * the hole, and sheened segment arcs — the same stack badges and icon rings use, so light and dark
- * themes stay consistent without a second palette. Inner and outer hairlines are omitted on purpose:
- * a continuous circle reads as a line joining the segment bars.
+ * the hole, and sheened arcs — the same stack badges and icon rings use.
  *
- * Lit count uses the same rounding rules as [OrbitSegmentedProgress] (via [litSegments]): above zero
- * always lights at least one piece; below 100% always leaves at least one dark.
+ * When [segmented] is true (default), the ring is cut into [segmentCount] bars with gaps. Lit count
+ * uses the same rounding rules as [OrbitSegmentedProgress] (via [litSegments]). When false, the
+ * ring is a continuous track with a single progress arc (Health KPI style).
  *
  * @param progress 0f..1f. Values outside are clamped.
- * @param caption optional spoken name for accessibility (e.g. `"Health"`). Not drawn in the ring —
- *   only the percentage sits in the centre.
+ * @param caption optional name under the percentage (e.g. `"HEALTH"`). Also used in the spoken
+ *   description when [contentDescription] is null.
  */
 @Composable
 fun OrbitDonutProgress(
@@ -167,6 +166,7 @@ fun OrbitDonutProgress(
     size: Dp = OrbitDonutProgressDefaults.Size,
     strokeWidth: Dp = OrbitDonutProgressDefaults.StrokeWidth,
     segmentCount: Int = OrbitDonutProgressDefaults.SegmentCount,
+    segmented: Boolean = true,
     caption: String? = null,
     contentDescription: String? = null,
 ) {
@@ -183,7 +183,6 @@ fun OrbitDonutProgress(
         OrbitGlass.SurfaceHighlightLight
     }
     val sheen = if (dark) 1f else OrbitGlass.Sheen
-    val hole = (size - strokeWidth * 2).coerceAtLeast(0.dp)
     val spoken = contentDescription
         ?: buildString {
             if (!caption.isNullOrBlank()) {
@@ -202,7 +201,7 @@ fun OrbitDonutProgress(
             .orbitGlass(
                 fill = control.ringContainer,
                 shape = CircleShape,
-                // No edge/rim — a hairline circle reads as a line joining the segment bars.
+                // No edge/rim — a hairline circle joins continuous/segment bars into a false ring.
                 highlightAlpha = highlightAlpha,
                 edge = null,
                 sheen = sheen,
@@ -221,55 +220,76 @@ fun OrbitDonutProgress(
                 height = this.size.height - inset * 2f,
             )
             val topLeft = Offset(inset, inset)
-            val slotSweep = 360f / count
-            val gapSweep = slotSweep * OrbitDonutProgressDefaults.GapFraction
-            val segSweep = (slotSweep - gapSweep).coerceAtLeast(0.5f)
 
-            repeat(count) { index ->
-                val start = OrbitDonutProgressDefaults.StartAngle +
-                    index * slotSweep +
-                    gapSweep / 2f
-                val color = if (index < lit) colors.filled else colors.track
+            if (segmented) {
+                val slotSweep = 360f / count
+                val gapSweep = slotSweep * OrbitDonutProgressDefaults.GapFraction
+                val segSweep = (slotSweep - gapSweep).coerceAtLeast(0.5f)
+
+                repeat(count) { index ->
+                    val start = OrbitDonutProgressDefaults.StartAngle +
+                        index * slotSweep +
+                        gapSweep / 2f
+                    val color = if (index < lit) colors.filled else colors.track
+                    drawGlassArc(
+                        color = color,
+                        startAngle = start,
+                        sweepAngle = segSweep,
+                        topLeft = topLeft,
+                        arcSize = arcSize,
+                        stroke = stroke,
+                        sheen = sheen,
+                        highlightAlpha = if (index < lit) highlightAlpha else highlightAlpha * 0.35f,
+                        cap = StrokeCap.Butt,
+                    )
+                }
+            } else {
+                // Continuous ring with square (butt) ends — not rounded pill caps.
                 drawGlassArc(
-                    color = color,
-                    startAngle = start,
-                    sweepAngle = segSweep,
+                    color = colors.track,
+                    startAngle = OrbitDonutProgressDefaults.StartAngle,
+                    sweepAngle = 360f,
                     topLeft = topLeft,
                     arcSize = arcSize,
                     stroke = stroke,
                     sheen = sheen,
-                    highlightAlpha = if (index < lit) highlightAlpha else highlightAlpha * 0.35f,
+                    highlightAlpha = highlightAlpha * 0.35f,
+                    cap = StrokeCap.Butt,
                 )
+                if (fraction > 0f) {
+                    drawGlassArc(
+                        color = colors.filled,
+                        startAngle = OrbitDonutProgressDefaults.StartAngle,
+                        sweepAngle = (fraction * 360f).coerceAtLeast(0.5f),
+                        topLeft = topLeft,
+                        arcSize = arcSize,
+                        stroke = stroke,
+                        sheen = sheen,
+                        highlightAlpha = highlightAlpha,
+                        cap = StrokeCap.Butt,
+                    )
+                }
             }
         }
 
-        // Glass lens in the hole — fill + highlight only, no circular edge line.
-        if (hole > 0.dp) {
-            Box(
-                modifier = Modifier
-                    .size(hole)
-                    .orbitGlassShadow(shape = CircleShape, elevation = sizing.shadowBadge)
-                    .clip(CircleShape)
-                    .orbitGlass(
-                        fill = control.ringContainer,
-                        shape = CircleShape,
-                        highlightAlpha = if (dark) {
-                            OrbitGlass.RingHighlightDark
-                        } else {
-                            OrbitGlass.RingHighlightLight
-                        },
-                        edge = null,
-                        sheen = sheen,
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
+        // Larger percent; HEALTH caption stays secondary under it.
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "$percent%",
+                style = OrbitTheme.extendedTypography.metricLarge.copy(
+                    fontWeight = FontWeight.Normal,
+                ),
+                color = colors.label,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+            )
+            if (!caption.isNullOrBlank()) {
                 Text(
-                    text = "$percent%",
-                    style = OrbitTheme.extendedTypography.metricLarge.copy(
-                        fontWeight = FontWeight.Normal,
-                    ),
-                    color = colors.label,
+                    text = caption,
+                    style = OrbitTheme.extendedTypography.cardLabel,
+                    color = colors.caption,
                     textAlign = TextAlign.Center,
+                    maxLines = 1,
                 )
             }
         }
@@ -277,7 +297,8 @@ fun OrbitDonutProgress(
 }
 
 /**
- * Flat glass sheen on a stroked arc. [StrokeCap.Butt] keeps radial cuts clean so gaps stay open.
+ * Flat glass sheen on a stroked arc. [StrokeCap.Butt] keeps square ends on continuous and
+ * segmented rings (no rounded pill caps).
  */
 private fun DrawScope.drawGlassArc(
     color: Color,
@@ -288,8 +309,9 @@ private fun DrawScope.drawGlassArc(
     stroke: Float,
     sheen: Float,
     highlightAlpha: Float,
+    cap: StrokeCap = StrokeCap.Butt,
 ) {
-    val style = Stroke(width = stroke, cap = StrokeCap.Butt)
+    val style = Stroke(width = stroke, cap = cap)
     val sheened = color.copy(alpha = (color.alpha * sheen).coerceAtMost(1f))
 
     drawArc(

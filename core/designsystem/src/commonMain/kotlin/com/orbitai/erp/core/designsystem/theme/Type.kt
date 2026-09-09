@@ -37,9 +37,8 @@ data class OrbitFontWeights(
      *
      * A dashboard number is already the largest thing on its card, so size alone gives it all the
      * emphasis it needs; adding weight on top makes it shout, and a screen of six shouting cards has
-     * no hierarchy left. Regular is also where Google Sans Flex's digits are best drawn — Bold
-     * closes the counters on 8 and 9 so a long number reads as a block, while Light thins the strokes
-     * enough that a figure set against a glass card starts to look tentative at small sizes.
+     * no hierarchy left. Metric figures use DM Sans at Regular — open counters stay clear with ₹ / %
+     * at large sizes, and Bold would close 8 and 9 into a block on glass cards.
      */
     val metric: FontWeight = FontWeight.Normal,
 )
@@ -145,9 +144,10 @@ internal fun orbitTypographyTokens(
     sans: FontFamily,
     scale: OrbitTypeScale,
     weights: OrbitFontWeights = OrbitFontWeights(),
+    metric: FontFamily = sans,
 ): OrbitTypographyTokens = OrbitTypographyTokens(
     metricLarge = TextStyle(
-        fontFamily = sans,
+        fontFamily = metric,
         fontWeight = weights.metric,
         fontSize = scale.h1.size,
         lineHeight = scale.h1.lineHeight,
@@ -155,7 +155,7 @@ internal fun orbitTypographyTokens(
         fontFeatureSettings = TabularNumbers,
     ),
     metricMedium = TextStyle(
-        fontFamily = sans,
+        fontFamily = metric,
         fontWeight = weights.metric,
         fontSize = scale.h3.size,
         lineHeight = scale.h3.lineHeight,
@@ -163,7 +163,7 @@ internal fun orbitTypographyTokens(
         fontFeatureSettings = TabularNumbers,
     ),
     metricSmall = TextStyle(
-        fontFamily = sans,
+        fontFamily = metric,
         fontWeight = weights.metric,
         fontSize = scale.h4.size,
         lineHeight = scale.h4.lineHeight,

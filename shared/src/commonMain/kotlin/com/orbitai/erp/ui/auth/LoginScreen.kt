@@ -123,8 +123,9 @@ fun LoginScreen(
                             OrbitButtonState.Disabled
                         },
                         shape = authShape,
-                        // Light auth: no white specular wash. Dark keeps default glass highlight.
-                        glassHighlight = isDark,
+                        // Frosted glass on light (see OrbitButton); keep specular on both themes.
+                        glassHighlight = true,
+                        shadowElevation = OrbitTheme.sizing.bottomNavShadow,
                     )
                 }
             }

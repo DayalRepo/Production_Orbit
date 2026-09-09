@@ -4,6 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.orbitai.erp.core.designsystem.resources.Res
+import com.orbitai.erp.core.designsystem.resources.dmsans_bold
+import com.orbitai.erp.core.designsystem.resources.dmsans_medium
+import com.orbitai.erp.core.designsystem.resources.dmsans_regular
+import com.orbitai.erp.core.designsystem.resources.dmsans_semibold
 import com.orbitai.erp.core.designsystem.resources.googlesansflex_black
 import com.orbitai.erp.core.designsystem.resources.googlesansflex_bold
 import com.orbitai.erp.core.designsystem.resources.googlesansflex_extrabold
@@ -39,6 +43,22 @@ internal fun orbitFontFamily(): FontFamily = FontFamily(
     Font(Res.font.googlesansflex_bold, FontWeight.Bold),
     Font(Res.font.googlesansflex_extrabold, FontWeight.ExtraBold),
     Font(Res.font.googlesansflex_black, FontWeight.Black),
+)
+
+/**
+ * DM Sans for KPI metric figures (percentages, currency with symbols).
+ *
+ * Bundled static weights from `composeResources/font/` — same approach as Google Sans Flex so
+ * weight selection works on every supported Android API (minSdk 24).
+ *
+ * Licensed under the SIL Open Font License 1.1 — see `licenses/OFL-DM-Sans.txt`.
+ */
+@Composable
+internal fun orbitMetricFontFamily(): FontFamily = FontFamily(
+    Font(Res.font.dmsans_regular, FontWeight.Normal),
+    Font(Res.font.dmsans_medium, FontWeight.Medium),
+    Font(Res.font.dmsans_semibold, FontWeight.SemiBold),
+    Font(Res.font.dmsans_bold, FontWeight.Bold),
 )
 
 /**

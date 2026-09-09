@@ -67,6 +67,11 @@ enum class BadgeKind(val label: String, val tone: OrbitBadgeTone) {
     Restored("Restored", OrbitBadgeTone.Teal),
     Missing("Missing", OrbitBadgeTone.Orange),
     Status("Status", OrbitBadgeTone.Slate),
+
+    // Portfolio health on the CEO dashboard.
+    Healthy("Healthy", OrbitBadgeTone.Green),
+    AtRisk("At risk", OrbitBadgeTone.Amber),
+    Critical("Critical", OrbitBadgeTone.Red),
     ;
 
     /**
@@ -97,6 +102,10 @@ enum class BadgeKind(val label: String, val tone: OrbitBadgeTone) {
             Restored -> OrbitIcons.Repeat
             Missing -> OrbitIcons.Puzzle
             Status -> OrbitIcons.Status
+            // Healthy = circle-check (Hugeicons stroke-rounded). At risk = alert. Critical = cancel-circle.
+            Healthy -> OrbitIcons.CircleCheck
+            AtRisk -> OrbitIcons.BadgeAlert
+            Critical -> OrbitIcons.CancelCircle
         }
 }
 
@@ -154,7 +163,7 @@ val StockLevel.badgeKind: BadgeKind
 
 val ProjectHealth.badgeKind: BadgeKind
     get() = when (this) {
-        ProjectHealth.OnTrack -> BadgeKind.InProgress
-        ProjectHealth.AtRisk -> BadgeKind.Issue
-        ProjectHealth.Delayed -> BadgeKind.Delayed
+        ProjectHealth.OnTrack -> BadgeKind.Healthy
+        ProjectHealth.AtRisk -> BadgeKind.AtRisk
+        ProjectHealth.Delayed -> BadgeKind.Critical
     }

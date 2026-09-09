@@ -746,7 +746,7 @@ object OrbitIcons {
         )
     }
 
-    /** [Ellipsis vertical](https://hugeicons.com/icon/ellipsis-vertical?style=stroke-rounded) ? stroke-rounded. */
+    /** [More vertical](https://hugeicons.com/icon/more-vertical?style=stroke-rounded) — stroke-rounded. */
     val MoreVertical: ImageVector by lazy {
         vector(
             name = "MoreVertical",

@@ -21,12 +21,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.component.display.OrbitAvatarSize
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
-import com.orbitai.erp.ui.component.kpi.AiRiskForecastKpiTile
-import com.orbitai.erp.ui.component.kpi.AiSavingsKpiTile
+import com.orbitai.erp.ui.component.kpi.CeoActionInsightRow
 import com.orbitai.erp.ui.component.kpi.CeoAiBriefCard
 import com.orbitai.erp.ui.component.kpi.CeoDashboardDemoData
 import com.orbitai.erp.ui.component.kpi.HealthCard
-import com.orbitai.erp.ui.component.kpi.InvoicesAtRiskKpiTile
+import com.orbitai.erp.ui.component.kpi.InvoicesEntryCard
+import com.orbitai.erp.ui.component.kpi.MaterialsSavingsCard
 import com.orbitai.erp.ui.component.team.AccountAvatar
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -34,9 +34,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 /**
- * CEO dashboard — greeting + full-width rule, brief, then KPI tiles.
- *
- * Order: Brief → Health → Invoices → AI savings → AI risk forecast.
+ * CEO dashboard — Brief → Health → action tiles → Materials & savings → Invoices.
  */
 @Composable
 fun CeoDashboardScreen(
@@ -48,6 +46,9 @@ fun CeoDashboardScreen(
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier,
     avatar: Painter? = null,
+    onViewInvoices: (() -> Unit)? = null,
+    onViewMaterials: (() -> Unit)? = null,
+    onChaseInvoice: ((invoiceId: String) -> Unit)? = null,
 ) {
     val metrics = rememberCeoLayoutMetrics()
     val spacing = OrbitTheme.spacing
@@ -74,7 +75,6 @@ fun CeoDashboardScreen(
                     },
                 )
                 Spacer(Modifier.height(spacing.md))
-                // Full-width rule aligned to the same content edges as the KPI cards below.
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
                     thickness = OrbitTheme.sizing.hairline,
@@ -104,24 +104,17 @@ fun CeoDashboardScreen(
                 )
             }
             item {
-                InvoicesAtRiskKpiTile(
-                    overdueAmountLabel = CeoDashboardDemoData.OverdueAmountLabel,
-                    invoiceCount = CeoDashboardDemoData.OverdueInvoiceCount,
-                    aiFlaggedCount = CeoDashboardDemoData.AiFlaggedInvoices,
+                CeoActionInsightRow()
+            }
+            item {
+                MaterialsSavingsCard(
+                    onViewMaterials = onViewMaterials ?: {},
                 )
             }
             item {
-                AiSavingsKpiTile(
-                    savingsAmountLabel = CeoDashboardDemoData.AiSavingsLabel,
-                    monthProgress = CeoDashboardDemoData.SavingsMonthProgress,
-                )
-            }
-            item {
-                AiRiskForecastKpiTile(
-                    riskCount = CeoDashboardDemoData.RiskCount,
-                    delayRisks = CeoDashboardDemoData.DelayRisks,
-                    costRisks = CeoDashboardDemoData.CostRisks,
-                    labourRisks = CeoDashboardDemoData.LabourRisks,
+                InvoicesEntryCard(
+                    onViewInvoices = onViewInvoices ?: {},
+                    onChaseInvoice = onChaseInvoice ?: {},
                 )
             }
         }

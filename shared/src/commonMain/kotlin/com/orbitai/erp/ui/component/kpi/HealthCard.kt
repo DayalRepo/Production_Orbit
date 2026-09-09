@@ -6,24 +6,27 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.container.OrbitCard
 import com.orbitai.erp.core.designsystem.component.display.OrbitDelta
-import com.orbitai.erp.core.designsystem.component.progress.OrbitMixSegment
-import com.orbitai.erp.core.designsystem.component.progress.OrbitProgressDefaults
-import com.orbitai.erp.core.designsystem.component.progress.OrbitSegmentedMixBar
+import com.orbitai.erp.core.designsystem.component.progress.OrbitDonutProgress
+import com.orbitai.erp.core.designsystem.component.progress.OrbitDonutProgressDefaults
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.core.designsystem.theme.controlColors
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * HEALTH KPI: score %, delta, and mix bars (green / amber / red) with section bracket on tap.
+ * HEALTH KPI: continuous green donut beside status count rows + delta.
  */
 @Composable
 fun HealthCard(
@@ -37,34 +40,29 @@ fun HealthCard(
 ) {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
-    val semantic = OrbitTheme.semanticColors
     val fraction = progress.coerceIn(0f, 1f)
     val percent = (fraction * 100f).roundToInt()
+    val totalProjects = healthyProjects + atRiskProjects + criticalProjects
+    val semantic = OrbitTheme.semanticColors
+    val donutColors = OrbitDonutProgressDefaults.greenColors
 
-    val segments = listOf(
-        OrbitMixSegment(
-            weight = healthyProjects.toFloat(),
-            color = semantic.healthOnTrack.content,
-            label = "Healthy",
-            statusPhrase = "healthy",
-        ),
-        OrbitMixSegment(
-            weight = atRiskProjects.toFloat(),
-            color = semantic.healthAtRisk.content,
-            label = "At risk",
-            statusPhrase = "at risk",
-        ),
-        OrbitMixSegment(
-            weight = criticalProjects.toFloat(),
-            color = semantic.healthDelayed.content,
-            label = "Critical",
-            statusPhrase = "critical",
-        ),
-    ).filter { it.weight > 0f }
+    data class StatusRow(
+        val label: String,
+        val count: Int,
+        val labelColor: androidx.compose.ui.graphics.Color,
+    )
+
+    val statusRows = listOf(
+        StatusRow("Total Projects", totalProjects, content.textPrimary),
+        StatusRow("Healthy", healthyProjects, semantic.healthOnTrack.content),
+        StatusRow("At risk", atRiskProjects, semantic.healthAtRisk.content),
+        StatusRow("Critical", criticalProjects, semantic.healthDelayed.content),
+    )
 
     OrbitCard(
         modifier = modifier.fillMaxWidth(),
         padding = spacing.md,
+        container = OrbitTheme.controlColors.cardContainer,
         contentDescription = buildString {
             append("Health, ")
             append(percent)
@@ -80,27 +78,54 @@ fun HealthCard(
                 append(" percent ")
                 append(comparisonLabel)
             }
+            append(", ")
+            append(totalProjects)
+            append(" projects, ")
+            append(healthyProjects)
+            append(" healthy, ")
+            append(atRiskProjects)
+            append(" at risk, ")
+            append(criticalProjects)
+            append(" critical")
         },
     ) {
         Column(modifier = Modifier.clearAndSetSemantics {}) {
-            Text(
-                text = "HEALTH",
-                style = OrbitTheme.extendedTypography.cardLabel,
-                color = content.textSecondary,
-            )
-            Spacer(Modifier.height(spacing.xxs))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+                horizontalArrangement = Arrangement.spacedBy(spacing.md),
             ) {
-                Text(
-                    text = "$percent%",
-                    style = OrbitTheme.extendedTypography.metricLarge,
-                    color = content.textPrimary,
-                    textAlign = TextAlign.Start,
+                OrbitDonutProgress(
+                    progress = fraction,
+                    colors = donutColors,
+                    size = 124.dp,
+                    strokeWidth = 18.dp,
+                    segmented = false,
+                    caption = "HEALTH",
+                    contentDescription = null,
                 )
-                if (delta != null) {
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(spacing.sm),
+                ) {
+                    statusRows.forEach { row ->
+                        HealthCountRow(
+                            label = row.label,
+                            count = row.count,
+                            labelColor = row.labelColor,
+                            metricColor = donutColors.label,
+                        )
+                    }
+                }
+            }
+
+            if (delta != null) {
+                Spacer(modifier.height(spacing.md))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+                ) {
                     OrbitDelta(
                         value = delta,
                         higherIsBetter = true,
@@ -109,22 +134,44 @@ fun HealthCard(
                     Text(
                         text = comparisonLabel,
                         style = OrbitTheme.extendedTypography.metricCaption,
-                        color = content.textSecondary,
+                        color = content.textTertiary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
-
-            Spacer(Modifier.height(spacing.md))
-
-            if (segments.isNotEmpty()) {
-                OrbitSegmentedMixBar(
-                    segments = segments,
-                    segmentCount = OrbitProgressDefaults.SegmentCount,
-                    showLegend = false,
-                )
-            }
         }
+    }
+}
+
+@Composable
+private fun HealthCountRow(
+    label: String,
+    count: Int,
+    labelColor: androidx.compose.ui.graphics.Color,
+    metricColor: androidx.compose.ui.graphics.Color,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "$label:",
+            style = OrbitTheme.typography.titleSmall,
+            color = labelColor,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = count.toString(),
+            style = OrbitTheme.extendedTypography.metricMedium.copy(
+                fontWeight = FontWeight.Normal,
+            ),
+            color = metricColor,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            modifier = Modifier.widthIn(min = 28.dp),
+        )
     }
 }

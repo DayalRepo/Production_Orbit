@@ -25,7 +25,6 @@ import com.orbitai.erp.core.designsystem.component.badge.OrbitRoleBadge
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.component.input.OrbitSwitch
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
-import com.orbitai.erp.core.designsystem.foundation.orbitPersonDisplayName
 import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
@@ -64,7 +63,8 @@ fun OrbitAccountPopover(
     val content = OrbitTheme.contentColors
     val danger = OrbitBadgeTone.Red.colors.label
     val charcoal = content.textSecondary
-    val displayName = orbitPersonDisplayName(name)
+    // Full uppercase name — no 18-char hard truncate; the identity block wraps to two lines.
+    val displayName = name.trim().uppercase()
 
     OrbitBubblePopover(
         expanded = expanded,
@@ -210,7 +210,8 @@ private fun AccountIdentityBlock(
                 text = name,
                 style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                 color = ink,
-                maxLines = 1,
+                maxLines = 2,
+                softWrap = true,
                 overflow = TextOverflow.Ellipsis,
             )
             if (roleBadge.isNotBlank()) {
@@ -228,4 +229,4 @@ private fun AccountIdentityBlock(
 }
 
 private val AccountGlyphSize = 20.dp
-private const val AccountWidthRatio = 1.4f
+private const val AccountWidthRatio = 1.75f

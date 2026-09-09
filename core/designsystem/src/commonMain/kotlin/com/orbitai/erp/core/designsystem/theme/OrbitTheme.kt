@@ -43,9 +43,10 @@ fun OrbitTheme(
     val semanticColors = if (darkTheme) OrbitDarkSemanticColors else OrbitLightSemanticColors
 
     val sans = orbitFontFamily()
+    val metric = orbitMetricFontFamily()
     val typography = remember(sans, tokens) { orbitTypography(sans, tokens.typeScale) }
-    val extendedTypography = remember(sans, tokens) {
-        orbitTypographyTokens(sans, tokens.typeScale)
+    val extendedTypography = remember(sans, metric, tokens) {
+        orbitTypographyTokens(sans, tokens.typeScale, metric = metric)
     }
 
     CompositionLocalProvider(
