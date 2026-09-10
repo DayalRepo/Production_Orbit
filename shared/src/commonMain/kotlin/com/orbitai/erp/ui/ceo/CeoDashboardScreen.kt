@@ -47,8 +47,6 @@ fun CeoDashboardScreen(
     modifier: Modifier = Modifier,
     avatar: Painter? = null,
     onViewInvoices: (() -> Unit)? = null,
-    onViewMaterials: (() -> Unit)? = null,
-    onChaseInvoice: ((invoiceId: String) -> Unit)? = null,
 ) {
     val metrics = rememberCeoLayoutMetrics()
     val spacing = OrbitTheme.spacing
@@ -107,14 +105,11 @@ fun CeoDashboardScreen(
                 CeoActionInsightRow()
             }
             item {
-                MaterialsSavingsCard(
-                    onViewMaterials = onViewMaterials ?: {},
-                )
+                MaterialsSavingsCard()
             }
             item {
                 InvoicesEntryCard(
                     onViewInvoices = onViewInvoices ?: {},
-                    onChaseInvoice = onChaseInvoice ?: {},
                 )
             }
         }

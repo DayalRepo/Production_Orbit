@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,12 +19,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.orbitai.erp.core.designsystem.component.button.OrbitButton
-import com.orbitai.erp.core.designsystem.component.button.OrbitButtonSize
-import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
 import com.orbitai.erp.core.designsystem.component.container.OrbitCard
 import com.orbitai.erp.core.designsystem.component.display.OrbitDelta
-import com.orbitai.erp.core.designsystem.component.progress.OrbitSegmentedProgress
 import com.orbitai.erp.core.designsystem.component.progress.OrbitTrendGraph
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
@@ -33,7 +28,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * Materials & savings — hero ₹ with side delta, interactive trend, AI win, target pace, CTA.
+ * Materials & savings — hero ₹ with side delta and interactive dual-series trend.
  */
 @Composable
 fun MaterialsSavingsCard(
@@ -47,16 +42,11 @@ fun MaterialsSavingsCard(
     materialsHistory: List<Float> = CeoDashboardDemoData.MaterialsTrendHistory,
     materialsForecast: List<Float> = CeoDashboardDemoData.MaterialsTrendForecast,
     xLabels: List<String> = CeoDashboardDemoData.MaterialsTrendXLabels,
-    aiWinLabel: String = CeoDashboardDemoData.MaterialsAiWin,
-    monthProgress: Float = CeoDashboardDemoData.MaterialsMonthProgress,
-    ctaLabel: String = CeoDashboardDemoData.MaterialsCtaLabel,
-    onViewMaterials: (() -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
     val dark = OrbitTheme.isDark
     val semantic = OrbitTheme.semanticColors
-    val pacePercent = (monthProgress.coerceIn(0f, 1f) * 100f).roundToInt()
 
     val savingsColor = if (dark) {
         semantic.healthAtRisk.content
@@ -124,7 +114,7 @@ fun MaterialsSavingsCard(
                 overflow = TextOverflow.Ellipsis,
             )
 
-            Spacer(modifier.height(spacing.sm))
+            Spacer(Modifier.height(spacing.sm))
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(spacing.md),
@@ -154,45 +144,6 @@ fun MaterialsSavingsCard(
                 formatValue = ::formatTrendRupeeLakh,
                 modifier = Modifier.fillMaxWidth(),
             )
-
-            Spacer(Modifier.height(spacing.sm))
-
-            Text(
-                text = aiWinLabel,
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-
-            Spacer(modifier.height(spacing.md))
-
-            OrbitSegmentedProgress(
-                progress = monthProgress,
-                modifier = Modifier.fillMaxWidth(),
-                contentDescription = "$pacePercent percent of month target",
-            )
-
-            Spacer(modifier.height(spacing.xs))
-
-            Text(
-                text = "$pacePercent% of month target",
-                style = OrbitTheme.extendedTypography.metricCaption,
-                color = content.textTertiary,
-                maxLines = 1,
-            )
-
-            if (onViewMaterials != null) {
-                Spacer(Modifier.height(spacing.md))
-                OrbitButton(
-                    label = ctaLabel,
-                    onClick = onViewMaterials,
-                    variant = OrbitButtonVariant.Primary,
-                    size = OrbitButtonSize.Medium,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
         }
     }
 }

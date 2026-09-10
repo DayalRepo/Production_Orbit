@@ -43,20 +43,18 @@ fun HealthCard(
     val fraction = progress.coerceIn(0f, 1f)
     val percent = (fraction * 100f).roundToInt()
     val totalProjects = healthyProjects + atRiskProjects + criticalProjects
-    val semantic = OrbitTheme.semanticColors
     val donutColors = OrbitDonutProgressDefaults.greenColors
 
     data class StatusRow(
         val label: String,
         val count: Int,
-        val labelColor: androidx.compose.ui.graphics.Color,
     )
 
     val statusRows = listOf(
-        StatusRow("Total Projects", totalProjects, content.textPrimary),
-        StatusRow("Healthy", healthyProjects, semantic.healthOnTrack.content),
-        StatusRow("At risk", atRiskProjects, semantic.healthAtRisk.content),
-        StatusRow("Critical", criticalProjects, semantic.healthDelayed.content),
+        StatusRow("Total Projects", totalProjects),
+        StatusRow("Healthy", healthyProjects),
+        StatusRow("At risk", atRiskProjects),
+        StatusRow("Critical", criticalProjects),
     )
 
     OrbitCard(
@@ -113,7 +111,6 @@ fun HealthCard(
                         HealthCountRow(
                             label = row.label,
                             count = row.count,
-                            labelColor = row.labelColor,
                             metricColor = donutColors.label,
                         )
                     }
@@ -121,7 +118,7 @@ fun HealthCard(
             }
 
             if (delta != null) {
-                Spacer(modifier.height(spacing.md))
+                Spacer(Modifier.height(spacing.md))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(spacing.sm),
@@ -148,9 +145,9 @@ fun HealthCard(
 private fun HealthCountRow(
     label: String,
     count: Int,
-    labelColor: androidx.compose.ui.graphics.Color,
     metricColor: androidx.compose.ui.graphics.Color,
 ) {
+    val content = OrbitTheme.contentColors
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -158,7 +155,7 @@ private fun HealthCountRow(
         Text(
             text = "$label:",
             style = OrbitTheme.typography.titleSmall,
-            color = labelColor,
+            color = content.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),

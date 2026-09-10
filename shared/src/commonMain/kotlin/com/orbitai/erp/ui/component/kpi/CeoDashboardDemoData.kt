@@ -13,15 +13,12 @@ object CeoDashboardDemoData {
 
     /** Expected progress vs delay → on-time confidence. */
     const val ConfidencePercent = 100
-    const val ConfidenceTrendDelta = 2f
 
     /** Bills / issues waiting on the PM past the threshold. */
     const val DecisionCount = 4
-    const val DecisionTrendDelta = -1f
 
     /** Open AI tips (waste cut, buy-ahead to avoid delay, etc.). */
     const val AiAdviceCount = 3
-    const val AiAdviceTrendDelta = 1f
 
     val ConfidenceDetailLines: List<String> = listOf(
         "8 of 12 sites on or ahead of schedule",
@@ -47,11 +44,6 @@ object CeoDashboardDemoData {
     /** MTD savings change vs prior month (percentage points for OrbitDelta). */
     const val MaterialsSavingsDelta = 18f
     const val MaterialsSavingsDeltaLabel = "vs last month"
-    /** One-line AI optimisation win under the chart. */
-    const val MaterialsAiWin = "Corridor B cement swap · ₹1.1L"
-    /** Month pace toward materials-savings target. */
-    const val MaterialsMonthProgress = 0.68f
-    const val MaterialsCtaLabel = "View materials"
 
     /**
      * Weekly savings index (₹L-scaled demo points) — climbs into Now, then mild forecast ease.
@@ -72,7 +64,11 @@ object CeoDashboardDemoData {
 
     val MaterialsTrendXLabels: List<String> = listOf("W1", "W4", "W8", "Now", "+2w", "+4w")
 
-    const val InvoicesOverdueLabel = "₹18.4L"
+    /** Hero total for the invoices card (open / overdue book). */
+    const val InvoicesTotalLabel = "₹18.4L"
+    /** Change in overdue book vs prior month (percentage points for OrbitDelta). */
+    const val InvoicesTotalDelta = 8f
+    const val InvoicesTotalDeltaLabel = "vs last month"
     const val InvoicesPendingCount = 12
     const val InvoicesAiFlaggedCount = 3
     const val InvoicesTopRiskClient = "Riverside"
@@ -84,11 +80,6 @@ object CeoDashboardDemoData {
     const val InvoicesAging0to30 = 5.2f
     const val InvoicesAging31to60 = 7.1f
     const val InvoicesAging60Plus = 6.1f
-
-    /** Weekly overdue ₹L for the last 8 weeks (tiny sparkline). */
-    val InvoicesOverdueTrend: List<Float> = listOf(
-        12.4f, 13.1f, 14.0f, 13.6f, 15.2f, 16.8f, 17.5f, 18.4f,
-    )
 
     /**
      * AI-authored markdown brief.

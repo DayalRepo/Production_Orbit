@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -157,6 +158,8 @@ object OrbitDonutProgressDefaults {
  * @param progress 0f..1f. Values outside are clamped.
  * @param caption optional name under the percentage (e.g. `"HEALTH"`). Also used in the spoken
  *   description when [contentDescription] is null.
+ * @param labelStyle overrides the centre percentage style (default [OrbitTypographyTokens.metricLarge]).
+ * @param captionStyle overrides the caption under the percentage (default cardLabel).
  */
 @Composable
 fun OrbitDonutProgress(
@@ -169,6 +172,8 @@ fun OrbitDonutProgress(
     segmented: Boolean = true,
     caption: String? = null,
     contentDescription: String? = null,
+    labelStyle: TextStyle? = null,
+    captionStyle: TextStyle? = null,
 ) {
     val fraction = progress.coerceIn(0f, 1f)
     val percent = OrbitDonutProgressDefaults.percentLabel(fraction)
@@ -272,11 +277,11 @@ fun OrbitDonutProgress(
             }
         }
 
-        // Larger percent; HEALTH caption stays secondary under it.
+        // Percent + optional caption; styles scale down when the hole is compact.
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "$percent%",
-                style = OrbitTheme.extendedTypography.metricLarge.copy(
+                style = labelStyle ?: OrbitTheme.extendedTypography.metricLarge.copy(
                     fontWeight = FontWeight.Normal,
                 ),
                 color = colors.label,
@@ -286,7 +291,7 @@ fun OrbitDonutProgress(
             if (!caption.isNullOrBlank()) {
                 Text(
                     text = caption,
-                    style = OrbitTheme.extendedTypography.cardLabel,
+                    style = captionStyle ?: OrbitTheme.extendedTypography.cardLabel,
                     color = colors.caption,
                     textAlign = TextAlign.Center,
                     maxLines = 1,

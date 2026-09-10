@@ -26,16 +26,13 @@ import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.brand.OrbitMark
 import com.orbitai.erp.core.designsystem.component.container.OrbitCard
 import com.orbitai.erp.core.designsystem.component.overlay.OrbitBottomSheet
-import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
-import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
-import kotlin.math.abs
 
 private enum class InsightKind { Confidence, Decision, AiAdvice }
 
 /**
- * Three CEO action tiles — metric + subtle trend arrow; tap opens a detail sheet.
+ * Three CEO action tiles — title, metric, caption; tap opens a detail sheet.
  */
 @Composable
 fun CeoActionInsightRow(
@@ -43,9 +40,6 @@ fun CeoActionInsightRow(
     confidencePercent: Int = CeoDashboardDemoData.ConfidencePercent,
     decisionCount: Int = CeoDashboardDemoData.DecisionCount,
     aiAdviceCount: Int = CeoDashboardDemoData.AiAdviceCount,
-    confidenceTrend: Float = CeoDashboardDemoData.ConfidenceTrendDelta,
-    decisionTrend: Float = CeoDashboardDemoData.DecisionTrendDelta,
-    aiAdviceTrend: Float = CeoDashboardDemoData.AiAdviceTrendDelta,
 ) {
     val spacing = OrbitTheme.spacing
     var openSheet by remember { mutableStateOf<InsightKind?>(null) }
@@ -58,7 +52,6 @@ fun CeoActionInsightRow(
             title = "Confidence",
             value = "$confidencePercent%",
             caption = "On time",
-            trendDelta = confidenceTrend,
             useOrbitMark = false,
             onClick = { openSheet = InsightKind.Confidence },
             modifier = Modifier.weight(1f),
@@ -67,7 +60,6 @@ fun CeoActionInsightRow(
             title = "Decision",
             value = decisionCount.toString(),
             caption = "Awaiting",
-            trendDelta = decisionTrend,
             useOrbitMark = false,
             onClick = { openSheet = InsightKind.Decision },
             modifier = Modifier.weight(1f),
@@ -76,7 +68,6 @@ fun CeoActionInsightRow(
             title = "AI advice",
             value = aiAdviceCount.toString(),
             caption = "Act now",
-            trendDelta = aiAdviceTrend,
             useOrbitMark = true,
             onClick = { openSheet = InsightKind.AiAdvice },
             modifier = Modifier.weight(1f),
@@ -125,29 +116,14 @@ private fun CeoActionInsightCard(
     title: String,
     value: String,
     caption: String,
-    trendDelta: Float,
     modifier: Modifier = Modifier,
     useOrbitMark: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
-    val sizing = OrbitTheme.sizing
     val content = OrbitTheme.contentColors
     val iconTint = content.iconPrimary
     val iconSize = 14.dp
-    val rising = trendDelta >= 0f
-    val trendColor = if (rising) {
-        OrbitTheme.semanticColors.success.content
-    } else {
-        OrbitTheme.semanticColors.danger.content
-    }
-    val trendLabel = buildString {
-        append(abs(trendDelta).let { v ->
-            val whole = v.toInt()
-            if (v == whole.toFloat()) "$whole" else ((v * 10f).toInt() / 10f).toString()
-        })
-        append(if (title == "Confidence") "%" else "")
-    }
 
     OrbitCard(
         modifier = modifier.height(140.dp),
@@ -186,40 +162,16 @@ private fun CeoActionInsightCard(
                 )
             }
 
-            Column(
+            Text(
+                text = value,
+                style = OrbitTheme.extendedTypography.metricLarge.copy(
+                    fontWeight = FontWeight.Normal,
+                ),
+                color = content.textPrimary,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
                 modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = value,
-                    style = OrbitTheme.extendedTypography.metricLarge.copy(
-                        fontWeight = FontWeight.Normal,
-                    ),
-                    color = content.textPrimary,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                )
-                Spacer(Modifier.height(spacing.xxs))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(spacing.xxs),
-                ) {
-                    OrbitGlyph(
-                        icon = if (rising) OrbitIcons.TrendUp else OrbitIcons.TrendDown,
-                        size = 12.dp,
-                        tint = trendColor,
-                        contentDescription = null,
-                        minimumStroke = sizing.iconStrokeHairline,
-                        maximumStroke = sizing.iconStrokeHairline,
-                    )
-                    Text(
-                        text = trendLabel,
-                        style = OrbitTheme.extendedTypography.metricCaption,
-                        color = trendColor,
-                        maxLines = 1,
-                    )
-                }
-            }
+            )
 
             Text(
                 text = caption,
