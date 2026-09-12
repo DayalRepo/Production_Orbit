@@ -216,6 +216,7 @@ fun OrbitAssignField(
                             OrbitInfoPopover(
                                 expanded = infoMemberId == member.id,
                                 onDismiss = { infoMemberId = null },
+                                name = orbitAssignDisplayName(member.name),
                                 roleBadge = member.role,
                                 fields = assignInfoFields(member),
                             )
@@ -304,6 +305,7 @@ private fun AssignFieldAvatarTrigger(
             OrbitInfoPopover(
                 expanded = infoOpen,
                 onDismiss = onDismissInfo,
+                name = orbitAssignDisplayName(member.name),
                 roleBadge = member.role,
                 fields = assignInfoFields(member),
             )
@@ -370,7 +372,6 @@ private fun AssignDropdownRow(
 }
 
 private fun assignInfoFields(member: OrbitAssignMember): List<OrbitInfoField> = buildList {
-    add(OrbitInfoField("Name", orbitAssignDisplayName(member.name)))
     member.username?.takeIf { it.isNotBlank() }?.let { add(OrbitInfoField("Username", it)) }
     add(OrbitInfoField("Mobile number", member.mobile, copyable = true))
 }

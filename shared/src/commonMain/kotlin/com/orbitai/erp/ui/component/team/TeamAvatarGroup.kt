@@ -98,14 +98,10 @@ fun TeamAvatarGroup(
             OrbitInfoPopover(
                 expanded = selected == index,
                 onDismiss = { selected = null },
-                // Name, role short-form badge, then number. The badge sits under the name inside
-                // the popover; the number stays the copyable line.
+                // Name once at the top, role badge under it, then the copyable number.
+                name = member.name,
                 roleBadge = member.role,
                 fields = listOf(
-                    OrbitInfoField("Name", member.name),
-                    // The number is the one value here worth copying: a name gets read and
-                    // remembered, a phone number gets pasted into a dialler or a message. Retyping
-                    // twelve digits off a screen with gloves on is where the errors come from.
                     OrbitInfoField("Mobile number", member.phone, copyable = true),
                 ),
             )

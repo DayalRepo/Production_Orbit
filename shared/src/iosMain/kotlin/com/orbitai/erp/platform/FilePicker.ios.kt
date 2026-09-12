@@ -20,3 +20,8 @@ actual fun rememberDocumentPicker(
 actual fun rememberFilePicker(
     onPicked: (PickedFile?) -> Unit,
 ): () -> Unit = rememberDocumentPicker(onPicked)
+
+@Composable
+actual fun rememberCameraPicker(
+    onPicked: (PickedFile?) -> Unit,
+): () -> Unit = { onPicked(null) }

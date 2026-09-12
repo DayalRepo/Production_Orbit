@@ -9,6 +9,7 @@ import com.orbitai.erp.core.designsystem.component.button.OrbitButtonIconPositio
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonSize
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
+import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 
 /**
  * The recurring actions of the ERP, each pinned to one variant and one wording.
@@ -33,9 +34,10 @@ import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
  * mark is the faster of the two to recognise — a red ✕ is identified before "Cancel" is read, so
  * putting it first shortens the scan rather than interrupting it.
  *
- * [Login] and [Open] are the exception and sit **after**. Their arrow is not naming the action, it
- * is pointing at where the action takes you, and a direction indicator belongs at the end of the
- * phrase it applies to for the same reason "next →" reads correctly and "→ next" does not.
+ * [Login], [Open] and [Next] are the exception and sit **after**. Their arrow is not naming the
+ * action, it is pointing at where the action takes you, and a direction indicator belongs at the
+ * end of the phrase it applies to for the same reason "next →" reads correctly and "→ next" does
+ * not.
  *
  * Two glyphs are shared deliberately. Reject and Cancel both take `cancel-01`: same gesture,
  * discard what is in front of you, and never offered together. Login and Open both take
@@ -48,7 +50,7 @@ import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
 enum class ActionKind(
     val label: String,
     val variant: OrbitButtonVariant,
-    val icon: ImageVector,
+    val icon: ImageVector?,
     val iconPosition: OrbitButtonIconPosition = OrbitButtonIconPosition.Leading,
 ) {
     Approve("Approve", OrbitButtonVariant.Primary, OrbitIcons.CheckmarkBadge),
@@ -84,6 +86,24 @@ enum class ActionKind(
         OrbitIcons.ArrowRight,
         OrbitButtonIconPosition.Trailing,
     ),
+
+    /**
+     * The quiet half of a wizard pair. Secondary so it never competes with [Next] on the same row.
+     */
+    Back("Back", OrbitButtonVariant.Secondary, OrbitIcons.ArrowLeft),
+
+    Next(
+        "Next",
+        OrbitButtonVariant.Primary,
+        OrbitIcons.ArrowRight,
+        OrbitButtonIconPosition.Trailing,
+    ),
+
+    /** Commits an issue the same way [Create] commits a task. */
+    Raise("Raise", OrbitButtonVariant.Primary, OrbitIcons.OctagonAlert),
+
+    /** Opens the edit screen for a created task or issue. Text-only on purpose. */
+    Update("Update", OrbitButtonVariant.Primary, null),
     ;
 
     /** In-flight wording, so a button that is working says what it is doing. */
@@ -96,6 +116,10 @@ enum class ActionKind(
             Login -> "Signing in"
             Create -> "Creating"
             Open -> "Opening"
+            Back -> "Returning"
+            Next -> "Continuing"
+            Raise -> "Raising"
+            Update -> "Updating"
         }
 }
 
@@ -116,7 +140,7 @@ fun ActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     label: String? = null,
-    size: OrbitButtonSize = OrbitButtonSize.Medium,
+    size: OrbitButtonSize = OrbitButtonSize.Large,
     state: OrbitButtonState = OrbitButtonState.Active,
     loading: Boolean = false,
 ) {
@@ -127,10 +151,11 @@ fun ActionButton(
         variant = action.variant,
         size = size,
         // Skipped while loading: the spinner takes the glyph's slot, so passing both would be a
-        // mark and a spinner competing for one position.
+        // mark and a spinner competing for one position. [ActionKind.Update] is text-only.
         icon = if (loading) null else action.icon,
         iconPosition = action.iconPosition,
         state = state,
         loading = loading,
+        shape = OrbitTheme.shapeTokens.dialog,
     )
 }

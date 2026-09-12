@@ -69,7 +69,6 @@ fun ProgressCard(
             "announces a bare percentage and a screen reader user has no way to know what it measures."
     }
     val spacing = OrbitTheme.spacing
-    val content = OrbitTheme.contentColors
     val fraction = progress.coerceIn(0f, 1f)
     val percent = (fraction * 100f).roundToInt()
 
@@ -79,85 +78,126 @@ fun ProgressCard(
         // standard padding leaves it looking like a mostly-empty box; a dashboard is a column of
         // these, so every unnecessary point of height costs a card off the bottom of the screen.
         padding = spacing.md,
-        contentDescription = contentDescription ?: buildString {
-            append(label)
-            append(", ")
-            append(percent)
-            append(" percent")
-            if (delta != null) {
-                append(", ")
-                append(if (delta >= 0f) "up " else "down ")
-                append(abs(delta).describe())
-                append(" percent ")
-                append(comparisonLabel)
-            }
-        },
+        contentDescription = contentDescription ?: progressAnnouncement(
+            label = label,
+            percent = percent,
+            delta = delta,
+            comparisonLabel = comparisonLabel,
+        ),
     ) {
-        // One description on the card, so the parts below are silent. Without this the figure is
-        // announced twice — once as text and once as the bar's range info.
-        Column(modifier = Modifier.clearAndSetSemantics {}) {
-            if (label != null) {
+        ProgressSection(
+            label = label,
+            progress = fraction,
+            delta = delta,
+            comparisonLabel = comparisonLabel,
+            higherIsBetter = higherIsBetter,
+        )
+    }
+}
+
+/**
+ * The labelled percentage, week-over-week delta, and segmented bar from [ProgressCard], without
+ * wrapping another card. Work-item cards reuse this so they do not nest glass.
+ */
+@Composable
+fun ProgressSection(
+    label: String?,
+    progress: Float,
+    modifier: Modifier = Modifier,
+    delta: Float? = null,
+    comparisonLabel: String = "vs last week",
+    higherIsBetter: Boolean = true,
+) {
+    val spacing = OrbitTheme.spacing
+    val content = OrbitTheme.contentColors
+    val fraction = progress.coerceIn(0f, 1f)
+    val percent = (fraction * 100f).roundToInt()
+
+    // One description on the parent, so the parts below are silent. Without this the figure is
+    // announced twice — once as text and once as the bar's range info.
+    Column(modifier = modifier.clearAndSetSemantics {}) {
+        if (label != null) {
+            Text(
+                // Set in caps. At the size a card label wants to be, small caps and sentence
+                // case are nearly the same height, but caps read as a *category* rather than as
+                // a sentence — which is what this is, and it stops the label competing with the
+                // figure for the role of "the thing the card says".
+                //
+                // Uppercased here rather than expected from the caller, so a label can be
+                // written once in normal case and used for both this and the spoken description
+                // below. Screen readers never see the caps: the column is semantically cleared
+                // and the card's own description uses the original string, which matters because
+                // TalkBack will spell out short all-caps words as initialisms.
+                text = label.uppercase(),
+                style = OrbitTheme.extendedTypography.cardLabel,
+                // Muted, unlike the figure below it. Both were full-strength ink, and at that
+                // weight the eye had no reason to prefer one over the other — the card read as
+                // two equally important things stacked rather than as a number with a name.
+                // Dropping the label to secondary is what makes the figure the subject; the
+                // label is still well clear of 4.5:1, it just stops arguing.
+                color = content.textSecondary,
+            )
+
+            Spacer(Modifier.height(spacing.xxs))
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+        ) {
+            Text(
+                text = "$percent%",
+                // One step down from the hero size. At `metricLarge` the figure was taller than
+                // the bar and the label together, which made a card of four short lines read as
+                // a number with some annotations rather than as a labelled measurement.
+                style = OrbitTheme.extendedTypography.metricMedium,
+                color = content.textPrimary,
+                textAlign = TextAlign.Start,
+            )
+            if (delta != null) {
+                OrbitDelta(
+                    value = delta,
+                    higherIsBetter = higherIsBetter,
+                    // Consumed by the parent description; this is here because the parameter is
+                    // required, not because anything will read it.
+                    contentDescription = "",
+                )
                 Text(
-                    // Set in caps. At the size a card label wants to be, small caps and sentence
-                    // case are nearly the same height, but caps read as a *category* rather than as
-                    // a sentence — which is what this is, and it stops the label competing with the
-                    // figure for the role of "the thing the card says".
-                    //
-                    // Uppercased here rather than expected from the caller, so a label can be
-                    // written once in normal case and used for both this and the spoken description
-                    // below. Screen readers never see the caps: the column is semantically cleared
-                    // and the card's own description uses the original string, which matters because
-                    // TalkBack will spell out short all-caps words as initialisms.
-                    text = label.uppercase(),
-                    style = OrbitTheme.extendedTypography.cardLabel,
-                    // Muted, unlike the figure below it. Both were full-strength ink, and at that
-                    // weight the eye had no reason to prefer one over the other — the card read as
-                    // two equally important things stacked rather than as a number with a name.
-                    // Dropping the label to secondary is what makes the figure the subject; the
-                    // label is still well clear of 4.5:1, it just stops arguing.
+                    text = comparisonLabel,
+                    // The one thing on the block that stays muted. It is a fixed caption that
+                    // says nothing a returning user does not already know, so it should be
+                    // legible on inspection and invisible at a glance.
+                    style = OrbitTheme.extendedTypography.metricCaption,
                     color = content.textSecondary,
                 )
-
-                Spacer(Modifier.height(spacing.xxs))
             }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(spacing.sm),
-            ) {
-                Text(
-                    text = "$percent%",
-                    // One step down from the hero size. At `metricLarge` the figure was taller than
-                    // the bar and the label together, which made a card of four short lines read as
-                    // a number with some annotations rather than as a labelled measurement.
-                    style = OrbitTheme.extendedTypography.metricMedium,
-                    color = content.textPrimary,
-                    textAlign = TextAlign.Start,
-                )
-                if (delta != null) {
-                    OrbitDelta(
-                        value = delta,
-                        higherIsBetter = higherIsBetter,
-                        // Consumed by the card's own description above; this is here because the
-                        // parameter is required, not because anything will read it.
-                        contentDescription = "",
-                    )
-                    Text(
-                        text = comparisonLabel,
-                        // The one thing on the card that stays muted. It is a fixed caption that
-                        // says nothing a returning user does not already know, so it should be
-                        // legible on inspection and invisible at a glance.
-                        style = OrbitTheme.extendedTypography.metricCaption,
-                        color = content.textSecondary,
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(spacing.sm))
-
-            OrbitSegmentedProgress(progress = fraction)
         }
+
+        Spacer(Modifier.height(spacing.sm))
+
+        OrbitSegmentedProgress(progress = fraction)
+    }
+}
+
+internal fun progressAnnouncement(
+    label: String?,
+    percent: Int,
+    delta: Float?,
+    comparisonLabel: String,
+): String = buildString {
+    if (label != null) {
+        append(label)
+        append(", ")
+    }
+    append(percent)
+    append(" percent")
+    if (delta != null) {
+        append(", ")
+        append(if (delta >= 0f) "up " else "down ")
+        append(abs(delta).describe())
+        append(" percent ")
+        append(comparisonLabel)
     }
 }
 

@@ -1,5 +1,24 @@
 package com.orbitai.erp.ui.component.dropdown
 
+import com.orbitai.erp.core.model.ProjectType
+
+/**
+ * High-level work-sequence stage. Codes match the printed chart and
+ * [com.orbitai.erp.core.designsystem.component.progress.OrbitStageProof].
+ */
+enum class WorkStage(val code: String, val label: String) {
+    Structure("SR", "Structure"),
+    CommonArea("CA", "Common area"),
+    UnitInternal("UI", "Unit internal"),
+    UnitExternal("UE", "Unit external"),
+    ExternalDevelopment("ED", "Ext. development"),
+    Basement("BS", "Basement"),
+    ;
+
+    /** What the stage dropdown shows — full name plus the stamp people use on site. */
+    val optionLabel: String get() = "$label ($code)"
+}
+
 /**
  * Stage names from the project's work sequence flow chart.
  *
@@ -160,6 +179,129 @@ object WorkSequence {
     val allStages: List<String> = (
         structure + unitInternal + unitExternal + commonArea + basement + externalDevelopment
         ).distinct()
+
+    /**
+     * Villa structure — footing and grade slab rather than a raft, transcribed from the villa chart.
+     */
+    val villaStructure = listOf(
+        "Excavation",
+        "PCC",
+        "Footing Reinforcement",
+        "Footing Shuttering",
+        "Footing Concreting & Foundation Column",
+        "Backfilling & Compaction",
+        "PCC and Grade Slab",
+        "Column Reinforcement, Shuttering and Concreting",
+        "Beam Bottom & Slab Shuttering and Bottom Reinforcement",
+        "Slab Conduiting/Sleeves",
+        "Slab Top Reinforcement",
+        "Slab Concreting",
+        "Staircase Shuttering, Reinforcement and Concreting",
+    )
+
+    /**
+     * Villa internals. No fire sprinkler or high-level plumbing; several toilet items are
+     * qualified "if applicable".
+     */
+    val villaUnitInternal = listOf(
+        "Electrical Conduit Drop Opening & GI Wire Pulling",
+        "Block Work",
+        "Plastering Bull Fixing",
+        "Electrical Box Fixing & Wall Conduiting",
+        "Toilet Rough Plastering",
+        "PHE Works",
+        "Internal Other Area Plastering Bore Packing",
+        "Water Proofing with Screed",
+        "Toilet Dado Tiling",
+        "Flooring with Suitable Protection",
+        "Inside Cornice Works",
+        "Temporary Main Door",
+        "UPVC Windows/Sliding Doors Fixing",
+        "2 Coats - Internal Wall Putty",
+        "Internal Wiring",
+        "Internal Door & Shaft Door Fixing (With LDPE Protection)",
+        "1st Coat Painting",
+        "Switch Plate Fixing",
+        "Flooring Protection Removal",
+        "Tile Cleaning with Acid Wash (for Tiles only if applicable)",
+        "Main Door Fixing",
+        "Toilet Tile Grouting (if applicable)",
+        "CP & Sanitary Fittings",
+        "Tile Grouting (other than Toilet)",
+        "Final Coat Painting",
+        "Deep Cleaning",
+        "Wooden Flooring",
+        "Handing Over",
+    )
+
+    /** Villa elevation, including lift installation when the villa has one. */
+    val villaUnitExternal = listOf(
+        "SS Railing & Toilet False Ceiling",
+        "LMR - Lift Centre Line Marking",
+        "Lift Door Frame and Call Boxes Fixing",
+        "Lift Installation",
+        "Entire Floor External Plastering - Elevation wise / External Cladding if applicable",
+        "External Plastering",
+        "MS Railing Works (if applicable)",
+        "External Primer with Texture & 1 Coat Paint",
+        "External Final Coat Painting",
+        "Flooring Protection Removal (Top Floor to Bottom Floor)",
+        "If No Band/Chajjah / Projection on Elevation",
+    )
+
+    /** Villa landscape, roads and sports / pool — no podium or basement services. */
+    val villaExternalDevelopment = listOf(
+        "Expansion Joints Sealing",
+        "Earth Strips/Cable Sleeves with Guide Wires",
+        "Soil Filling for Landscaping",
+        "Kerb Stone Fixing",
+        "External Cabling",
+        "Compaction and Paved Block Laying",
+        "Landscape PHE Works",
+        "External Light Fixtures & Plantation Works",
+        "Services Hume Pipe & Chamber Construction",
+        "Excavation/Levelling",
+        "GSB",
+        "Wet Mix Macadam",
+        "Bituminous / CC Roads",
+        "External Sports Area Works",
+        "Swimming Pool and Terrace Water Proofing",
+    )
+
+    fun stagesFor(type: ProjectType): List<WorkStage> = when (type) {
+        ProjectType.Villas -> listOf(
+            WorkStage.Structure,
+            WorkStage.UnitInternal,
+            WorkStage.UnitExternal,
+            WorkStage.ExternalDevelopment,
+        )
+        ProjectType.ApartmentCommunity -> listOf(
+            WorkStage.Structure,
+            WorkStage.CommonArea,
+            WorkStage.UnitInternal,
+            WorkStage.UnitExternal,
+            WorkStage.ExternalDevelopment,
+            WorkStage.Basement,
+        )
+    }
+
+    fun tasksFor(type: ProjectType, stage: WorkStage): List<String> = when (type) {
+        ProjectType.Villas -> when (stage) {
+            WorkStage.Structure -> villaStructure
+            WorkStage.UnitInternal -> villaUnitInternal
+            WorkStage.UnitExternal -> villaUnitExternal
+            WorkStage.ExternalDevelopment -> villaExternalDevelopment
+            WorkStage.CommonArea, WorkStage.Basement -> emptyList()
+        }
+        ProjectType.ApartmentCommunity -> when (stage) {
+            WorkStage.Structure -> structure
+            WorkStage.CommonArea -> commonArea
+            WorkStage.UnitInternal -> unitInternal
+            WorkStage.UnitExternal -> unitExternal
+            WorkStage.ExternalDevelopment -> externalDevelopment
+            WorkStage.Basement -> basement
+        }
+    }
 }
 
 /**

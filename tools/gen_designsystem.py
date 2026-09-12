@@ -66,6 +66,9 @@ ICONS = {
     "MinusSign": "MinusSignIcon",
     "Tick": "Tick02Icon",
     "BadgeAlert": "BadgeAlertIcon",
+    # Raise-issue action —
+    # [octagon-alert](https://hugeicons.com/icon/octagon-alert?style=stroke-rounded) stroke-rounded.
+    "OctagonAlert": "OctagonAlertIcon",
     "TimeQuarter": "TimeQuarter02Icon",
     "Status": "StatusIcon",
     "Delete": "Delete01Icon",
@@ -116,6 +119,9 @@ ICONS = {
     # Tenancy / scope line on the account card (org or project).
     "TableOfContents": "TableOfContentsIcon",
     "Corporate": "CorporateIcon",
+    # Where / site pin on work-item cards —
+    # [location-01](https://hugeicons.com/icon/location-01?style=stroke-rounded) stroke-rounded.
+    "Location01": "Location01Icon",
     # Delta arrows. Diagonal rather than vertical: a plain up arrow is also the "scroll to top" and
     # "sort ascending" glyph, and the diagonal is unambiguously a trend line. They are named for the
     # direction of the change rather than the direction the arrow points, since a falling metric is

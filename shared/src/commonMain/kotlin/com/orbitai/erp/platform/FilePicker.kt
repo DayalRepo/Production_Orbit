@@ -28,3 +28,12 @@ expect fun rememberDocumentPicker(
 expect fun rememberFilePicker(
     onPicked: (PickedFile?) -> Unit,
 ): () -> Unit
+
+/**
+ * Opens the device camera. Requests camera permission first when required.
+ * [onPicked] receives `null` when the user backs out or permission is denied.
+ */
+@Composable
+expect fun rememberCameraPicker(
+    onPicked: (PickedFile?) -> Unit,
+): () -> Unit

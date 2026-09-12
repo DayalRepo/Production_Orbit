@@ -95,6 +95,8 @@ fun OrbitFileUpload(
     dropZoneTitle: String = "Choose a file or drag & drop it here.",
     dropZoneHint: String = "JPEG, PNG, PDF, and MP4 formats, up to 50 MB.",
     browseLabel: String = "Browse File",
+    cameraLabel: String? = null,
+    onCameraClick: (() -> Unit)? = null,
     onCancelUpload: ((OrbitUploadItem) -> Unit)? = null,
     onRemove: ((OrbitUploadItem) -> Unit)? = null,
 ) {
@@ -110,6 +112,8 @@ fun OrbitFileUpload(
             browseLabel = browseLabel,
             enabled = enabled,
             onBrowseClick = onBrowseClick,
+            cameraLabel = cameraLabel,
+            onCameraClick = onCameraClick,
         )
 
         items.forEach { item ->
@@ -143,6 +147,8 @@ fun OrbitFileUploadDropZone(
     title: String = "Choose a file or drag & drop it here.",
     hint: String = "JPEG, PNG, PDF, and MP4 formats, up to 50 MB.",
     browseLabel: String = "Browse File",
+    cameraLabel: String? = null,
+    onCameraClick: (() -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
@@ -196,11 +202,23 @@ fun OrbitFileUploadDropZone(
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
         Spacer(Modifier.height(spacing.xs))
-        UploadBrowseButton(
-            label = browseLabel,
-            enabled = enabled,
-            onClick = onBrowseClick,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            UploadBrowseButton(
+                label = browseLabel,
+                enabled = enabled,
+                onClick = onBrowseClick,
+            )
+            if (cameraLabel != null && onCameraClick != null) {
+                UploadBrowseButton(
+                    label = cameraLabel,
+                    enabled = enabled,
+                    onClick = onCameraClick,
+                )
+            }
+        }
     }
 }
 

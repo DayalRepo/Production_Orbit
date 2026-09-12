@@ -36,9 +36,10 @@ enum class BadgeKind(val label: String, val tone: OrbitBadgeTone) {
     Paused("Paused", OrbitBadgeTone.Amber),
     Pending("Pending", OrbitBadgeTone.Amber),
 
-    // Review and inspection.
+    // Review, inspection, and send-back.
     Review("In review", OrbitBadgeTone.Violet),
     Inspection("Inspection", OrbitBadgeTone.Violet),
+    Rework("Rework", OrbitBadgeTone.Amber),
 
     // Finished well. All one tone on purpose — see the class note.
     Successful("Successful", OrbitBadgeTone.Green),
@@ -48,6 +49,7 @@ enum class BadgeKind(val label: String, val tone: OrbitBadgeTone) {
 
     // Finished badly.
     Failed("Failed", OrbitBadgeTone.Red),
+    Rejected("Rejected", OrbitBadgeTone.Red),
     Cancelled("Cancelled", OrbitBadgeTone.Rose),
     Issue("Issue", OrbitBadgeTone.Red),
     Deleted("Deleted", OrbitBadgeTone.Red),
@@ -87,9 +89,10 @@ enum class BadgeKind(val label: String, val tone: OrbitBadgeTone) {
             Pending -> OrbitIcons.Clock
             Review -> OrbitIcons.ListBullet
             Inspection -> OrbitIcons.NotepadDashed
+            Rework -> OrbitIcons.Repeat
             Successful, Done, Approved -> OrbitIcons.CircleCheck
             Completed -> OrbitIcons.Tick
-            Failed, Cancelled -> OrbitIcons.CancelCircle
+            Failed, Rejected, Cancelled -> OrbitIcons.CancelCircle
             Issue -> OrbitIcons.BadgeAlert
             Deleted -> OrbitIcons.Delete
             Submitted -> OrbitIcons.Mail
@@ -138,10 +141,13 @@ val WorkStatus.badgeKind: BadgeKind
     get() = when (this) {
         WorkStatus.Open -> BadgeKind.Created
         WorkStatus.InProgress -> BadgeKind.InProgress
+        WorkStatus.Rework -> BadgeKind.Rework
         // Blocked has no dedicated badge: to a reader it is an issue, and giving it a separate
         // glyph would imply a distinction the screens do not actually make.
         WorkStatus.Blocked -> BadgeKind.Issue
         WorkStatus.InReview -> BadgeKind.Review
+        WorkStatus.Inspection -> BadgeKind.Inspection
+        WorkStatus.Rejected -> BadgeKind.Rejected
         WorkStatus.Completed -> BadgeKind.Completed
         WorkStatus.Cancelled -> BadgeKind.Cancelled
     }

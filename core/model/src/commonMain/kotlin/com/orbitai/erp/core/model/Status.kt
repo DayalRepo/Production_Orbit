@@ -12,11 +12,20 @@ enum class WorkStatus {
     @SerialName("in_progress")
     InProgress,
 
+    @SerialName("rework")
+    Rework,
+
     @SerialName("blocked")
     Blocked,
 
     @SerialName("in_review")
     InReview,
+
+    @SerialName("inspection")
+    Inspection,
+
+    @SerialName("rejected")
+    Rejected,
 
     @SerialName("completed")
     Completed,
@@ -27,15 +36,18 @@ enum class WorkStatus {
 
     val displayName: String
         get() = when (this) {
-            Open -> "Open"
+            Open -> "Created"
             InProgress -> "In Progress"
+            Rework -> "Rework"
             Blocked -> "Blocked"
             InReview -> "In Review"
+            Inspection -> "Inspection"
+            Rejected -> "Rejected"
             Completed -> "Completed"
             Cancelled -> "Cancelled"
         }
 
-    val isTerminal: Boolean get() = this == Completed || this == Cancelled
+    val isTerminal: Boolean get() = this == Completed || this == Cancelled || this == Rejected
 }
 
 @Serializable

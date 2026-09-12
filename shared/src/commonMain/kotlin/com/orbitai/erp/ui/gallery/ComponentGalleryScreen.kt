@@ -15,11 +15,27 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.core.model.ProjectType
+import com.orbitai.erp.ui.card.CreatedItemsScreen
+import com.orbitai.erp.ui.card.WorkItemKind
+import com.orbitai.erp.ui.card.WorkItemRecord
+import com.orbitai.erp.ui.card.sampleIssueApartment
+import com.orbitai.erp.ui.card.sampleIssueVilla
+import com.orbitai.erp.ui.card.sampleTaskApartment
+import com.orbitai.erp.ui.card.sampleTaskVilla
+import com.orbitai.erp.ui.card.toRecord
+import com.orbitai.erp.ui.form.CreateTaskForm
+import com.orbitai.erp.ui.form.RaiseIssueForm
 
 /**
  * A scrolling gallery of everything in the design system, for reviewing it on a real device.
@@ -39,8 +55,95 @@ fun ComponentGalleryScreen(
     onToggleTheme: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val spacing = OrbitTheme.spacing
+    var openForm by remember { mutableStateOf<FormPreview?>(null) }
+    val createdItems = remember { mutableStateListOf<WorkItemRecord>() }
+    var viewing by remember { mutableStateOf<List<WorkItemRecord>?>(null) }
+    var viewingTitle by remember { mutableStateOf("Created items") }
 
+    fun openCards(items: List<WorkItemRecord>, title: String) {
+        viewingTitle = title
+        viewing = items
+        openForm = null
+    }
+
+    val cards = viewing
+    when {
+        cards != null -> CreatedItemsScreen(
+            items = cards,
+            title = viewingTitle,
+            onBack = { viewing = null },
+            modifier = modifier,
+        )
+        openForm == FormPreview.CreateTaskVilla -> CreateTaskForm(
+            projectType = ProjectType.Villas,
+            onDismiss = { openForm = null },
+            onCreate = { draft ->
+                createdItems.add(
+                    0,
+                    draft.toRecord(kind = WorkItemKind.Task, projectType = ProjectType.Villas),
+                )
+                openCards(createdItems.toList(), "Created items")
+            },
+        )
+        openForm == FormPreview.CreateTaskApartment -> CreateTaskForm(
+            projectType = ProjectType.ApartmentCommunity,
+            onDismiss = { openForm = null },
+            onCreate = { draft ->
+                createdItems.add(
+                    0,
+                    draft.toRecord(
+                        kind = WorkItemKind.Task,
+                        projectType = ProjectType.ApartmentCommunity,
+                    ),
+                )
+                openCards(createdItems.toList(), "Created items")
+            },
+        )
+        openForm == FormPreview.RaiseIssueVilla -> RaiseIssueForm(
+            projectType = ProjectType.Villas,
+            onDismiss = { openForm = null },
+            onRaise = { draft ->
+                createdItems.add(0, draft.toRecord(ProjectType.Villas))
+                openCards(createdItems.toList(), "Created items")
+            },
+        )
+        openForm == FormPreview.RaiseIssueApartment -> RaiseIssueForm(
+            projectType = ProjectType.ApartmentCommunity,
+            onDismiss = { openForm = null },
+            onRaise = { draft ->
+                createdItems.add(0, draft.toRecord(ProjectType.ApartmentCommunity))
+                openCards(createdItems.toList(), "Created items")
+            },
+        )
+        else -> GalleryIndex(
+            isDark = isDark,
+            onToggleTheme = onToggleTheme,
+            onOpenForm = { preview ->
+                when (preview) {
+                    FormPreview.SampleTaskVilla ->
+                        openCards(listOf(sampleTaskVilla()), "Created task")
+                    FormPreview.SampleTaskApartment ->
+                        openCards(listOf(sampleTaskApartment()), "Created task")
+                    FormPreview.SampleIssueVilla ->
+                        openCards(listOf(sampleIssueVilla()), "Raised issue")
+                    FormPreview.SampleIssueApartment ->
+                        openCards(listOf(sampleIssueApartment()), "Raised issue")
+                    else -> openForm = preview
+                }
+            },
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun GalleryIndex(
+    isDark: Boolean,
+    onToggleTheme: () -> Unit,
+    onOpenForm: (FormPreview) -> Unit,
+    modifier: Modifier,
+) {
+    val spacing = OrbitTheme.spacing
     // The system bars, then the screen padding. Both are needed and the order matters: the app draws
     // edge to edge, so without the inset the first row sits under the status bar clock and the last
     // under the gesture bar, and applying it after the scroll modifier is what keeps the inset out of
@@ -76,6 +179,7 @@ fun ComponentGalleryScreen(
             )
         }
 
+        FormGalleryPage(onOpen = onOpenForm)
         DateTimeGalleryPage()
         BrandGalleryPage()
         ProgressGalleryPage()

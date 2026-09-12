@@ -294,6 +294,8 @@ fun OrbitChecklistEditor(
     modifier: Modifier = Modifier,
     titlePlaceholder: String = "e.g. Tower A pour readiness",
     itemPlaceholder: String = "e.g. Confirm pump booking",
+    /** False when a parent wizard already owns Cancel / Next — hide the nested decision pair. */
+    showActions: Boolean = true,
 ) {
     val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
@@ -497,28 +499,30 @@ fun OrbitChecklistEditor(
             }
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            OrbitButton(
-                label = "Cancel",
-                onClick = onCancel,
-                modifier = Modifier.weight(1f),
-                variant = OrbitButtonVariant.Destructive,
-                size = OrbitButtonSize.Medium,
-                icon = OrbitIcons.Cancel,
-            )
-            OrbitButton(
-                label = "Create",
-                onClick = { if (canCreate) onCreate() },
-                modifier = Modifier.weight(1f),
-                variant = OrbitButtonVariant.Primary,
-                size = OrbitButtonSize.Medium,
-                icon = OrbitIcons.Add,
-                state = if (canCreate) OrbitButtonState.Active else OrbitButtonState.Disabled,
-            )
+        if (showActions) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                OrbitButton(
+                    label = "Cancel",
+                    onClick = onCancel,
+                    modifier = Modifier.weight(1f),
+                    variant = OrbitButtonVariant.Destructive,
+                    size = OrbitButtonSize.Medium,
+                    icon = OrbitIcons.Cancel,
+                )
+                OrbitButton(
+                    label = "Create",
+                    onClick = { if (canCreate) onCreate() },
+                    modifier = Modifier.weight(1f),
+                    variant = OrbitButtonVariant.Primary,
+                    size = OrbitButtonSize.Medium,
+                    icon = OrbitIcons.Add,
+                    state = if (canCreate) OrbitButtonState.Active else OrbitButtonState.Disabled,
+                )
+            }
         }
     }
 }

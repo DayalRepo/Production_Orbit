@@ -55,23 +55,25 @@ internal fun rememberGalleryCrew(painters: GalleryPainters = rememberGalleryPain
     }
 
 @Composable
-internal fun rememberGallerySiteEngineers(
-    painters: GalleryPainters = rememberGalleryPainters(),
-): List<OrbitAssignMember> = remember(painters) {
-    listOf(
-        MockDirectory.userById("u-se-villas").toAssignMember("arjun.reddy", painters.avatar02),
-        MockDirectory.userById("u-se-apt").toAssignMember("ravi.menon", painters.avatar03),
-    )
+fun rememberGallerySiteEngineers(): List<OrbitAssignMember> {
+    val painters = rememberGalleryPainters()
+    return remember(painters) {
+        listOf(
+            MockDirectory.userById("u-se-villas").toAssignMember("arjun.reddy", painters.avatar02),
+            MockDirectory.userById("u-se-apt").toAssignMember("ravi.menon", painters.avatar03),
+        )
+    }
 }
 
 @Composable
-internal fun rememberGalleryContractors(
-    painters: GalleryPainters = rememberGalleryPainters(),
-): List<OrbitAssignMember> = remember(painters) {
-    listOf(
-        MockDirectory.userById("u-con-villas").toAssignMember("imran.qureshi", painters.avatar05),
-        MockDirectory.userById("u-con-apt").toAssignMember("suresh.pillai", painters.avatar01),
-    )
+fun rememberGalleryContractors(): List<OrbitAssignMember> {
+    val painters = rememberGalleryPainters()
+    return remember(painters) {
+        listOf(
+            MockDirectory.userById("u-con-villas").toAssignMember("imran.qureshi", painters.avatar05),
+            MockDirectory.userById("u-con-apt").toAssignMember("suresh.pillai", painters.avatar01),
+        )
+    }
 }
 
 /** Account-menu preview: CEO (org) and site engineer on the apartment project. */

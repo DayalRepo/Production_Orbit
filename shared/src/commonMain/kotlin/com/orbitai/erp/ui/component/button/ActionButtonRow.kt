@@ -32,7 +32,7 @@ fun ActionButtonRow(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
-    size: OrbitButtonSize = OrbitButtonSize.Medium,
+    size: OrbitButtonSize = OrbitButtonSize.Large,
     state: OrbitButtonState = OrbitButtonState.Active,
     confirmLoading: Boolean = false,
 ) {

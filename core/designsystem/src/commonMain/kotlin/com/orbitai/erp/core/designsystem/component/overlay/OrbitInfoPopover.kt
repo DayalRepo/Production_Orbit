@@ -95,11 +95,15 @@ fun OrbitInfoPopover(
     fields: List<OrbitInfoField>,
     modifier: Modifier = Modifier,
     title: String = "Info",
+    name: String? = null,
     roleBadge: String? = null,
     minWidth: Dp = InfoMinWidth,
     maxWidth: Dp = InfoMaxWidth,
 ) {
     val spacing = OrbitTheme.spacing
+    val identity = name?.takeIf { it.isNotBlank() }
+        ?: fields.firstOrNull { it.label.equals("Name", ignoreCase = true) }?.value
+    val rest = fields.filterNot { it.label.equals("Name", ignoreCase = true) }
 
     OrbitBubblePopover(
         expanded = expanded,
@@ -113,26 +117,23 @@ fun OrbitInfoPopover(
             modifier = Modifier.padding(
                 start = spacing.md,
                 end = spacing.md,
-                top = spacing.none,
-                bottom = spacing.xs,
+                top = spacing.xs,
+                bottom = spacing.sm,
             ),
-            // Enough to separate the facts, no more. The lines are different weights and different
-            // inks, so they do not need a wide gap to stop reading as one wrapped paragraph — and
-            // there is now a rule between them doing the separating structurally.
             verticalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
-            fields.forEachIndexed { index, field ->
-                val primary = index == 0
-                if (primary && !roleBadge.isNullOrBlank()) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(spacing.xs),
-                    ) {
-                        InfoRow(field = field)
+            if (identity != null) {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                    InfoRow(field = OrbitInfoField("Name", identity))
+                    if (!roleBadge.isNullOrBlank()) {
                         OrbitRoleBadge(label = roleBadge)
                     }
-                } else {
-                    InfoRow(field = field)
                 }
+            } else if (!roleBadge.isNullOrBlank()) {
+                OrbitRoleBadge(label = roleBadge)
+            }
+            rest.forEach { field ->
+                InfoRow(field = field)
             }
         }
     }
@@ -151,7 +152,7 @@ private fun InfoRow(field: OrbitInfoField) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = OrbitTheme.sizing.iconButtonSm),
+            .heightIn(min = OrbitTheme.sizing.buttonHeightMd),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

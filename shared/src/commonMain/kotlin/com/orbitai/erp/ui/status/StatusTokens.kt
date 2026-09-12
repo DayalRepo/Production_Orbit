@@ -26,8 +26,11 @@ val WorkStatus.colors: ColorPair
         when (this@colors) {
             WorkStatus.Open -> statusOpen
             WorkStatus.InProgress -> statusInProgress
+            WorkStatus.Rework -> warning
             WorkStatus.Blocked -> statusBlocked
             WorkStatus.InReview -> statusInReview
+            WorkStatus.Inspection -> statusInReview
+            WorkStatus.Rejected -> danger
             WorkStatus.Completed -> statusCompleted
             WorkStatus.Cancelled -> statusCancelled
         }
