@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,7 +38,7 @@ fun OrbitGlassCheckbox(
     val control = OrbitTheme.controlColors
     val green = OrbitBadgeTone.Green.colors
     val dark = OrbitTheme.isDark
-    val shape = RoundedCornerShape(6.dp)
+    val shape = OrbitTheme.shapeTokens.inputChip
     val interaction = remember { MutableInteractionSource() }
 
     val fill = when {

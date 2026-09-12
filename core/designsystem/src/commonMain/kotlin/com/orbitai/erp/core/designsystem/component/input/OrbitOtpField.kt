@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,16 +22,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.theme.OrbitPalette
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
@@ -40,8 +35,8 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
 /**
  * Six rounded digit cells for one-time password entry.
  *
- * Filled digits render as `*` (mask), never the typed numeral. Cells use the same solid fill +
- * opaque border as [OrbitFieldShell] (no glass / shadow).
+ * Filled digits render as `*` (mask), never the typed numeral. Cells use the same card fill and
+ * control rim as other fields so both themes stay on the token palette.
  */
 @Composable
 fun OrbitOtpField(
@@ -50,7 +45,7 @@ fun OrbitOtpField(
     label: String,
     modifier: Modifier = Modifier,
     length: Int = OrbitOtpDefaults.Length,
-    cellSize: Dp = OrbitOtpDefaults.CellSize,
+    cellSize: Dp = OrbitTheme.sizing.otpCellSize,
     state: OrbitFieldState = OrbitFieldState.Default,
     enabled: Boolean = true,
     requestFocus: Boolean = true,
@@ -74,7 +69,7 @@ fun OrbitOtpField(
         }
     }
 
-    val shape = RoundedCornerShape(percent = 40)
+    val shape = OrbitTheme.shapeTokens.button
     val dark = OrbitTheme.isDark
     val errorRim = if (dark) OrbitPalette.Red70 else OrbitPalette.Red40
     val successRim = if (dark) OrbitPalette.Green70 else OrbitPalette.Green40
@@ -84,7 +79,7 @@ fun OrbitOtpField(
         OrbitFieldState.Default -> control.controlBorder
     }
     val rimWidth = if (state != OrbitFieldState.Default) sizing.borderFocus else sizing.hairline
-    val fill = if (dark) Color.Black else Color.White
+    val fill = control.cardContainer
 
     Box(
         modifier = modifier
@@ -112,8 +107,7 @@ fun OrbitOtpField(
                     if (filled) {
                         Text(
                             text = maskChar.toString(),
-                            style = OrbitTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            style = OrbitTheme.typography.headlineSmall,
                             color = content.textPrimary,
                             textAlign = TextAlign.Center,
                         )
@@ -129,7 +123,7 @@ fun OrbitOtpField(
             },
             enabled = enabled,
             singleLine = true,
-            textStyle = TextStyle(
+            textStyle = OrbitTheme.typography.headlineSmall.copy(
                 color = content.textPrimary.copy(alpha = 0f),
                 textAlign = TextAlign.Center,
             ),
@@ -148,5 +142,4 @@ fun OrbitOtpField(
 
 object OrbitOtpDefaults {
     const val Length = 6
-    val CellSize: Dp = 44.dp
 }

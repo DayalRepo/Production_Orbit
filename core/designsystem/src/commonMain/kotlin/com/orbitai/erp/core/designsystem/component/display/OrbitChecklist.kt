@@ -46,7 +46,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -189,7 +188,7 @@ fun OrbitChecklist(
         ) {
             Text(
                 text = title,
-                style = OrbitTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = OrbitTheme.typography.titleMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
                 color = content.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -214,7 +213,7 @@ fun OrbitChecklist(
             ) {
                 Text(
                     text = orbitChecklistProgressLabel(items),
-                    style = OrbitTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                    style = OrbitTheme.typography.labelMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
                     color = progressInk,
                     maxLines = 1,
                 )
@@ -230,7 +229,7 @@ fun OrbitChecklist(
                 }
                 Text(
                     text = orbitChecklistRemainingLabel(items),
-                    style = OrbitTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                    style = OrbitTheme.typography.labelMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
                     color = content.textSecondary,
                     maxLines = 1,
                 )
@@ -349,7 +348,7 @@ fun OrbitChecklistEditor(
                     .weight(1f)
                     .fillMaxWidth(),
                 textStyle = OrbitTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = OrbitTheme.fontWeights.title,
                     color = content.textPrimary,
                 ),
                 cursorBrush = SolidColor(control.actionContainer),
@@ -418,7 +417,7 @@ fun OrbitChecklistEditor(
                         )
                         Text(
                             text = item.label,
-                            style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                            style = OrbitTheme.typography.bodyMedium.copy(fontWeight = OrbitTheme.fontWeights.title),
                             color = content.textPrimary,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -529,7 +528,7 @@ private fun FieldLabel(text: String) {
     val content = OrbitTheme.contentColors
     Text(
         text = text,
-        style = OrbitTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+        style = OrbitTheme.typography.labelLarge.copy(fontWeight = OrbitTheme.fontWeights.heading),
         color = content.textPrimary,
     )
 }
@@ -540,12 +539,12 @@ private fun RequiredFieldLabel(text: String, starColor: Color) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = text,
-            style = OrbitTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+            style = OrbitTheme.typography.labelLarge.copy(fontWeight = OrbitTheme.fontWeights.heading),
             color = content.textPrimary,
         )
         Text(
             text = " *",
-            style = OrbitTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+            style = OrbitTheme.typography.labelLarge.copy(fontWeight = OrbitTheme.fontWeights.heading),
             color = starColor,
         )
     }
@@ -585,7 +584,7 @@ private fun ChecklistAllCompleteRow() {
         Spacer(modifier = Modifier.width(spacing.md))
         Text(
             text = "All items complete",
-            style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+            style = OrbitTheme.typography.bodyMedium.copy(fontWeight = OrbitTheme.fontWeights.title),
             color = content.textSecondary,
         )
     }
@@ -652,7 +651,7 @@ private fun ChecklistRow(
         Text(
             text = item.label,
             style = OrbitTheme.typography.bodyMedium.copy(
-                fontWeight = if (item.checked) FontWeight.Normal else FontWeight.Medium,
+                fontWeight = if (item.checked) OrbitTheme.fontWeights.body else OrbitTheme.fontWeights.title,
                 textDecoration = if (item.checked) TextDecoration.LineThrough else TextDecoration.None,
             ),
             color = if (item.checked) content.textTertiary else content.textPrimary,

@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
@@ -74,7 +73,7 @@ fun OrbitDescriptionAiMenu(
                 Text(
                     text = "ORBIT AI",
                     style = OrbitTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = OrbitTheme.fontWeights.heading,
                     color = OrbitTheme.contentColors.textPrimary,
                 )
                 OrbitIconButton(
@@ -148,7 +147,7 @@ private fun AiMenuRow(
             Text(
                 text = label,
                 style = OrbitTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
+                fontWeight = OrbitTheme.fontWeights.title,
                 color = content.textPrimary,
             )
             Text(

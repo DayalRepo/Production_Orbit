@@ -44,7 +44,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -273,7 +272,7 @@ fun OrbitStageProof(
             ) {
                 Text(
                     text = "STAGEPROOF",
-                    style = mono.copy(fontWeight = FontWeight.SemiBold),
+                    style = mono.copy(fontWeight = OrbitTheme.fontWeights.heading),
                     color = colors.headerLabel,
                 )
                 Text(text = " · ", style = mono, color = colors.summaryLabel)
@@ -347,7 +346,7 @@ private fun StageProofTotalRow(
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
-    val style = OrbitTheme.extendedTypography.reference.copy(fontWeight = FontWeight.SemiBold)
+    val style = OrbitTheme.extendedTypography.reference.copy(fontWeight = OrbitTheme.fontWeights.heading)
 
     OrbitDivider(
         modifier = Modifier.padding(top = spacing.sm, bottom = spacing.sm),
@@ -467,7 +466,7 @@ private fun StageProofRow(
                 Text(
                     text = stage.label,
                     style = OrbitTheme.extendedTypography.reference.copy(
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = OrbitTheme.fontWeights.heading,
                     ),
                     color = labelColor,
                     maxLines = 2,
@@ -518,7 +517,7 @@ private fun StageProofCodeChip(code: String) {
     ) {
         Text(
             text = code.uppercase(),
-            style = OrbitTheme.extendedTypography.metricCaption.copy(fontWeight = FontWeight.SemiBold),
+            style = OrbitTheme.extendedTypography.metricCaption.copy(fontWeight = OrbitTheme.fontWeights.heading),
             color = content.textSecondary,
             maxLines = 1,
             textAlign = TextAlign.Center,
@@ -613,7 +612,7 @@ private fun StageProofNumberMark(
         }
         Text(
             text = digit,
-            style = OrbitTheme.extendedTypography.reference.copy(fontWeight = FontWeight.SemiBold),
+            style = OrbitTheme.extendedTypography.reference.copy(fontWeight = OrbitTheme.fontWeights.heading),
             color = when (phase) {
                 OrbitStepPhase.Completed -> colors.onActive
                 OrbitStepPhase.Current -> colors.onActive

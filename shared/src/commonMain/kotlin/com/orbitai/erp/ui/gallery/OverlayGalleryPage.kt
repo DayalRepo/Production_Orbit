@@ -30,7 +30,7 @@ internal fun OverlayGalleryPage() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
 
-    GallerySection("Info popover · name, role badge, copyable mobile") {
+    GallerySection("Info popover") {
         Box {
             var open by remember { mutableStateOf(false) }
             OrbitButton(
@@ -54,7 +54,7 @@ internal fun OverlayGalleryPage() {
         }
     }
 
-    GallerySection("Bubble popover · shell with custom body") {
+    GallerySection("Bubble popover") {
         Box {
             var open by remember { mutableStateOf(false) }
             OrbitButton(
@@ -80,14 +80,9 @@ internal fun OverlayGalleryPage() {
         }
     }
 
-    GallerySection("Copy button · idle then confirm tick") {
+    GallerySection("Copy button") {
         OrbitCard(padding = spacing.md) {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                Text(
-                    text = "Tap to copy. The glyph swaps to a tick, then returns.",
-                    style = OrbitTheme.typography.bodySmall,
-                    color = content.textSecondary,
-                )
                 GalleryControlFlow {
                     OrbitCopyButton(
                         value = GalleryAccountSamples.CeoPhone,

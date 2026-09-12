@@ -17,10 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.badge.OrbitRoleBadge
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.component.input.OrbitSwitch
@@ -62,8 +59,7 @@ fun OrbitAccountPopover(
     val sizing = OrbitTheme.sizing
     val content = OrbitTheme.contentColors
     val danger = OrbitBadgeTone.Red.colors.label
-    val charcoal = content.textSecondary
-    // Full uppercase name — no 18-char hard truncate; the identity block wraps to two lines.
+    // Full uppercase name — wraps, never ellipsises.
     val displayName = name.trim().uppercase()
 
     OrbitBubblePopover(
@@ -78,7 +74,7 @@ fun OrbitAccountPopover(
             name = displayName,
             roleBadge = role,
             phone = phone,
-            ink = charcoal,
+            ink = content.textPrimary,
             contentDescription = "Name, $displayName. Role, $role. Mobile, $phone",
             modifier = Modifier
                 .fillMaxWidth()
@@ -104,17 +100,15 @@ fun OrbitAccountPopover(
             ) {
                 OrbitGlyph(
                     icon = if (themeDark) OrbitIcons.Moon else OrbitIcons.Sun,
-                    size = AccountGlyphSize,
+                    size = sizing.iconSm,
                     tint = content.iconPrimary,
                     contentDescription = null,
-                    minimumStroke = sizing.iconStrokeHairline,
-                    maximumStroke = sizing.iconStrokeHairline,
+                    minimumStroke = sizing.iconStrokeSm,
                 )
                 Text(
                     text = mode,
-                    // Same weight/size as the account name so Light/Dark does not shout louder.
-                    style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                    color = charcoal,
+                    style = OrbitTheme.typography.bodyMedium.copy(fontWeight = OrbitTheme.fontWeights.title),
+                    color = content.textPrimary,
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
                 )
@@ -158,15 +152,14 @@ fun OrbitAccountPopover(
         ) {
             OrbitGlyph(
                 icon = OrbitIcons.Logout,
-                size = AccountGlyphSize,
+                size = sizing.iconSm,
                 tint = danger,
                 contentDescription = null,
-                minimumStroke = sizing.iconStrokeHairline,
-                maximumStroke = sizing.iconStrokeHairline,
+                minimumStroke = sizing.iconStrokeSm,
             )
             Text(
                 text = signOutLabel,
-                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
                 color = danger,
             )
         }
@@ -195,12 +188,10 @@ private fun AccountIdentityBlock(
     ) {
         OrbitGlyph(
             icon = OrbitIcons.UserRound,
-            size = AccountGlyphSize,
+            size = sizing.iconSm,
             tint = content.iconPrimary,
             contentDescription = null,
-            minimumStroke = sizing.iconStrokeHairline,
-            maximumStroke = sizing.iconStrokeHairline,
-            modifier = Modifier.padding(top = 2.dp),
+            minimumStroke = sizing.iconStrokeSm,
         )
         Column(
             modifier = Modifier.weight(1f),
@@ -208,25 +199,21 @@ private fun AccountIdentityBlock(
         ) {
             Text(
                 text = name,
-                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
                 color = ink,
-                maxLines = 2,
                 softWrap = true,
-                overflow = TextOverflow.Ellipsis,
             )
             if (roleBadge.isNotBlank()) {
                 OrbitRoleBadge(label = roleBadge)
             }
             Text(
                 text = phone,
-                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                color = ink,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                style = OrbitTheme.typography.bodyMedium.copy(fontWeight = OrbitTheme.fontWeights.title),
+                color = content.textSecondary,
+                softWrap = true,
             )
         }
     }
 }
 
-private val AccountGlyphSize = 20.dp
-private const val AccountWidthRatio = 1.75f
+private const val AccountWidthRatio = 1.45f

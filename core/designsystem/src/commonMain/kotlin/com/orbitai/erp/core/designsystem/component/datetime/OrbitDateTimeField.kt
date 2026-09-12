@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldShell
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldState
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
@@ -106,7 +105,7 @@ fun OrbitDateTimeField(
                 style = OrbitTheme.typography.bodyLarge,
                 // The value carries weight and the placeholder does not. This is the field's only cue
                 // that it holds something, since a read-only field has no cursor to show a difference.
-                fontWeight = if (value != null) FontWeight.Medium else FontWeight.Normal,
+                fontWeight = if (value != null) OrbitTheme.fontWeights.title else OrbitTheme.fontWeights.body,
                 color = when {
                     !enabled -> content.textDisabled
                     value != null -> content.textPrimary

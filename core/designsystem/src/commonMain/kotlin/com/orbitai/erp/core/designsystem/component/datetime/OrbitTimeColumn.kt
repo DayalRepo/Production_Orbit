@@ -22,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
@@ -214,7 +213,7 @@ private fun TimeSlot(
         Text(
             text = slot.format12Hour(),
             style = OrbitTheme.typography.bodyMedium,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+            fontWeight = if (selected) OrbitTheme.fontWeights.heading else OrbitTheme.fontWeights.title,
             color = when {
                 selected -> control.onActionContainer
                 !enabled -> content.textDisabled

@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -258,7 +257,7 @@ fun OrbitAvatarGroup(
                         OrbitGlyph(
                             icon = OrbitIcons.Cancel,
                             size = if (size == OrbitAvatarSize.Xs) sizing.iconXs else sizing.iconSm,
-                            tint = content.textSecondary,
+                            tint = content.iconInactive,
                             contentDescription = null,
                         )
                     }
@@ -344,7 +343,7 @@ fun OrbitAvatarGroup(
                                 OrbitAvatarSize.Lg -> OrbitTheme.typography.titleMedium
                                 OrbitAvatarSize.Xl -> OrbitTheme.typography.headlineSmall
                             },
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = OrbitTheme.fontWeights.heading,
                             color = content.textSecondary,
                         )
                     }

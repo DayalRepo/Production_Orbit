@@ -6,6 +6,8 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.VectorGroup
 import androidx.compose.ui.graphics.vector.VectorNode
@@ -150,8 +152,8 @@ private fun ImageVector.orbitRestroked(strokeLineWidth: Float): ImageVector {
                     } else {
                         node.strokeLineWidth
                     },
-                    strokeLineCap = node.strokeLineCap,
-                    strokeLineJoin = node.strokeLineJoin,
+                    strokeLineCap = if (node.stroke != null) StrokeCap.Butt else node.strokeLineCap,
+                    strokeLineJoin = if (node.stroke != null) StrokeJoin.Round else node.strokeLineJoin,
                     strokeLineMiter = node.strokeLineMiter,
                     trimPathStart = node.trimPathStart,
                     trimPathEnd = node.trimPathEnd,

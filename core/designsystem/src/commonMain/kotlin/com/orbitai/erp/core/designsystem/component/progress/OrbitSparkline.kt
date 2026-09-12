@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -356,7 +355,7 @@ fun OrbitTrendGraph(
                     fun hollowMarker(center: Offset, color: Color) {
                         val r = 3.5.dp.toPx()
                         drawCircle(
-                            color = if (dark) Color(0xFF1C1C1C) else Color.White,
+                            color = if (dark) Color(0xFF1C1C1E) else Color.White,
                             radius = r,
                             center = center,
                         )
@@ -386,7 +385,7 @@ fun OrbitTrendGraph(
                             val p = pointAt(scrub, primaryValue)
                             drawCircle(color = lineColor, radius = 4.5.dp.toPx(), center = p)
                             drawCircle(
-                                color = if (dark) Color(0xFF1C1C1C) else Color.White,
+                                color = if (dark) Color(0xFF1C1C1E) else Color.White,
                                 radius = 2.25.dp.toPx(),
                                 center = p,
                             )
@@ -395,7 +394,7 @@ fun OrbitTrendGraph(
                             val p = pointAt(scrub, secRaw)
                             drawCircle(color = secondaryColor, radius = 4.dp.toPx(), center = p)
                             drawCircle(
-                                color = if (dark) Color(0xFF1C1C1C) else Color.White,
+                                color = if (dark) Color(0xFF1C1C1E) else Color.White,
                                 radius = 2.dp.toPx(),
                                 center = p,
                             )
@@ -432,7 +431,7 @@ fun OrbitTrendGraph(
                                 }
                                 .wrapContentWidth()
                                 .widthIn(min = 120.dp, max = 220.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(OrbitTheme.shapeTokens.tooltip)
                                 .background(tipSurface)
                                 .padding(horizontal = 10.dp, vertical = 6.dp),
                         ) {

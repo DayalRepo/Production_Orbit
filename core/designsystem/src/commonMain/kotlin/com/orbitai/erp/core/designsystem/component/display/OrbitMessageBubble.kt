@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -158,7 +157,7 @@ private fun MessageBubbleCard(
                 text = displaySender,
                 style = OrbitTheme.typography.labelSmall,
                 color = content.textTertiary,
-                fontWeight = FontWeight.Medium,
+                fontWeight = OrbitTheme.fontWeights.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = textAlign,
@@ -167,7 +166,7 @@ private fun MessageBubbleCard(
 
         Text(
             text = text,
-            style = OrbitTheme.extendedTypography.bodyLongForm.copy(fontWeight = FontWeight.Medium),
+            style = OrbitTheme.extendedTypography.bodyLongForm.copy(fontWeight = OrbitTheme.fontWeights.title),
             color = content.textPrimary,
             maxLines = if (expanded) Int.MAX_VALUE else collapsedMaxLines,
             overflow = TextOverflow.Ellipsis,
@@ -182,7 +181,7 @@ private fun MessageBubbleCard(
         if (overflows || expanded) {
             Text(
                 text = if (expanded) "Show less" else "Show more",
-                style = OrbitTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = OrbitTheme.typography.labelMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
                 color = linkInk,
                 modifier = Modifier
                     .orbitHandCursor()

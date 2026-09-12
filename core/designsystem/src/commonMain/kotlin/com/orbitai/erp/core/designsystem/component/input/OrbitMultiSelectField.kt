@@ -24,7 +24,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -34,11 +33,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
-import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
@@ -175,7 +172,7 @@ fun OrbitMultiSelectField(
                             OrbitTheme.typography.bodyLarge,
                             OrbitTheme.extendedTypography.fieldLarge,
                         ),
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = OrbitTheme.fontWeights.title,
                         color = if (enabled) {
                             content.textSecondary
                         } else {
@@ -295,11 +292,9 @@ fun OrbitMultiSelectField(
  *
  * ### Cornered, not a pill
  *
- * Every other small rounded thing in this system — filter chips, badges, buttons — is a full pill,
- * and that is precisely the problem: a row of pills inside a text field reads as a row of buttons
- * the user is expected to press. These are entered data. Squaring the corners to a small radius
- * separates "value I have supplied" from "control I can operate", while staying soft enough to sit
- * inside a 10dp field without the two radii fighting each other.
+ * These chips sit *inside* a field, so they use [OrbitShapeTokens.inputChip] — a tighter radius
+ * than buttons and filter chips — so a row of values does not read as a row of actions. They stay
+ * soft enough to sit inside the field without the two radii fighting each other.
  *
  * It is also deliberately not
  * [OrbitChip][com.orbitai.erp.core.designsystem.component.status.OrbitChip]. Borrowing that
@@ -338,7 +333,7 @@ private fun SelectedChip(
             Text(
                 text = label,
                 style = OrbitTheme.typography.labelLarge,
-                fontWeight = FontWeight.Medium,
+                fontWeight = OrbitTheme.fontWeights.title,
                 color = if (enabled) content.textPrimary else content.textDisabled,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -362,7 +357,7 @@ private fun SelectedChip(
             Box(
                 modifier = Modifier
                     .size(sizing.iconMd)
-                    .clip(CircleShape)
+                    .clip(OrbitTheme.shapeTokens.avatar)
                     .indication(removeInteraction, orbitCircularPressIndication())
                     .clickable(
                         interactionSource = removeInteraction,

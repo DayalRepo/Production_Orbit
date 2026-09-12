@@ -80,13 +80,13 @@ fun ComponentGalleryScreen(
         BrandGalleryPage()
         ProgressGalleryPage()
         MessageBubbleGalleryPage()
+        MarkdownGalleryPage()
         ChecklistGalleryPage()
         AvatarGalleryPage(isDark = isDark, onToggleTheme = onToggleTheme)
         OverlayGalleryPage()
         DisplayGalleryPage()
         ScrollbarGalleryPage()
         FeedbackGalleryPage()
-        ShellGalleryPage()
         StateGalleryPage()
         InputGalleryPage()
         NavigationGalleryPage()
@@ -94,7 +94,6 @@ fun ComponentGalleryScreen(
         ComposerGalleryPage()
         ButtonGalleryPage()
         BadgeGalleryPage()
-        SignOffGalleryPage()
 
         // On Android the gesture bar sits directly under the last row of badges.
         Spacer(modifier = Modifier.height(spacing.xxl))

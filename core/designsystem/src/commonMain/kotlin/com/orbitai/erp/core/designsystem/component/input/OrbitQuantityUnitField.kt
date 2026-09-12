@@ -35,7 +35,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -173,7 +172,7 @@ fun OrbitQuantityUnitField(
                                     },
                                     textStyle = textStyle.copy(
                                         color = ink,
-                                        fontWeight = FontWeight.Medium,
+                                        fontWeight = OrbitTheme.fontWeights.title,
                                         textAlign = TextAlign.Center,
                                     ),
                                     singleLine = true,
@@ -194,7 +193,7 @@ fun OrbitQuantityUnitField(
                         Text(
                             text = value.toString(),
                             style = textStyle,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = OrbitTheme.fontWeights.title,
                             color = ink,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -239,7 +238,7 @@ fun OrbitQuantityUnitField(
                 Text(
                     text = selectedUnit ?: unitPlaceholder,
                     style = textStyle,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = OrbitTheme.fontWeights.title,
                     color = if (selectedUnit != null) ink else hint,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

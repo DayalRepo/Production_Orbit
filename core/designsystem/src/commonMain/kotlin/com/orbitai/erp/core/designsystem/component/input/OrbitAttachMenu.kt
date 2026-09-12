@@ -29,7 +29,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
@@ -236,7 +235,7 @@ private fun OrbitAttachMenuRow(item: OrbitAttachOption, onDismiss: () -> Unit) {
             // weight of a button label rather than the weight of body copy. At bodyMedium regular
             // the two options read as captions and the panel looked like a tooltip.
             style = OrbitTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
+            fontWeight = OrbitTheme.fontWeights.title,
             color = content.textPrimary,
             maxLines = 1,
             modifier = Modifier.clearAndSetSemantics {},

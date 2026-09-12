@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
@@ -60,7 +59,7 @@ fun OrbitDescriptionAiPanel(
                             OrbitDescriptionAiAction.Translate -> "Translate with Orbit AI"
                         },
                         style = OrbitTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = OrbitTheme.fontWeights.heading,
                         color = content.textPrimary,
                     )
                     OrbitIconButton(

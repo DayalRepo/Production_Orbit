@@ -19,9 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.withStyle
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -40,12 +38,8 @@ fun OrbitSplashScreen(
     onFinished: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val markColor = if (OrbitTheme.isDark) {
-        OrbitLauncherIconDefaults.DarkMark
-    } else {
-        OrbitLauncherIconDefaults.LightMark
-    }
-    val wordColor = if (OrbitTheme.isDark) Color.White else Color.Black
+    val markColor = OrbitMarkDefaults.color()
+    val wordColor = OrbitTheme.contentColors.textPrimary
 
     val contentAlpha = remember { Animatable(1f) }
     val markSpread = remember { Animatable(0f) }
@@ -54,10 +48,10 @@ fun OrbitSplashScreen(
     }
     var typedCount by remember { mutableIntStateOf(0) }
 
-    val wordStyle = TextStyle(
+    val wordStyle = OrbitTheme.typography.displayLarge.copy(
         fontSize = OrbitOpeningLockup.WordSize,
         lineHeight = OrbitOpeningLockup.WordSize,
-        fontWeight = FontWeight.W300,
+        fontWeight = OrbitTheme.fontWeights.display,
         letterSpacing = OrbitOpeningLockup.WordTracking,
         lineHeightStyle = LineHeightStyle(
             alignment = LineHeightStyle.Alignment.Proportional,

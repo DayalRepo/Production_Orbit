@@ -35,7 +35,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -187,8 +186,6 @@ fun OrbitMessageField(
     val multiline = lineCount > 1 && !recording
 
     val radius by animateDpAsState(
-        // Half the min height is a true pill at one line. The card radius is where it lands once it
-        // has grown; anything larger keeps scooping the corners into the text.
         targetValue = if (multiline) CardRadius else sizing.bottomNavHeight / 2,
         animationSpec = tween(ShapeMs),
         label = "orbit-composer-radius",
@@ -293,7 +290,10 @@ fun OrbitMessageField(
                                         .orbitReleaseFocusWithKeyboard()
                                         .semantics { contentDescription = label },
                                     enabled = enabled,
-                                    textStyle = base.copy(color = ink, fontWeight = FontWeight.Medium),
+                                    textStyle = base.copy(
+                                        color = ink,
+                                        fontWeight = OrbitTheme.fontWeights.title,
+                                    ),
                                     // Default, not Send. A prompt is a paragraph and the return key has
                                     // to insert a newline; putting Send there means every attempt at a
                                     // second sentence fires the message off half-written.
@@ -314,7 +314,7 @@ fun OrbitMessageField(
                                 // first keystroke made the line appear to jump and thicken. A
                                 // placeholder is a preview of what you are about to type; any metric it
                                 // does not share with the real text shows up as a shift.
-                                style = base.copy(fontWeight = FontWeight.Medium),
+                                style = base.copy(fontWeight = OrbitTheme.fontWeights.title),
                                 color = hint,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,

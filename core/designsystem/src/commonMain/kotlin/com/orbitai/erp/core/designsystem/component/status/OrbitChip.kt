@@ -1,7 +1,5 @@
 package com.orbitai.erp.core.designsystem.component.status
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -19,8 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
+import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
+import com.orbitai.erp.core.designsystem.theme.OrbitGlass
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
 
@@ -81,8 +81,17 @@ fun OrbitChip(
             // the page instead of hovering over it at full depth.
             .orbitGlassShadow(shape = shape, elevation = sizing.shadowBadge, alpha = alpha)
             .clip(shape)
-            .background(background.copy(alpha = background.alpha * alpha), shape)
-            .border(sizing.border, borderColor.copy(alpha = borderColor.alpha * alpha), shape)
+            .orbitGlass(
+                fill = background.copy(alpha = background.alpha * alpha),
+                shape = shape,
+                highlightAlpha = if (OrbitTheme.isDark) {
+                    OrbitGlass.BadgeHighlightDark
+                } else {
+                    OrbitGlass.BadgeHighlightLight
+                } * alpha,
+                edge = borderColor.copy(alpha = borderColor.alpha * alpha),
+                edgeWidth = sizing.hairline,
+            )
             .orbitHandCursor()
             .selectable(
                 selected = selected,

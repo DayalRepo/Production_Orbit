@@ -43,7 +43,7 @@ internal fun MessageBubbleGalleryPage() {
         }
     }
 
-    GallerySection("Single bubble · long body") {
+    GallerySection("Message bubble") {
         OrbitMessageBubble(
             text = LongAiMessage,
             role = OrbitMessageBubbleRole.Ai,

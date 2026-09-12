@@ -43,10 +43,10 @@ fun OrbitTheme(
     val semanticColors = if (darkTheme) OrbitDarkSemanticColors else OrbitLightSemanticColors
 
     val sans = orbitFontFamily()
-    val metric = orbitMetricFontFamily()
-    val typography = remember(sans, tokens) { orbitTypography(sans, tokens.typeScale) }
-    val extendedTypography = remember(sans, metric, tokens) {
-        orbitTypographyTokens(sans, tokens.typeScale, metric = metric)
+    val weights = OrbitFontWeights()
+    val typography = remember(sans, tokens) { orbitTypography(sans, tokens.typeScale, weights) }
+    val extendedTypography = remember(sans, tokens) {
+        orbitTypographyTokens(sans, tokens.typeScale, weights)
     }
 
     CompositionLocalProvider(
@@ -56,9 +56,10 @@ fun OrbitTheme(
         LocalOrbitSemanticColors provides semanticColors,
         LocalOrbitSpacing provides OrbitSpacing(),
         LocalOrbitSizing provides tokens.sizing,
-        LocalOrbitShapes provides OrbitShapeTokens(),
+        LocalOrbitShapes provides tokens.shapes,
         LocalOrbitElevation provides OrbitElevation(),
         LocalOrbitTypography provides extendedTypography,
+        LocalOrbitFontWeights provides weights,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
@@ -101,6 +102,9 @@ object OrbitTheme {
 
     val extendedTypography: OrbitTypographyTokens
         @Composable @ReadOnlyComposable get() = LocalOrbitTypography.current
+
+    val fontWeights: OrbitFontWeights
+        @Composable @ReadOnlyComposable get() = LocalOrbitFontWeights.current
 
     val typeScale: OrbitTypeScale
         @Composable @ReadOnlyComposable get() = LocalOrbitPlatformTokens.current.typeScale

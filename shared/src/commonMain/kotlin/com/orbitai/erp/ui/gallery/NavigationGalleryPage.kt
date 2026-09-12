@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,19 +41,10 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 @Composable
 internal fun NavigationGalleryPage() {
     val spacing = OrbitTheme.spacing
-    val content = OrbitTheme.contentColors
-    val sizing = OrbitTheme.sizing
 
-    GallerySection("Bottom nav · role bars") {
+    GallerySection("Bottom nav") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-            Text(
-                text = "Full pill + separate assistant circle. Icons only; soft glass shadow; " +
-                    "spring micro-animation on the active glyph. Edge inset ${sizing.bottomNavEdgeInset} " +
-                    "matches the tab bar column.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
-            RoleNavSample(label = "CEO") {
+            RoleNavSample {
                 var selected by remember { mutableStateOf(OrbitCeoNavIds.Dashboard) }
                 OrbitCeoNavBar(
                     selectedId = selected,
@@ -63,7 +53,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 3,
                 )
             }
-            RoleNavSample(label = "Project Manager") {
+            RoleNavSample {
                 var selected by remember { mutableStateOf(OrbitProjectManagerNavIds.Dashboard) }
                 OrbitProjectManagerNavBar(
                     selectedId = selected,
@@ -72,7 +62,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 12,
                 )
             }
-            RoleNavSample(label = "Site Engineer") {
+            RoleNavSample {
                 var selected by remember { mutableStateOf(OrbitSiteEngineerNavIds.Dashboard) }
                 OrbitSiteEngineerNavBar(
                     selectedId = selected,
@@ -81,7 +71,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 1,
                 )
             }
-            RoleNavSample(label = "Contractor") {
+            RoleNavSample {
                 var selected by remember { mutableStateOf(OrbitContractorNavIds.Dashboard) }
                 OrbitContractorNavBar(
                     selectedId = selected,
@@ -90,7 +80,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 99,
                 )
             }
-            RoleNavSample(label = "Warehouse Manager") {
+            RoleNavSample {
                 var selected by remember { mutableStateOf(OrbitWarehouseManagerNavIds.Dashboard) }
                 OrbitWarehouseManagerNavBar(
                     selectedId = selected,
@@ -99,7 +89,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 5,
                 )
             }
-            RoleNavSample(label = "Procurement Manager") {
+            RoleNavSample {
                 var selected by remember {
                     mutableStateOf(OrbitProcurementManagerNavIds.Dashboard)
                 }
@@ -110,7 +100,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 2,
                 )
             }
-            RoleNavSample(label = "QA/QC") {
+            RoleNavSample {
                 var selected by remember { mutableStateOf(OrbitQaQcNavIds.Dashboard) }
                 OrbitQaQcNavBar(
                     selectedId = selected,
@@ -122,15 +112,8 @@ internal fun NavigationGalleryPage() {
         }
     }
 
-    GallerySection("Tab bar · pages bar") {
+    GallerySection("Tab bar") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-            Text(
-                text = "Underline tabs (pages bar): active label + glass underline. Edge inset " +
-                    "${sizing.tabBarEdgeInset} and min height ${sizing.minTouchTarget} follow the " +
-                    "platform chrome grid with the bottom nav.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             TabSample(
                 tabs = listOf(
                     OrbitTab("task", "Task"),
@@ -185,23 +168,14 @@ internal fun NavigationGalleryPage() {
 }
 
 @Composable
-private fun RoleNavSample(label: String, content: @Composable () -> Unit) {
-    val spacing = OrbitTheme.spacing
-    Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-        Text(
-            text = label,
-            style = OrbitTheme.typography.labelLarge,
-            color = OrbitTheme.contentColors.textPrimary,
-        )
-        // Gallery already pads for safe drawing, so skip the nav-bar inset here.
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(96.dp),
-            contentAlignment = Alignment.BottomCenter,
-        ) {
-            content()
-        }
+private fun RoleNavSample(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(96.dp),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        content()
     }
 }
 

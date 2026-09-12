@@ -3,7 +3,6 @@ package com.orbitai.erp.ui.gallery
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -24,7 +23,6 @@ import kotlin.random.Random
 @Composable
 internal fun ChecklistGalleryPage() {
     val spacing = OrbitTheme.spacing
-    val content = OrbitTheme.contentColors
 
     val editorItems = remember { mutableStateListOf<OrbitChecklistItem>() }
     var title by remember { mutableStateOf("") }
@@ -45,13 +43,8 @@ internal fun ChecklistGalleryPage() {
         )
     }
 
-    GallerySection("Checklist · create items") {
+    GallerySection("Checklist editor") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
-            Text(
-                text = "Add a title and items, then Create. The editor stays open so you can add more.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             OrbitChecklistEditor(
                 title = title,
                 onTitleChange = { title = it },
@@ -104,13 +97,8 @@ internal fun ChecklistGalleryPage() {
         }
     }
 
-    GallerySection("Checklist · interactive") {
+    GallerySection("Checklist") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
-            Text(
-                text = "Tap a row to check — strikethrough + progress update.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             OrbitChecklist(
                 title = "Getting started checklist",
                 items = liveItems.toList(),

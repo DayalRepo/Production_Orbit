@@ -25,7 +25,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
@@ -47,7 +46,7 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
  *
  * ### Typed text outweighs the hint it replaced
  *
- * The value is set a step heavier than the placeholder — [FontWeight.Medium] against the hint's
+ * The value is set a step heavier than the placeholder — [OrbitTheme.fontWeights.title] against the hint's
  * regular — and in the primary ink rather than the secondary. The two are the same size and sit on
  * the same baseline, so they occupy identical space and nothing shifts as the hint gives way.
  *
@@ -166,7 +165,7 @@ fun OrbitTextField(
                             .semantics { contentDescription = label },
                         enabled = enabled,
                         readOnly = readOnly,
-                        textStyle = base.copy(color = ink, fontWeight = FontWeight.Medium),
+                        textStyle = base.copy(color = ink, fontWeight = OrbitTheme.fontWeights.title),
                         keyboardOptions = keyboardOptions,
                         keyboardActions = keyboardActions,
                         singleLine = singleLine,

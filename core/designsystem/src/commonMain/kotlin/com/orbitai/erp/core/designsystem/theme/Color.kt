@@ -77,22 +77,20 @@ internal object OrbitPalette {
 
     // The same matrix inverted. Dark themes lift rather than brighten: each step up in the hierarchy
     // is a step *lighter*, because there is no shadow to read against a near-black page.
-    // Neutral greys only (equal R/G/B) — tinted charcoal (#121214 / #1C1C1E) reads as a brown cast
-    // on OLED; glass highlight + contact shadow already carry elevation.
     /** App background — the scrollable page root. */
-    val DarkBackground = Color(0xFF121212)
+    val DarkBackground = Color(0xFF121214)
     val DarkSurfaceLowest = Color(0xFF0D0D0D)
     /** Standard card and list-item container. */
-    val DarkSurfaceCard = Color(0xFF1C1C1C)
+    val DarkSurfaceCard = Color(0xFF1C1C1E)
     val DarkSurface = Color(0xFF121212)
     val DarkSurfaceLow = Color(0xFF171717)
     /** Muted inset — text inputs, search bars, nested sub-boxes. */
-    val DarkSurfaceInset = Color(0xFF2C2C2C)
+    val DarkSurfaceInset = Color(0xFF2C2C2E)
     val DarkSurfaceContainer = Color(0xFF1D1D1D)
     /** Elevated container — modals, sheets, floating dialogs, popovers. */
-    val DarkSurfaceElevated = Color(0xFF252525)
+    val DarkSurfaceElevated = Color(0xFF252528)
     /** Interactive container — secondary buttons, badge chips, toggles. */
-    val DarkSurfaceInteractive = Color(0xFF3A3A3A)
+    val DarkSurfaceInteractive = Color(0xFF3A3A3C)
     val DarkSurfaceHigh = Color(0xFF232323)
     val DarkSurfaceHighest = Color(0xFF2A2A2A)
     val DarkSurfaceBright = Color(0xFF333333)
@@ -125,8 +123,8 @@ internal object OrbitPalette {
     val LightDivider = Color(0xFFF2F2F7)
     /** Active/focus border: selected cards, focused inputs. */
     val LightBorderFocus = Color(0xFF007AFF)
-    val DarkBorder = Color(0xFF3F3F3F)
-    val DarkDivider = Color(0xFF2C2C2C)
+    val DarkBorder = Color(0xFF3F3F46)
+    val DarkDivider = Color(0xFF2C2C2E)
     val DarkBorderFocus = Color(0xFF0A84FF)
 
     val Red30 = Color(0xFF7F1D1D)

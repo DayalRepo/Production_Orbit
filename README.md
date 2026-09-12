@@ -75,31 +75,34 @@ cannot be compiled at all.
 | | Android | iOS |
 | --- | --- | --- |
 | Base font size | 16sp | 17pt |
-| H1 | 32/40 | 34/41 |
-| Body | 16/24 | 17/22 |
+| Display | 23/27 | 24/28 |
+| H1 | 20/24 | 22/27 |
+| Body | 16/23 | 17/24 |
+| Caption | 14/19 | 15/20 |
+| Buttons | 32 / 40 / 48dp | same |
+| Fields | 48 / 56 / 64dp | same |
 | `minTouchTarget` | 48dp | 44pt |
-| Toolbar icon | 24dp | 20–24pt |
+| Toolbar icon | 24dp | 24pt |
 | `avatarSm` / `avatarXl` | 40dp / 88dp | 32pt / 80pt |
-| Primary text (light / dark) | `#1A1C1E` / `#E3E2E6` | `#1C1C1E` / `#EBEBF5` |
+| Primary text (light / dark) | `#1C1C1E` / `#F2F2F7` | `#1C1C1E` / `#F2F2F7` |
 | Top bar title | Left-aligned | Centred |
 
 ### Typeface
 
-Google Sans Flex, bundled in `core/designsystem/src/commonMain/composeResources/font/` as all nine
-static instances (100–900, roughly 1.1 MB). Static files rather than the six-axis variable font
-because variable-axis selection requires Android API 26 and `minSdk` is 24 — on Android 7 every
-weight would collapse to Regular. Licensed under the SIL Open Font License 1.1; see
-`core/designsystem/licenses/OFL-Google-Sans-Flex.txt`.
+DM Sans, bundled in `core/designsystem/src/commonMain/composeResources/font/` as Regular, Medium,
+SemiBold and Bold. Static files rather than a variable font because variable-axis selection requires
+Android API 26 and `minSdk` is 24 — on Android 7 every weight would collapse to Regular. Licensed
+under the SIL Open Font License 1.1; see `core/designsystem/licenses/OFL-DM-Sans.txt`.
 
-All nine ship so weight decisions need no asset work. Weight assignments are collected in
-`OrbitFontWeights`, so changing boldness is one edit rather than forty. If the asset size matters
-more than the flexibility, dropping Thin, ExtraLight, ExtraBold and Black reclaims about 500 KB.
+Weight assignments live in `OrbitFontWeights` (display 700, heading 600, title/label 500, body and
+KPI figures 400), so changing boldness is one edit. Lighter or heavier requests fall to the nearest
+bundled face.
 
 Because resource-backed fonts can only be loaded from a composition, the type scale is built by
 `orbitTypography(sans, scale)` rather than being a top-level `val`. No call site names a font family
 or a size, so both are changeable in one place.
 
-Numeric styles stay in Google Sans Flex and request its `tnum` feature rather than switching to a
+Numeric styles stay in DM Sans and request its `tnum` feature rather than switching to a
 monospace face that would match nothing else on screen.
 
 ### Colour and contrast
@@ -417,11 +420,10 @@ interchangeable blocks distinguishable only by the word inside, and scales the p
 container rather than with the words, so on a tablet a two-word decision spans the screen.
 
 The minimum widths are therefore a floor rather than a target: 72/88/104dp against heights of
-32/40/48dp, with end padding of 18/22/28dp. They exist only because a pill's radius is half its
-height, so a two-character label on an unconstrained pill comes out as a circle.
-`OrbitPillGeometryTest` bounds them from *both* sides — wide enough to leave room between the curves,
-narrow enough that an ordinary verb clears them, because a floor that an ordinary verb hits is a
-fixed width wearing a floor's name.
+32/40/48dp, with end padding of 14/18/24dp. They stop a two-character label collapsing into a
+near-square. `OrbitPillGeometryTest` bounds them from *both* sides — wide enough to leave room
+between the corners, narrow enough that an ordinary verb clears them, because a floor that an
+ordinary verb hits is a fixed width wearing a floor's name.
 
 Small takes the same type size as Medium and a heavier weight — SemiBold against Medium. It is
 already giving up height and padding; taking the type down as well left a label that was legible in
@@ -637,13 +639,11 @@ the rule that a field is never shorter than a button of the same size — a colu
 a taller button looks assembled from two designs.
 
 `OrbitSearchField` is separate rather than `OrbitTextField` with an icon, for three reasons. It is a
-**pill**, which is the one piece of shape vocabulary this product spends on meaning: rounded
-rectangles are things you fill in, pills are things you act with, and a search box is closer to a
-control than a form field. It **clears itself**, because abandoning a search is the most common
-thing anyone does with one. And its IME action is **Search**, so the keyboard offers a search key
-rather than a newline. Its clear button takes the full 48dp target even though the glyph is small:
-a miss lands in the field, which focuses it and opens the keyboard, so a failed clear actively makes
-things worse.
+**pill**, because a search box is closer to a control than a form field. It **clears itself**,
+because abandoning a search is the most common thing anyone does with one. And its IME action is
+**Search**, so the keyboard offers a search key rather than a newline. Its clear button takes the
+full 48dp target even though the glyph is small: a miss lands in the field, which focuses it and
+opens the keyboard, so a failed clear actively makes things worse.
 
 ##### Findings from the first attempt
 
@@ -1008,7 +1008,7 @@ Dark uses `Blue80` and reaches 8.6:1. `SegmentedProgressContrastTest` pins both 
 at the WCAG 1.4.11 floor of 3:1, and has a third test whose only job is to fail loudly if someone
 collapses the two blues into one token.
 
-The figures are set in Google Sans Flex at 400 (`OrbitFontWeights.metric`). A dashboard number is
+The figures are set in DM Sans at 400 (`OrbitFontWeights.metric`). A dashboard number is
 already the largest thing on its card, so size alone carries the emphasis; adding weight makes it
 shout, and a screen of six shouting cards has no hierarchy left. 300 was tried first and went too far
 the other way — at that weight the strokes thin enough that a figure over a glass card starts to look

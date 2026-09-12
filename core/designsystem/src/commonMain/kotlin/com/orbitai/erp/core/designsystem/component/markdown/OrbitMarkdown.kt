@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -23,15 +23,16 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.orbitai.erp.core.designsystem.component.container.orbitGlassHorizontalScrollbar
-import com.orbitai.erp.core.designsystem.component.container.orbitGlassScrollbar
+import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
+import com.orbitai.erp.core.designsystem.component.container.OrbitHorizontalScrollbar
+import com.orbitai.erp.core.designsystem.component.container.OrbitScrollbarDefaults
+import com.orbitai.erp.core.designsystem.component.container.OrbitVerticalScrollbar
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
@@ -123,16 +124,34 @@ fun parseOrbitMarkdown(source: String): List<OrbitMarkdownBlock> {
 fun orbitMarkdownPlainText(source: String): String =
     parseOrbitMarkdown(source).joinToString(separator = " ") { block ->
         when (block) {
-            is OrbitMarkdownBlock.Heading -> block.text
-            is OrbitMarkdownBlock.Paragraph -> block.text
-            is OrbitMarkdownBlock.Bullet -> block.text
+            is OrbitMarkdownBlock.Heading -> stripOrbitMarkdownInline(block.text)
+            is OrbitMarkdownBlock.Paragraph -> stripOrbitMarkdownInline(block.text)
+            is OrbitMarkdownBlock.Bullet -> stripOrbitMarkdownInline(block.text)
             is OrbitMarkdownBlock.Table -> {
-                val head = block.headers.joinToString(", ")
-                val body = block.rows.joinToString("; ") { it.joinToString(", ") }
+                val head = block.headers.joinToString(", ") { stripOrbitMarkdownInline(it) }
+                val body = block.rows.joinToString("; ") { row ->
+                    row.joinToString(", ") { stripOrbitMarkdownInline(it) }
+                }
                 listOf(head, body).filter { it.isNotBlank() }.joinToString(". ")
             }
         }
     }
+
+internal fun stripOrbitMarkdownInline(text: String): String {
+    val out = StringBuilder(text.length)
+    var i = 0
+    while (i < text.length) {
+        when {
+            text.startsWith("**", i) || text.startsWith("__", i) || text.startsWith("~~", i) -> i += 2
+            text[i] == '*' || text[i] == '_' -> i += 1
+            else -> {
+                out.append(text[i])
+                i += 1
+            }
+        }
+    }
+    return out.toString()
+}
 
 @Composable
 fun OrbitMarkdown(
@@ -143,6 +162,9 @@ fun OrbitMarkdown(
     val blocks = remember(source) { parseOrbitMarkdown(source) }
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
+    val reading = OrbitTheme.typography.bodyMedium.copy(
+        fontWeight = OrbitTheme.fontWeights.title,
+    )
     val align = if (centered) TextAlign.Center else TextAlign.Start
     val cross = if (centered) Alignment.CenterHorizontally else Alignment.Start
 
@@ -158,7 +180,7 @@ fun OrbitMarkdown(
                         1 -> OrbitTheme.typography.titleLarge
                         2 -> OrbitTheme.typography.titleMedium
                         else -> OrbitTheme.typography.titleSmall
-                    }.copy(fontWeight = FontWeight.SemiBold)
+                    }.copy(fontWeight = OrbitTheme.fontWeights.heading)
                     Text(
                         text = annotatedInline(block.text),
                         style = style,
@@ -171,9 +193,7 @@ fun OrbitMarkdown(
                 is OrbitMarkdownBlock.Paragraph -> {
                     Text(
                         text = annotatedInline(block.text),
-                        style = OrbitTheme.typography.bodyMedium.copy(
-                            fontWeight = OrbitTheme.typography.titleMedium.fontWeight,
-                        ),
+                        style = reading,
                         color = content.textSecondary,
                         textAlign = align,
                         modifier = Modifier.fillMaxWidth(),
@@ -184,9 +204,7 @@ fun OrbitMarkdown(
                     if (centered) {
                         Text(
                             text = annotatedInline("• ${block.text}"),
-                            style = OrbitTheme.typography.bodyMedium.copy(
-                                fontWeight = OrbitTheme.typography.titleMedium.fontWeight,
-                            ),
+                            style = reading,
                             color = content.textSecondary,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
@@ -198,14 +216,12 @@ fun OrbitMarkdown(
                         ) {
                             Text(
                                 text = "•",
-                                style = OrbitTheme.typography.bodyMedium,
+                                style = reading,
                                 color = content.textSecondary,
                             )
                             Text(
                                 text = annotatedInline(block.text),
-                                style = OrbitTheme.typography.bodyMedium.copy(
-                                    fontWeight = OrbitTheme.typography.titleMedium.fontWeight,
-                                ),
+                                style = reading,
                                 color = content.textSecondary,
                                 modifier = Modifier.weight(1f),
                             )
@@ -241,8 +257,10 @@ private fun OrbitMarkdownTable(
     val shape = OrbitTheme.shapeTokens.card
     val hScroll = rememberScrollState()
     val vScroll = rememberScrollState()
-    val colWidth = 112.dp
+    val colWidth = TableColumnWidth
     val tableWidth = colWidth * cols + spacing.sm * (cols - 1).coerceAtLeast(0) + spacing.xs * 2
+    val listOverflows = vScroll.maxValue > 0
+    val wideOverflows = hScroll.maxValue > 0
 
     Column(
         modifier = Modifier
@@ -266,16 +284,28 @@ private fun OrbitMarkdownTable(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 220.dp)
-                .orbitGlassScrollbar(scrollState = vScroll)
-                .orbitGlassHorizontalScrollbar(scrollState = hScroll),
+                .heightIn(max = sizing.dropdownMaxHeight),
         ) {
             Column(
                 modifier = Modifier
+                    .then(
+                        if (listOverflows) {
+                            Modifier.padding(end = OrbitScrollbarDefaults.Thickness + spacing.sm)
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .then(
+                        if (wideOverflows) {
+                            Modifier.padding(bottom = OrbitScrollbarDefaults.Thickness + spacing.sm)
+                        } else {
+                            Modifier
+                        },
+                    )
                     .horizontalScroll(hScroll)
                     .verticalScroll(vScroll)
                     .width(tableWidth),
-                verticalArrangement = Arrangement.spacedBy(0.dp),
+                verticalArrangement = Arrangement.spacedBy(spacing.none),
             ) {
                 TableRow(
                     cells = headers.padTo(cols),
@@ -283,10 +313,7 @@ private fun OrbitMarkdownTable(
                     centered = centered,
                     colWidth = colWidth,
                 )
-                HorizontalDivider(
-                    thickness = sizing.hairline,
-                    color = control.controlBorder,
-                )
+                OrbitDivider(color = control.controlBorder)
                 rows.forEachIndexed { index, row ->
                     TableRow(
                         cells = row.padTo(cols),
@@ -295,12 +322,29 @@ private fun OrbitMarkdownTable(
                         colWidth = colWidth,
                     )
                     if (index != rows.lastIndex) {
-                        HorizontalDivider(
-                            thickness = sizing.hairline,
-                            color = control.controlBorder.copy(alpha = 0.55f),
-                        )
+                        OrbitDivider(color = control.controlBorder.copy(alpha = 0.55f))
                     }
                 }
+            }
+            if (listOverflows) {
+                OrbitVerticalScrollbar(
+                    scrollState = vScroll,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxHeight()
+                        .padding(vertical = spacing.xs)
+                        .padding(end = spacing.xxs),
+                )
+            }
+            if (wideOverflows) {
+                OrbitHorizontalScrollbar(
+                    scrollState = hScroll,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(horizontal = spacing.xs)
+                        .padding(bottom = spacing.xxs),
+                )
             }
         }
     }
@@ -323,11 +367,9 @@ private fun TableRow(
             Text(
                 text = annotatedInline(cell),
                 style = if (header) {
-                    OrbitTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+                    OrbitTheme.typography.labelMedium.copy(fontWeight = OrbitTheme.fontWeights.heading)
                 } else {
-                    OrbitTheme.typography.bodySmall.copy(
-                        fontWeight = OrbitTheme.typography.titleMedium.fontWeight,
-                    )
+                    OrbitTheme.typography.bodySmall.copy(fontWeight = OrbitTheme.fontWeights.title)
                 },
                 color = if (header) content.textPrimary else content.textSecondary,
                 textAlign = if (centered) TextAlign.Center else TextAlign.Start,
@@ -343,7 +385,8 @@ private fun TableRow(
 private fun annotatedInline(text: String): AnnotatedString {
     val primary = OrbitTheme.contentColors.textPrimary
     val secondary = OrbitTheme.contentColors.textSecondary
-    return remember(text, primary, secondary) {
+    val headingWeight = OrbitTheme.fontWeights.heading
+    return remember(text, primary, secondary, headingWeight) {
         buildAnnotatedString {
             var i = 0
             while (i < text.length) {
@@ -351,7 +394,7 @@ private fun annotatedInline(text: String): AnnotatedString {
                     text.startsWith("**", i) -> {
                         val end = text.indexOf("**", i + 2)
                         if (end > i) {
-                            withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = primary)) {
+                            withStyle(SpanStyle(fontWeight = headingWeight, color = primary)) {
                                 append(text.substring(i + 2, end))
                             }
                             i = end + 2
@@ -444,3 +487,4 @@ private fun List<String>.padTo(size: Int): List<String> =
 
 private val HEADING = Regex("""^(#{1,3})\s+(.+)$""")
 private val BULLET = Regex("""^[-*]\s+(.+)$""")
+private val TableColumnWidth = 112.dp

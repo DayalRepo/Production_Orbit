@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
@@ -113,20 +112,14 @@ fun OrbitTabBar(
                 modifier = Modifier
                     .padding(horizontal = edgeInset)
                     .horizontalScroll(scroll)
-                    .padding(bottom = spacing.sm)
-                    .heightIn(min = rowMinHeight),
-                verticalAlignment = Alignment.CenterVertically,
+                    .heightIn(min = rowMinHeight)
+                    .padding(bottom = TabLabelToBarGap),
+                verticalAlignment = Alignment.Bottom,
             ) {
                 tabs.forEachIndexed { index, tab ->
                     val selectedTab = tab.id == selected.id
                     val interaction = remember(tab.id) { MutableInteractionSource() }
-                    Text(
-                        text = tab.label,
-                        style = OrbitTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Medium,
-                        ),
-                        color = if (selectedTab) content.textPrimary else content.textTertiary,
-                        maxLines = 1,
+                    Box(
                         modifier = Modifier
                             .padding(end = if (index < tabs.lastIndex) itemGap else spacing.none)
                             .heightIn(min = rowMinHeight)
@@ -143,7 +136,17 @@ fun OrbitTabBar(
                                 onClick = { onSelect(tab.id) },
                             )
                             .semantics { contentDescription = tab.label },
-                    )
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        Text(
+                            text = tab.label,
+                            style = OrbitTheme.typography.titleMedium.copy(
+                                fontWeight = OrbitTheme.fontWeights.title,
+                            ),
+                            color = if (selectedTab) content.textPrimary else content.textTertiary,
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
 
@@ -183,5 +186,6 @@ fun OrbitTabBar(
 }
 
 private const val IndicatorMs = 180
-private val TabUnderlineHeight = 2.5.dp
-private val TabUnderlineInset = 4.dp
+private val TabUnderlineHeight = 2.dp
+private val TabUnderlineInset = 2.dp
+private val TabLabelToBarGap = 2.dp

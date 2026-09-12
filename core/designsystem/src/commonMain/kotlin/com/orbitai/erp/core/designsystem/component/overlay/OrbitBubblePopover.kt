@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -239,7 +238,7 @@ fun OrbitBubblePopover(
                         // because a panel that appears over other content has to say what it is
                         // before it says anything else.
                         style = OrbitTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = OrbitTheme.fontWeights.heading,
                         color = contentColors.textPrimary,
                         modifier = Modifier.weight(1f),
                     )

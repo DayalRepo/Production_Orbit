@@ -23,7 +23,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -174,7 +173,7 @@ fun OrbitDropdownField(
             Text(
                 text = selected ?: placeholder,
                 style = base,
-                fontWeight = FontWeight.Medium,
+                fontWeight = OrbitTheme.fontWeights.title,
                 color = if (selected != null) ink else hint,
                 modifier = Modifier
                     .weight(1f)

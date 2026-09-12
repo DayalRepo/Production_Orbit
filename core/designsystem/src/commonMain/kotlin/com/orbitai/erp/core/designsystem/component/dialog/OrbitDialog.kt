@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
@@ -133,7 +132,7 @@ fun OrbitDialog(
                     style = OrbitTheme.typography.titleMedium,
                     // Medium rather than the tier's default. Bold at this size reads as an alert,
                     // which is the wrong register for a dialog that is only asking for a name.
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = OrbitTheme.fontWeights.title,
                     color = contentColors.textPrimary,
                     modifier = Modifier.weight(1f),
                 )

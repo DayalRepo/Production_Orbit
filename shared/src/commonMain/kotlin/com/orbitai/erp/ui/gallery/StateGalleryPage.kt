@@ -35,14 +35,14 @@ internal fun StateGalleryPage() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
 
-    GallerySection("Skeleton · a list still loading") {
+    GallerySection("Skeleton") {
         OrbitCard(padding = spacing.md) {
             OrbitSkeletonList(rows = 3)
         }
     }
 
     // Confirm / rename / create / bare shell side by side: the differences are the whole design.
-    GallerySection("Dialogs · glass, over a dimmed screen") {
+    GallerySection("Dialogs") {
         GalleryFlow {
             var open by remember { mutableStateOf<String?>(null) }
 

@@ -26,7 +26,7 @@ internal fun AssignGalleryPage() {
     var siteSelected by remember { mutableStateOf(setOf("se-1", "se-2", "se-3", "se-4")) }
     var contractorSelected by remember { mutableStateOf(setOf("c-1", "c-2", "c-3", "c-4", "c-5")) }
 
-    GallerySection("Assign · site engineer") {
+    GallerySection("Assign") {
         OrbitAssignField(
             selectedIds = siteSelected,
             members = siteEngineers,
@@ -38,7 +38,7 @@ internal fun AssignGalleryPage() {
         )
     }
 
-    GallerySection("Assign · contractor") {
+    GallerySection("Assign contractor") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
             OrbitAssignField(
                 selectedIds = contractorSelected,

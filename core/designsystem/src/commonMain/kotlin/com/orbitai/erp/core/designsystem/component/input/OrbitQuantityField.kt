@@ -8,7 +8,6 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -31,7 +30,6 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -175,7 +173,7 @@ fun OrbitQuantityField(
                             },
                             textStyle = textStyle.copy(
                                 color = ink,
-                                fontWeight = FontWeight.Medium,
+                                fontWeight = OrbitTheme.fontWeights.title,
                                 textAlign = TextAlign.Center,
                             ),
                             singleLine = true,
@@ -199,7 +197,7 @@ fun OrbitQuantityField(
                 Text(
                     text = value.toString(),
                     style = textStyle,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = OrbitTheme.fontWeights.title,
                     color = ink,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -234,7 +232,7 @@ internal fun QuantityStepperButton(
     Box(
         modifier = Modifier
             .size(sizing.minTouchTarget)
-            .clip(CircleShape)
+            .clip(OrbitTheme.shapeTokens.avatar)
             .then(
                 if (enabled) {
                     Modifier
@@ -258,13 +256,10 @@ internal fun QuantityStepperButton(
             size = iconSize,
             tint = if (enabled) content.iconPrimary else content.iconDisabled,
             contentDescription = null,
-            minimumStroke = StepperIconStroke,
+            minimumStroke = sizing.iconStrokeSm,
         )
     }
 }
-
-/** Heavier stroke so the bare +/- glyphs read clearly without a square container behind them. */
-private val StepperIconStroke = 1.5.dp
 
 /**
  * Whether [draft] is a quantity this field would accept.

@@ -20,11 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.orbitai.erp.core.designsystem.component.brand.OrbitLauncherIconDefaults
 import com.orbitai.erp.core.designsystem.component.brand.OrbitMark
+import com.orbitai.erp.core.designsystem.component.brand.OrbitMarkDefaults
 import com.orbitai.erp.core.designsystem.component.button.OrbitCopyButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonSize
@@ -70,14 +69,10 @@ fun OrbitAiBriefCard(
     val control = OrbitTheme.controlColors
     val dark = OrbitTheme.isDark
     val linkInk = if (dark) OrbitPalette.Blue80 else OrbitPalette.Blue50
-    val markColor = if (dark) {
-        OrbitLauncherIconDefaults.DarkMark
-    } else {
-        OrbitLauncherIconDefaults.LightMark
-    }
+    val markColor = OrbitMarkDefaults.color()
     val plain = remember(markdown) { orbitMarkdownPlainText(markdown) }
     val bodyStyle = OrbitTheme.typography.bodyMedium.copy(
-        fontWeight = OrbitTheme.typography.titleMedium.fontWeight,
+        fontWeight = OrbitTheme.fontWeights.title,
     )
 
     var textExpanded by remember(markdown) { mutableStateOf(false) }
@@ -165,7 +160,7 @@ fun OrbitAiBriefCard(
                     Text(
                         text = "Show less",
                         style = OrbitTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = OrbitTheme.fontWeights.title,
                         ),
                         color = linkInk,
                         modifier = Modifier
@@ -177,7 +172,7 @@ fun OrbitAiBriefCard(
                     Text(
                         text = "Show more",
                         style = OrbitTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = OrbitTheme.fontWeights.title,
                         ),
                         color = linkInk,
                         modifier = Modifier

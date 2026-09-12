@@ -161,18 +161,18 @@ data class OrbitControlColors(
 /**
  * Light theme.
  *
- * The filled container is `#1A1C1E`, the same deep charcoal the house rules specify for primary
- * text, rather than black — see the class doc.
+ * The filled container is `#1C1C1E`, the same deep charcoal as primary text, rather than black —
+ * see the class doc.
  */
 internal val OrbitLightControlColors = OrbitControlColors(
-    actionContainer = Color(0xFF1A1C1E),
-    onActionContainer = Color(0xFFF7F7F8),
-    controlContainer = Color(0x141A1C1E),
+    actionContainer = Color(0xFF1C1C1E),
+    onActionContainer = Color(0xFFF2F2F7),
+    controlContainer = Color(0x141C1C1E),
     controlBorder = Color(0xFFE2E2E6),
-    controlContent = Color(0xFF1A1C1E),
+    controlContent = Color(0xFF1C1C1E),
     ringContainer = Color(0xB8FFFFFF),
     cardContainer = Color(0xFFFFFFFF),
-    outlineBorder = Color(0x471A1C1E),
+    outlineBorder = Color(0x471C1C1E),
     insetContainer = Color(0xFFF2F2F7),
     dividerSubtle = Color(0xFFF2F2F7),
     dividerElevated = Color(0xFFE2E2E6),
@@ -182,11 +182,11 @@ internal val OrbitLightControlColors = OrbitControlColors(
 
 /** Dark theme, with the polarity of [actionContainer] flipped. */
 internal val OrbitDarkControlColors = OrbitControlColors(
-    actionContainer = Color(0xFFE3E2E6),
-    onActionContainer = Color(0xFF16191D),
-    controlContainer = Color(0x1FE3E2E6),
-    controlBorder = Color(0xFF3F3F3F),
-    controlContent = Color(0xFFE3E2E6),
+    actionContainer = Color(0xFFF2F2F7),
+    onActionContainer = Color(0xFF1C1C1E),
+    controlContainer = Color(0x1FF2F2F7),
+    controlBorder = Color(0xFF3F3F46),
+    controlContent = Color(0xFFF2F2F7),
     // Black, not grey — the dark ring deepens where the light one lightens.
     //
     // This was a pale grey (`0x2EA8A8AC`) on the reasoning that glass is a lightening material, and
@@ -201,13 +201,13 @@ internal val OrbitDarkControlColors = OrbitControlColors(
     // to match the glyph — and by the contact shadow, both of which are position and material cues
     // rather than a wash.
     ringContainer = Color(0x33000000),
-    cardContainer = Color(0xFF1C1C1C),
-    outlineBorder = Color(0x5CE3E2E6),
-    insetContainer = Color(0xFF2C2C2C),
-    dividerSubtle = Color(0xFF2C2C2C),
-    dividerElevated = Color(0xFF555555),
+    cardContainer = Color(0xFF1C1C1E),
+    outlineBorder = Color(0x5CF2F2F7),
+    insetContainer = Color(0xFF2C2C2E),
+    dividerSubtle = Color(0xFF2C2C2E),
+    dividerElevated = Color(0xFF55555A),
     borderFocus = Color(0xFF0A84FF),
-    interactiveContainer = Color(0xFF3A3A3A),
+    interactiveContainer = Color(0xFF3A3A3C),
 )
 
 val OrbitTheme.controlColors: OrbitControlColors

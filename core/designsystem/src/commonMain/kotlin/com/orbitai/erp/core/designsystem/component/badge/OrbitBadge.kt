@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,7 +43,7 @@ enum class OrbitBadgeEmphasis {
 enum class OrbitBadgeSize { Small, Medium, Large }
 
 /**
- * A non-interactive status pill: full-radius, optional leading glyph, tinted per [tone].
+ * A non-interactive status chip: modestly rounded, optional leading glyph, tinted per [tone].
  *
  * Three things about this component are load-bearing rather than cosmetic.
  *
@@ -81,6 +81,7 @@ fun OrbitBadge(
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
     val colors = tone.colors
+    val shape = OrbitTheme.shapeTokens.badge
 
     val minHeight = when (size) {
         OrbitBadgeSize.Small -> sizing.badgeHeightSm
@@ -115,7 +116,7 @@ fun OrbitBadge(
     val surface: Modifier = when (emphasis) {
         OrbitBadgeEmphasis.Glass -> Modifier.orbitGlass(
             fill = colors.container,
-            shape = CircleShape,
+            shape = shape,
             highlightAlpha = if (OrbitTheme.isDark) {
                 OrbitGlass.BadgeHighlightDark
             } else {
@@ -128,14 +129,14 @@ fun OrbitBadge(
         // glass cue left is a faint highlight to stop it looking like a flat sticker.
         OrbitBadgeEmphasis.Solid -> Modifier.orbitGlass(
             fill = colors.solidContainer,
-            shape = CircleShape,
+            shape = shape,
             highlightAlpha = OrbitGlass.ButtonHighlightDark,
             sheen = 1f,
         )
         OrbitBadgeEmphasis.Outline -> Modifier.border(
             width = sizing.border,
             color = colors.label,
-            shape = CircleShape,
+            shape = shape,
         )
     }
 
@@ -150,11 +151,12 @@ fun OrbitBadge(
                     Modifier
                 } else {
                     Modifier.orbitGlassShadow(
-                        shape = CircleShape,
+                        shape = shape,
                         elevation = sizing.shadowBadge,
                     )
                 },
             )
+            .clip(shape)
             .then(surface)
             .padding(horizontal = horizontalPadding, vertical = spacing.xs)
             .semantics(mergeDescendants = true) {},

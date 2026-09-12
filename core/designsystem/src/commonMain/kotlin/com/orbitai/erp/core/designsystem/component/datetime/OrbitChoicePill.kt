@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
@@ -88,7 +87,11 @@ internal fun OrbitChoicePill(
         Text(
             text = label,
             style = OrbitTheme.typography.bodyMedium,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+            fontWeight = if (selected) {
+                OrbitTheme.fontWeights.heading
+            } else {
+                OrbitTheme.fontWeights.title
+            },
             color = when {
                 selected -> control.onActionContainer
                 !enabled -> content.textDisabled

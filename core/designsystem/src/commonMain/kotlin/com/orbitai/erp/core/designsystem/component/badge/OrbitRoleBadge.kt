@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
@@ -54,7 +53,7 @@ object OrbitRoleBadgeDefaults {
             )
         }
 
-    /** Softened corners — not a full pill. */
+    /** Full pill, matching status badges. */
     val shape
         @Composable
         @ReadOnlyComposable
@@ -64,8 +63,8 @@ object OrbitRoleBadgeDefaults {
 /**
  * Capital role short form (CEO, PM, SE, CONTR, …) in a rounded rectangle chip.
  *
- * Deliberately not [OrbitBadge]: status pills are full-radius and tinted by tone; this chip is a
- * black/white identity mark with a fixed corner radius, glass sheen and badge shadow.
+ * Deliberately not [OrbitBadge]: status chips are tinted by tone; this chip is a
+ * black/white identity mark with the same pill, glass sheen and badge shadow.
  */
 @Composable
 fun OrbitRoleBadge(
@@ -99,7 +98,7 @@ fun OrbitRoleBadge(
     ) {
         Text(
             text = label,
-            style = OrbitTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
+            style = OrbitTheme.typography.labelMedium.copy(fontWeight = OrbitTheme.fontWeights.title),
             color = colors.label,
             maxLines = 1,
         )

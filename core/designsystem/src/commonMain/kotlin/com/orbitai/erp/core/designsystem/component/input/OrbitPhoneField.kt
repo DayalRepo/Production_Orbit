@@ -35,7 +35,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -139,7 +138,7 @@ fun OrbitPhoneField(
                 Text(
                     text = country.dialCode,
                     style = base,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = OrbitTheme.fontWeights.title,
                     color = ink,
                     maxLines = 1,
                     modifier = Modifier.clearAndSetSemantics {},
@@ -192,7 +191,7 @@ fun OrbitPhoneField(
                         },
                         enabled = enabled,
                         singleLine = true,
-                        textStyle = base.copy(color = ink, fontWeight = FontWeight.Medium),
+                        textStyle = base.copy(color = ink, fontWeight = OrbitTheme.fontWeights.title),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         keyboardActions = keyboardActions,
                         visualTransformation = OrbitPhoneGroupingTransformation,

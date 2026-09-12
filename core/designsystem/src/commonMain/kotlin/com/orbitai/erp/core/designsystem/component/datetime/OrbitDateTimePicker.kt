@@ -204,7 +204,7 @@ private fun PickerFooter(
             // person just picked; a grey Cancel beside a filled Schedule also left the pair looking
             // like one button and one label.
             variant = OrbitButtonVariant.Destructive,
-            size = OrbitButtonSize.Small,
+            size = OrbitButtonSize.Medium,
             icon = OrbitIcons.Cancel,
             state = if (onCancel != null) OrbitButtonState.Active else OrbitButtonState.Disabled,
             modifier = Modifier.weight(1f),
@@ -214,7 +214,7 @@ private fun PickerFooter(
             label = confirmLabel,
             onClick = onConfirm,
             variant = OrbitButtonVariant.Primary,
-            size = OrbitButtonSize.Small,
+            size = OrbitButtonSize.Medium,
             icon = OrbitIcons.CalendarSchedule,
             state = if (confirmEnabled) OrbitButtonState.Active else OrbitButtonState.Disabled,
             modifier = Modifier.weight(1f),

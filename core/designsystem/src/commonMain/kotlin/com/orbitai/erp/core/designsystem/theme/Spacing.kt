@@ -287,23 +287,19 @@ data class OrbitSizing(
      * what makes it read as a lens over the surface rather than as a badge crowding its contents. A
      * tight ring looks like a bug in the padding.
      *
-     * These are the visible circle, not the hit area; the hit area is `max(diameter, minTouchTarget)`,
-     * which is why the small ring is allowed to be 36dp.
+     * These are the visible box, not the hit area; the hit area is `max(box, minTouchTarget)`.
+     * Matched to labelled button heights so an icon button beside an Approve reads as the same size.
      */
     val iconButtonSm: Dp = 32.dp,
-    val iconButtonMd: Dp = 38.dp,
-    val iconButtonLg: Dp = 44.dp,
+    val iconButtonMd: Dp = 40.dp,
+    val iconButtonLg: Dp = 48.dp,
 
     /**
-     * The glyph inside the ring.
-     *
-     * Small relative to the ring, which is deliberate: the clear space is the component. These sizes
-     * would draw a stroke of 1.2 to 1.5dp if the vector were left to scale on its own, so they are
-     * always rendered through `OrbitGlyph`, which lifts the stroke back to the platform floor.
+     * The glyph inside the box. Same ladder as labelled-button icons so the two families match.
      */
-    val iconButtonGlyphSm: Dp = 18.dp,
-    val iconButtonGlyphMd: Dp = 20.dp,
-    val iconButtonGlyphLg: Dp = 22.dp,
+    val iconButtonGlyphSm: Dp = 16.dp,
+    val iconButtonGlyphMd: Dp = 18.dp,
+    val iconButtonGlyphLg: Dp = 20.dp,
 
     /**
      * Minimum heights for a text field, one per size.
@@ -322,6 +318,12 @@ data class OrbitSizing(
     val fieldHeightMd: Dp = 56.dp,
     val fieldHeightLg: Dp = 64.dp,
 
+    /**
+     * One OTP digit cell. Matches the small field / Android touch floor so six cells stay hittable
+     * without shrinking below the rest of the form.
+     */
+    val otpCellSize: Dp = 48.dp,
+
     /** Horizontal padding inside a field, paired with the heights above. */
     val fieldPaddingSm: Dp = 12.dp,
     val fieldPaddingMd: Dp = 16.dp,
@@ -329,10 +331,7 @@ data class OrbitSizing(
 
     val listRowMinHeight: Dp = 64.dp,
 
-    /**
-     * Minimum height of [com.orbitai.erp.core.designsystem.component.navigation.OrbitTopAppBar].
-     * Matches the medium field tier so title rows and form fields share one vertical rhythm.
-     */
+    /** Title-row height, matched to the medium field tier. */
     val appBarHeight: Dp = 56.dp,
 
     /**
@@ -657,7 +656,7 @@ data class OrbitSizing(
      * 1.8-unit stroke would land near 2dp and look heavy in a floating glass bar. Cap it here so
      * size can grow without the line weight growing with it.
      */
-    val bottomNavIconStroke: Dp = 1.45.dp,
+    val bottomNavIconStroke: Dp = 1.25.dp,
     /**
      * Inset from the pill's curved ends to the outer icon slots.
      *
@@ -683,10 +682,10 @@ data class OrbitSizing(
     /**
      * Contact shadow under the pill and circle.
      *
-     * Raised a step so the floating nav casts a soft, centred fall below the bar rather than a
-     * hairline Material rim. Auth Continue / Verify reuse this token so CTAs match the nav weight.
+     * Softer than [shadowIconButton] / `elevation.bottomBar` — those were tuned for small rings, and
+     * at bar size a 3dp shadow reads as a drop rather than as glass resting on the page.
      */
-    val bottomNavShadow: Dp = 6.dp,
+    val bottomNavShadow: Dp = 2.dp,
     /**
      * Air between the bar and the platform gesture / navigation bar.
      *

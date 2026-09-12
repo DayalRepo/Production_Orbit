@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.Role
@@ -286,15 +285,10 @@ private fun NavGlyph(
 ) {
     val sizing = OrbitTheme.sizing
     val control = OrbitTheme.controlColors
+    val icons = OrbitTheme.contentColors
     val dark = OrbitTheme.isDark
     val interaction = remember(item.id) { MutableInteractionSource() }
-    // Stronger tints than global icon tokens so inactive tabs stay readable without thickening stroke.
-    val tint = when {
-        selected && dark -> Color(0xFFFFFFFF)
-        selected && !dark -> Color(0xFF000000)
-        dark -> Color(0xFFC7C7CC)
-        else -> Color(0xFF636366)
-    }
+    val tint = if (selected) icons.iconPrimary else icons.iconInactive
 
     Box(
         modifier = modifier

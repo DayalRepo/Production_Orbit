@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
@@ -23,7 +22,7 @@ import com.orbitai.erp.core.designsystem.component.brand.OrbitLauncherIcon
 import com.orbitai.erp.core.designsystem.component.brand.OrbitNavBrandMark
 import com.orbitai.erp.core.designsystem.component.brand.OrbitOpeningMark
 import com.orbitai.erp.core.designsystem.component.brand.OrbitSplashScreen
-import com.orbitai.erp.core.designsystem.component.brand.OrbitLauncherIconDefaults
+import com.orbitai.erp.core.designsystem.component.brand.OrbitMarkDefaults
 import com.orbitai.erp.core.designsystem.component.button.OrbitButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -35,28 +34,22 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 internal fun BrandGalleryPage() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
-    val openingColor = OrbitLauncherIconDefaults.LightMark
+    val openingColor = OrbitMarkDefaults.color()
 
 
-    GallerySection("Brand · marks") {
+    GallerySection("Brand") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-            Text(
-                text = "Three reusable mark components — launcher plate, splash letter O, and " +
-                    "bottom-nav AI glyph. Shared geometry lives in OrbitMark.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(spacing.xl),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                BrandSample(label = "Launcher") {
+                BrandSample {
                     OrbitLauncherIcon(size = 64.dp)
                 }
-                BrandSample(label = "Opening") {
+                BrandSample {
                     OrbitOpeningMark(color = openingColor)
                 }
-                BrandSample(label = "Nav AI") {
+                BrandSample {
                     OrbitNavBrandMark(
                         size = 22.dp,
                         color = content.iconPrimary,
@@ -67,23 +60,17 @@ internal fun BrandGalleryPage() {
                 horizontalArrangement = Arrangement.spacedBy(spacing.xl),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                BrandSample(label = "Launcher light") {
+                BrandSample {
                     OrbitLauncherIcon(size = 64.dp, darkPlate = false)
                 }
             }
         }
     }
 
-    GallerySection("Splash screen · replay") {
+    GallerySection("Splash") {
         var generation by remember { mutableIntStateOf(0) }
         var playing by remember { mutableStateOf(false) }
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            Text(
-                text = "Tap Replay to run the opening beat. Idle preview is a static mark — " +
-                    "auto-play here after the real splash was a crash path on cold start.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -116,7 +103,6 @@ internal fun BrandGalleryPage() {
 
 @Composable
 private fun BrandSample(
-    label: String,
     content: @Composable () -> Unit,
 ) {
     Column(
@@ -124,10 +110,5 @@ private fun BrandSample(
         verticalArrangement = Arrangement.spacedBy(OrbitTheme.spacing.sm),
     ) {
         content()
-        Text(
-            text = label,
-            style = OrbitTheme.typography.labelSmall,
-            color = OrbitTheme.contentColors.textSecondary,
-        )
     }
 }

@@ -18,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import com.orbitai.erp.core.designsystem.component.button.OrbitButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonSize
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
@@ -132,7 +131,7 @@ fun OrbitMaterialUsageLog(
         Column(verticalArrangement = Arrangement.spacedBy(spacing.xxs)) {
             Text(
                 text = title,
-                style = OrbitTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = OrbitTheme.typography.titleMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
                 color = content.textPrimary,
             )
             Text(
@@ -205,13 +204,13 @@ private fun MaterialUsageRow(
         ) {
             Text(
                 text = "Log $index",
-                style = OrbitTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                style = OrbitTheme.typography.labelLarge.copy(fontWeight = OrbitTheme.fontWeights.heading),
                 color = content.textSecondary,
             )
             if (canRemove) {
                 Text(
                     text = "Remove",
-                    style = OrbitTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                    style = OrbitTheme.typography.labelLarge.copy(fontWeight = OrbitTheme.fontWeights.heading),
                     color = danger,
                     modifier = Modifier
                         .orbitHandCursor()

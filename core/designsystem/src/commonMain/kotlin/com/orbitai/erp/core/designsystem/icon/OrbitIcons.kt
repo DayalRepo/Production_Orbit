@@ -12,7 +12,8 @@ import androidx.compose.ui.unit.dp
  * The icon set, taken from the Hugeicons free stroke-rounded collection (MIT, published as
  * `@hugeicons/core-free-icons`). Licence text is in `licenses/MIT-Hugeicons.txt`.
  *
- * Every glyph is authored on a 24x24 viewport with a 1.5-unit stroke, round caps and round joins,
+ * Every glyph is authored on a 24x24 viewport with a 1.5-unit stroke, square caps and round joins,
+ * so the set reads as straight strokes with modestly rounded corners — not fully rounded sausages.
  * which is where the set's uniform stroke weight comes from. Because the stroke is in viewport
  * units it scales with the glyph: at `iconMd` (24dp) it draws 1.5dp, at a 16dp badge icon it draws
  * 1dp. That is intended ? holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
@@ -1160,7 +1161,7 @@ private fun vector(
             pathData = PathParser().parsePathString(data).toNodes(),
             stroke = SolidColor(Color.Black),
             strokeLineWidth = STROKE_WIDTH,
-            strokeLineCap = StrokeCap.Round,
+            strokeLineCap = StrokeCap.Butt,
             strokeLineJoin = StrokeJoin.Round,
         )
     }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,7 +11,6 @@ import com.orbitai.erp.core.designsystem.component.display.OrbitDelta
 import com.orbitai.erp.core.designsystem.component.progress.OrbitDonutProgress
 import com.orbitai.erp.core.designsystem.component.progress.OrbitDonutProgressDefaults
 import com.orbitai.erp.core.designsystem.component.progress.OrbitFormPageBar
-import com.orbitai.erp.core.designsystem.component.progress.OrbitPillProgress
 import com.orbitai.erp.core.designsystem.component.progress.OrbitSegmentedProgress
 import com.orbitai.erp.core.designsystem.component.progress.OrbitStageProof
 import com.orbitai.erp.core.designsystem.component.progress.OrbitStageProofKind
@@ -25,20 +23,13 @@ import com.orbitai.erp.ui.component.progress.ProgressCard
 @Composable
 internal fun ProgressGalleryPage() {
     val spacing = OrbitTheme.spacing
-    val content = OrbitTheme.contentColors
 
-    GallerySection("Donut progress · health and progress") {
+    GallerySection("Donut progress") {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
-            Text(
-                text = "16 segments · Health = Done/delta green · Progress = soft blue · " +
-                    "glass plate + centre percent (optional caption under it).",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -60,21 +51,17 @@ internal fun ProgressGalleryPage() {
         }
     }
 
-    GallerySection("Form page bar · wizard steps") {
+    GallerySection("Form page bar") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
-            Text(
-                text = "One bar per filling page. Corner-rounded glass strips with shadow — lit through the current page.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
-            FormPageSample(pageCount = 2, currentPage = 0, caption = "2 pages · on first")
-            FormPageSample(pageCount = 3, currentPage = 1, caption = "3 pages · on second")
-            FormPageSample(pageCount = 4, currentPage = 2, caption = "4 pages · on third")
-            FormPageSample(pageCount = 5, currentPage = 4, caption = "5 pages · on last")
-            FormPageSample(pageCount = 7, currentPage = 3, caption = "7 pages · mid form")
+            FormPageSample(pageCount = 2, currentPage = 0)
+            FormPageSample(pageCount = 3, currentPage = 1)
+            FormPageSample(pageCount = 4, currentPage = 2)
+            FormPageSample(pageCount = 5, currentPage = 4)
+            FormPageSample(pageCount = 7, currentPage = 3)
         }
     }
 
+    GallerySection("Progress") {
     Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
         ProgressCard(
             label = "Progress",
@@ -94,60 +81,20 @@ internal fun ProgressGalleryPage() {
             contentDescription = "Progress, 52 percent, up 3 percent vs last week",
         )
     }
+    }
 
-    GallerySection("Rounding · the four readings that matter") {
+    GallerySection("Segmented progress") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
-            listOf(
-                0f to "0% · nothing lit",
-                0.01f to "1% · one slat, never none",
-                0.99f to "99% · one slat dark, never full",
-                1f to "100% · every slat lit",
-            ).forEach { (value, caption) ->
-                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-                    Text(
-                        text = caption,
-                        style = OrbitTheme.typography.bodySmall,
-                        color = content.textSecondary,
-                    )
-                    OrbitSegmentedProgress(
-                        progress = value,
-                        contentDescription = caption,
-                    )
-                }
+            listOf(0f, 0.01f, 0.99f, 1f).forEach { value ->
+                OrbitSegmentedProgress(
+                    progress = value,
+                    contentDescription = "Progress ${(value * 100).toInt()} percent",
+                )
             }
         }
     }
 
-    GallerySection("Pill progress · continuous fraction") {
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
-            Text(
-                text = "Single capsule fill for checklist summaries — prefer over segmented when the reading is one fraction.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
-            listOf(
-                0f to "0% · empty track",
-                0.35f to "35% · early",
-                0.72f to "72% · near complete",
-                1f to "100% · full capsule",
-            ).forEach { (value, caption) ->
-                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
-                    Text(
-                        text = caption,
-                        style = OrbitTheme.typography.bodySmall,
-                        color = content.textSecondary,
-                    )
-                    OrbitPillProgress(
-                        progress = value,
-                        contentDescription = caption,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
-        }
-    }
-
-    GallerySection("Delta chips") {
+    GallerySection("Delta") {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.sm),
@@ -168,13 +115,8 @@ internal fun ProgressGalleryPage() {
         }
     }
 
-    GallerySection("Stage proof · villa and building") {
+    GallerySection("Stage proof") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-            Text(
-                text = "High-level unit sequence from the work chart. Villa omits CA/BS; building includes both.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             OrbitStageProof(
                 kind = OrbitStageProofKind.Villa,
                 completedCount = 3,
@@ -202,13 +144,8 @@ internal fun ProgressGalleryPage() {
         }
     }
 
-    GallerySection("Step indicator · STAGES header, tap to expand") {
+    GallerySection("Step indicator") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-            Text(
-                text = "Status sub-lines follow stage vocabulary: Not started, In progress, Inspecting, Pending, Complete.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             OrbitStepIndicator(
                 steps = WorkflowNotStarted,
                 currentIndex = 0,
@@ -415,18 +352,10 @@ private val WorkflowComplete = listOf(
 private fun FormPageSample(
     pageCount: Int,
     currentPage: Int,
-    caption: String,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(OrbitTheme.spacing.xs)) {
-        OrbitFormPageBar(
-            pageCount = pageCount,
-            currentPage = currentPage,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Text(
-            text = caption,
-            style = OrbitTheme.typography.bodySmall,
-            color = OrbitTheme.contentColors.textTertiary,
-        )
-    }
+    OrbitFormPageBar(
+        pageCount = pageCount,
+        currentPage = currentPage,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }

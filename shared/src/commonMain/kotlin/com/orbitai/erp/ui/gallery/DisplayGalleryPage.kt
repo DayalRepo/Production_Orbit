@@ -64,7 +64,7 @@ internal fun DisplayGalleryPage() {
     // stack to expand it into a wrapped grid, tap a face for its details, tap the same face again
     // to close. The last two members have no photograph, so the monogram fallback is exercised at
     // the same time.
-    GallerySection("Avatar group · tap to expand, tap a face for details") {
+    GallerySection("Avatar group") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
             TeamAvatarGroup(members = crew)
 
@@ -79,7 +79,7 @@ internal fun DisplayGalleryPage() {
         }
     }
 
-    GallerySection("Avatar group · overflow and monogram fallback, static") {
+    GallerySection("Avatar group overflow") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
             OrbitAvatarGroup(members = team, size = OrbitAvatarSize.Sm)
             // Only three, so no overflow chip at all.
@@ -98,7 +98,7 @@ internal fun DisplayGalleryPage() {
         }
     }
 
-    GallerySection("Count badge · glass, on the badge tones") {
+    GallerySection("Count badge") {
         GalleryFlow {
             OrbitCountBadge(count = 1, label = "unread messages")
             OrbitCountBadge(count = 12, label = "open issues", tone = OrbitBadgeTone.Amber)
@@ -109,7 +109,7 @@ internal fun DisplayGalleryPage() {
         }
     }
 
-    GallerySection("OrbitFileUpload · drop zone and progress") {
+    GallerySection("File upload") {
         ManagedFileUpload(modifier = Modifier.fillMaxWidth())
     }
 
@@ -117,7 +117,7 @@ internal fun DisplayGalleryPage() {
     // removing one removes it, and renaming one renames it. Wired dead — `onRemove = {}` — the
     // dialogs could be opened but never answered, and the one thing worth reviewing here is what
     // happens *after* Yes.
-    GallerySection("OrbitAttachmentRow · composer, remove with confirmation") {
+    GallerySection("Attachments") {
         ManagedAttachmentList(
             initial = listOf(
                 DemoFile("1.pdf", "2 MB"),
@@ -138,7 +138,7 @@ internal fun DisplayGalleryPage() {
     // the point of showing both, since the visual difference is two glyphs and the difference in
     // consequence is total. It is also where the two confirmations can be compared side by side:
     // remove is an ordinary question, delete is a red one that will not dismiss on a stray tap.
-    GallerySection("OrbitAttachmentRow · library, rename and delete") {
+    GallerySection("Attachment library") {
         ManagedAttachmentList(
             initial = listOf(
                 DemoFile("1.pdf", "2 MB"),
@@ -153,7 +153,7 @@ internal fun DisplayGalleryPage() {
 
     // Read-only: an attachment on a saved record is evidence, not a draft. Download is the only
     // action offered.
-    GallerySection("Attachments · read only") {
+    GallerySection("Attachment read only") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
             FileAttachmentRow(
                 fileName = "signed-challan.pdf",

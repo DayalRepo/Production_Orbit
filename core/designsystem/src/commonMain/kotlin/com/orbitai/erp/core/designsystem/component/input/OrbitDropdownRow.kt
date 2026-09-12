@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,11 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
-import com.orbitai.erp.core.designsystem.theme.OrbitAlpha
+import com.orbitai.erp.core.designsystem.theme.OrbitBadgeTone
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.colors
 
@@ -79,7 +76,7 @@ fun OrbitDropdownRow(
             style = OrbitTheme.typography.bodyLarge,
             // Constant across every row, selected or not. See above for why the selected row does
             // not get heavier.
-            fontWeight = FontWeight.Medium,
+            fontWeight = OrbitTheme.fontWeights.title,
             color = if (enabled) content.textPrimary else content.textDisabled,
             // Stage and unit names wrap rather than ellipsize — the full string is what gets ordered.
             maxLines = Int.MAX_VALUE,
@@ -100,7 +97,11 @@ fun OrbitDropdownRow(
             OrbitGlyph(
                 icon = OrbitIcons.Tick,
                 size = sizing.iconSm,
-                tint = if (enabled) content.iconPrimary else content.iconPrimary.copy(alpha = OrbitAlpha.Disabled),
+                tint = if (enabled) {
+                    OrbitBadgeTone.Green.colors.icon
+                } else {
+                    content.iconDisabled
+                },
                 contentDescription = null,
                 minimumStroke = sizing.iconStrokeLight,
             )

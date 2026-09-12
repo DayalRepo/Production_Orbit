@@ -40,7 +40,7 @@ internal fun AvatarGalleryPage(
         Res.drawable.avatar_01,
     )
 
-    GallerySection("Avatar tiers · Xs to Xl") {
+    GallerySection("Avatars") {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.md),
@@ -56,7 +56,7 @@ internal fun AvatarGalleryPage(
         }
     }
 
-    GallerySection("Avatar fallback · initials") {
+    GallerySection("Avatar initials") {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.md),
@@ -73,7 +73,7 @@ internal fun AvatarGalleryPage(
         }
     }
 
-    GallerySection("Account menu · name, role badge, mobile") {
+    GallerySection("Account menu") {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.xl),

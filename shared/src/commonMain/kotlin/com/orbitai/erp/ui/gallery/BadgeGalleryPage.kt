@@ -16,7 +16,7 @@ import com.orbitai.erp.ui.component.badge.StatusBadge
 @Composable
 internal fun BadgeGalleryPage() {
     Column(verticalArrangement = Arrangement.spacedBy(OrbitTheme.spacing.xxl)) {
-        GallerySection("Badges · ${BadgeKind.entries.size} kinds") {
+        GallerySection("Badges") {
             GalleryFlow {
                 BadgeKind.entries.forEach { StatusBadge(kind = it) }
             }
@@ -36,7 +36,7 @@ internal fun BadgeGalleryPage() {
             }
         }
 
-        GallerySection("Role short form · light/dark glass chip") {
+        GallerySection("Role badges") {
             GalleryFlow {
                 UserRole.entries.forEach { role ->
                     OrbitRoleBadge(label = role.shortLabel)

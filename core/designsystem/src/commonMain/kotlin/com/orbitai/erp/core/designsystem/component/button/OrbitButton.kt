@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -128,7 +127,7 @@ enum class OrbitButtonIconPosition {
  * button grows and the label wraps rather than being clipped (WCAG 1.4.4). There is also a minimum
  * width, without which a two-letter label renders as a near-square.
  *
- * The shape is a 12dp rounded rectangle on both platforms, not a pill — see `OrbitShapeTokens`.
+ * The shape is a full pill on both platforms — see `OrbitShapeTokens.button`.
  *
  * ### Surface
  *
@@ -206,14 +205,8 @@ fun OrbitButton(
         else -> null
     }
 
-    // Light-theme see-through glass (~26% alpha) over a pale page washes to white — the page shows
-    // through the hole. Frost keeps the glass stack (sheen + highlight + rim) but lifts the tint to
-    // near-opaque so it reads as frosted glass, not a transparent window onto white.
-    // Dark theme keeps the soft translucent container (it already reads as glass on dark pages).
-    // [solid] remains an explicit override for opaque brand fill + on-solid ink.
     val container = when {
         tone != null && solid -> tone.solidContainer
-        tone != null && !isDark -> frostedTonalFill(tone.container)
         tone != null -> tone.container
         variant == OrbitButtonVariant.Secondary -> control.controlContainer
         else -> Color.Transparent
@@ -259,7 +252,11 @@ fun OrbitButton(
         // SemiBold at Small, Medium above it. Stroke weight is what carries a short label at small
         // sizes: "Open" at Medium weight inside a light blue chip reads as a caption on a shape,
         // and the fix is more ink rather than more pixels.
-        fontWeight = size.pick(FontWeight.SemiBold, FontWeight.Medium, FontWeight.Medium),
+        fontWeight = size.pick(
+            OrbitTheme.fontWeights.heading,
+            OrbitTheme.fontWeights.title,
+            OrbitTheme.fontWeights.title,
+        ),
         // Tracking runs the opposite way to weight, and both are corrections for the same thing.
         //
         // The house default is 0, set deliberately for body text. A button label is not body text:
@@ -292,11 +289,11 @@ fun OrbitButton(
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
 
-    // Soft specular on glass; solid CTAs and [glassHighlight]=false skip the white wash.
+    // Badge highlight: these are badge tones on a badge fill, verified against this gradient.
     val baseHighlight = when {
         resolvedSolid || !glassHighlight -> 0f
-        isDark -> OrbitGlass.ButtonHighlightDark
-        else -> OrbitGlass.ButtonHighlightLight
+        isDark -> OrbitGlass.BadgeHighlightDark
+        else -> OrbitGlass.BadgeHighlightLight
     }
     val highlight by animateFloatAsState(
         targetValue = when {
@@ -459,13 +456,3 @@ private data class Dim(val container: Float, val ring: Float, val content: Float
 
 /** Hover animation duration for glass highlight lift. */
 private const val HoverMs = 120
-
-/**
- * Near-opaque frost of a translucent tonal fill.
- *
- * Keeps the RGB of the soft glass tint but raises alpha so a pale page cannot show through as
- * white. True backdrop blur is not used (no cross-platform frosted-glass API at minSdk 24); this
- * is the frosted-pane read the glass stack was designed around.
- */
-private fun frostedTonalFill(tint: Color): Color =
-    Color(red = tint.red, green = tint.green, blue = tint.blue, alpha = 0.92f)

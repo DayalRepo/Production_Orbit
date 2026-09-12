@@ -26,22 +26,17 @@ import com.orbitai.erp.core.designsystem.component.container.OrbitVerticalScroll
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 
 /**
- * Arrowed track scrollbars — the chrome used beside long menus and attachment strips.
+ * Track-and-thumb scrollbars beside long menus and attachment strips.
  *
- * Worth scrolling on a device: thumb travel, arrow steps, and light/dark track contrast.
+ * Worth scrolling on a device: thumb travel and light/dark glass contrast.
  */
 @Composable
 internal fun ScrollbarGalleryPage() {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
 
-    GallerySection("Vertical scrollbar · menu chrome") {
+    GallerySection("Vertical scrollbar") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            Text(
-                text = "Arrows step ~one viewport. Thumb is positional only — flick the list to travel.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             OrbitCard(padding = spacing.sm) {
                 val scroll = rememberScrollState()
                 Row(
@@ -78,13 +73,8 @@ internal fun ScrollbarGalleryPage() {
         }
     }
 
-    GallerySection("Horizontal scrollbar · strip chrome") {
+    GallerySection("Horizontal scrollbar") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            Text(
-                text = "Same chrome on its side — used under composer attachment strips.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             OrbitCard(padding = spacing.sm) {
                 val scroll = rememberScrollState()
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -123,13 +113,8 @@ internal fun ScrollbarGalleryPage() {
         }
     }
 
-    GallerySection("Lazy scrollbar · item-step arrows") {
+    GallerySection("Lazy scrollbar") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            Text(
-                text = "Same chrome for LazyColumn / LazyRow — arrows move one item. Used in time pickers.",
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
             OrbitCard(padding = spacing.sm) {
                 val listState = rememberLazyListState()
                 Row(

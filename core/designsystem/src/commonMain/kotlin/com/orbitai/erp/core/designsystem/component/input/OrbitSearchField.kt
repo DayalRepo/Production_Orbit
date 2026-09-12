@@ -28,7 +28,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
@@ -46,11 +45,8 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
  * It very nearly is, and the two share [OrbitFieldShell] so the glass, rim and focus behaviour
  * cannot drift apart. What differs is worth a separate component:
  *
- * - **The shape is a pill**, where a text field is a 10dp rounded rectangle. That is the one piece
- *   of shape vocabulary this product spends on meaning: rounded rectangles are things you fill in,
- *   pills are things you act with. A search box is closer to a control than to a form field — you
- *   type into it to *do* something immediately, not to record a value — and every platform has
- *   converged on the pill for exactly that reason.
+ * - **The shape is a pill**, where a text field is a modest rounded rectangle. Search is closer
+ *   to a control than a form field — you type to *do* something immediately.
  * - **It clears itself.** A trailing ✕ appears once there is a query, because backspacing out of a
  *   search term is a chore and abandoning a search is the most common thing anyone does with one.
  * - **The IME action is Search**, so the on-screen keyboard offers a search key rather than a
@@ -77,7 +73,7 @@ fun OrbitSearchField(
 
     val minHeight = size.pick(sizing.fieldHeightSm, sizing.fieldHeightMd, sizing.fieldHeightLg)
     val padding = size.pick(sizing.fieldPaddingSm, sizing.fieldPaddingMd, sizing.fieldPaddingLg)
-    val glyph = size.pick(sizing.iconSm, sizing.iconMd, sizing.iconMd)
+    val glyph = sizing.iconSm
 
     val base: TextStyle = size.pick(
         // A Small search field takes the same type as a Medium one. The size step exists to make the
@@ -99,7 +95,6 @@ fun OrbitSearchField(
 
     OrbitFieldShell(
         interactionSource = interactionSource,
-        // The one shape difference from a text field, and the reason this is its own component.
         shape = OrbitTheme.shapeTokens.chip,
         minHeight = minHeight,
         horizontalPadding = padding,
@@ -114,7 +109,7 @@ fun OrbitSearchField(
         OrbitGlyph(
             icon = OrbitIcons.Search,
             size = glyph,
-            tint = hint,
+            tint = if (enabled) content.iconInactive else content.iconDisabled,
             contentDescription = null,
             // Beside type, so the full stroke floor. The lighter weights are for glyphs standing
             // alone; this one has a line of body text next to it to hold its own against.
@@ -144,7 +139,7 @@ fun OrbitSearchField(
                     enabled = enabled,
                     // A step heavier than the placeholder, so a live query does not read as the
                     // hint it replaced.
-                    textStyle = base.copy(color = ink, fontWeight = FontWeight.Medium),
+                    textStyle = base.copy(color = ink, fontWeight = OrbitTheme.fontWeights.title),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { onSearch?.invoke() }),
                     singleLine = true,
@@ -187,7 +182,7 @@ fun OrbitSearchField(
                 OrbitGlyph(
                     icon = OrbitIcons.Cancel,
                     size = glyph,
-                    tint = hint,
+                    tint = content.iconInactive,
                     contentDescription = null,
                     minimumStroke = sizing.iconStrokeLight,
                     modifier = Modifier.clearAndSetSemantics {},

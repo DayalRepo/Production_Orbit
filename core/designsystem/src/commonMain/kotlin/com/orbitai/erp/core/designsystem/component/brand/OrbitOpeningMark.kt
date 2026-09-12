@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 fun OrbitOpeningMark(
     modifier: Modifier = Modifier,
     size: Dp = OrbitOpeningLockup.MarkSize,
-    color: Color = OrbitLauncherIconDefaults.LightMark,
+    color: Color = OrbitMarkDefaults.color(),
     contentDescription: String? = "Orbit.ai",
     spread: Float = 1f,
 ) {
@@ -35,7 +35,7 @@ fun OrbitOpeningMark(
  * Brand-intro horizontal lockup sizes.
  *
  * - Mark: 72dp capital O
- * - Word: 44sp light (300)
+ * - Word: 44sp display weight in theme ink
  * - Gap: lettermark kerning; whole lockup stays screen-centred
  */
 object OrbitOpeningLockup {

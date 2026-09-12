@@ -21,11 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
@@ -253,7 +251,11 @@ private fun RowScope.DayCell(
             Text(
                 text = date.day.toString(),
                 style = OrbitTheme.typography.bodyMedium,
-                fontWeight = if (endpoint || isToday) FontWeight.SemiBold else FontWeight.Normal,
+                fontWeight = if (endpoint || isToday) {
+                    OrbitTheme.fontWeights.heading
+                } else {
+                    OrbitTheme.fontWeights.body
+                },
                 color = when {
                     endpoint -> control.onActionContainer
                     !selectable -> content.textDisabled
@@ -301,7 +303,8 @@ private fun RangeRail(
     }
 }
 
-private val MarkerShape = RoundedCornerShape(percent = 50)
+private val MarkerShape
+    @Composable get() = OrbitTheme.shapeTokens.badge
 
 private const val DaysPerWeek = 7
 private const val RangeRailAlpha = 0.18f

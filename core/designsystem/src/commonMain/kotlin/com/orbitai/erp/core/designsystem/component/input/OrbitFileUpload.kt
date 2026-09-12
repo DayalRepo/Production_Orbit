@@ -16,8 +16,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -37,7 +35,6 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -188,7 +185,7 @@ fun OrbitFileUploadDropZone(
         Text(
             text = title,
             style = OrbitTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
+            fontWeight = OrbitTheme.fontWeights.title,
             color = content.textPrimary,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
@@ -220,7 +217,7 @@ private fun UploadBrowseButton(
 
     Box(
         modifier = Modifier
-            .heightIn(min = BrowseButtonHeight)
+            .heightIn(min = OrbitTheme.sizing.buttonHeightSm)
             .clip(shape)
             .border(OrbitTheme.sizing.hairline, control.controlBorder, shape)
             .background(control.cardContainer, shape)
@@ -263,7 +260,7 @@ private fun OrbitFileUploadItemRow(
     val content = OrbitTheme.contentColors
     val shape = OrbitTheme.shapeTokens.cardCompact
     val progressColors = OrbitProgressDefaults.colors
-    val mark = UploadPreviewMark
+    val mark = sizing.avatarSm
 
     Column(
         modifier = Modifier
@@ -397,7 +394,7 @@ private fun UploadStatusLine(item: OrbitUploadItem) {
                 )
                 OrbitLoadingIcon(
                     size = OrbitTheme.sizing.iconXs,
-                    tint = content.textSecondary,
+                    tint = content.iconInactive,
                 )
                 Text(
                     text = "Uploading…",
@@ -414,7 +411,7 @@ private fun UploadStatusLine(item: OrbitUploadItem) {
                 Box(
                     modifier = Modifier
                         .size(OrbitTheme.sizing.iconXs)
-                        .clip(CircleShape)
+                        .clip(OrbitTheme.shapeTokens.avatar)
                         .background(green),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -450,7 +447,7 @@ private fun UploadRowAction(
     Box(
         modifier = Modifier
             .size(sizing.minTouchTarget)
-            .clip(CircleShape)
+            .clip(OrbitTheme.shapeTokens.avatar)
             .orbitHandCursor()
             .clickable(
                 interactionSource = interactionSource,
@@ -477,7 +474,7 @@ private fun UploadProgressBar(
     colors: com.orbitai.erp.core.designsystem.component.progress.OrbitProgressColors,
     height: Dp,
 ) {
-    val shape = RoundedCornerShape(percent = 50)
+    val shape = OrbitTheme.shapeTokens.progress
     val fraction = progress.coerceIn(0f, 1f)
 
     Canvas(
@@ -507,5 +504,3 @@ private val DashLength = 7.dp
 private val DashGap = 5.dp
 private val DashStroke = 1.5.dp
 private val UploadProgressHeight = 4.dp
-private val BrowseButtonHeight = 32.dp
-private val UploadPreviewMark = 40.dp

@@ -1,5 +1,6 @@
 package com.orbitai.erp.core.designsystem.theme
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -130,15 +131,15 @@ class DesignSpecTest {
         assertEquals(Color(0xFFEBEBEF), light.interactiveContainer, "light interactive container")
 
         val dark = OrbitDarkControlColors
-        assertEquals(Color(0xFF3F3F3F), dark.controlBorder, "dark standard border")
-        assertEquals(Color(0xFF2C2C2C), dark.dividerSubtle, "dark subtle divider")
+        assertEquals(Color(0xFF3F3F46), dark.controlBorder, "dark standard border")
+        assertEquals(Color(0xFF2C2C2E), dark.dividerSubtle, "dark subtle divider")
         assertEquals(Color(0xFF0A84FF), dark.borderFocus, "dark focus border")
-        assertEquals(Color(0xFF1C1C1C), dark.cardContainer, "dark card")
-        assertEquals(Color(0xFF2C2C2C), dark.insetContainer, "dark inset box")
-        assertEquals(Color(0xFF3A3A3A), dark.interactiveContainer, "dark interactive container")
+        assertEquals(Color(0xFF1C1C1E), dark.cardContainer, "dark card")
+        assertEquals(Color(0xFF2C2C2E), dark.insetContainer, "dark inset box")
+        assertEquals(Color(0xFF3A3A3C), dark.interactiveContainer, "dark interactive container")
 
         assertEquals(Color(0xFFF9F9FB), OrbitPalette.LightBackground, "light app background")
-        assertEquals(Color(0xFF121212), OrbitPalette.DarkBackground, "dark app background")
+        assertEquals(Color(0xFF121214), OrbitPalette.DarkBackground, "dark app background")
     }
 
     @Test
@@ -150,7 +151,7 @@ class DesignSpecTest {
             "the light border is too strong against a white card",
         )
         assertTrue(
-            contrast(OrbitDarkControlColors.controlBorder, Color(0xFF1C1C1C)) < 2.0,
+            contrast(OrbitDarkControlColors.controlBorder, Color(0xFF1C1C1E)) < 2.0,
             "the dark border is too strong against a dark card",
         )
     }
@@ -159,11 +160,11 @@ class DesignSpecTest {
 
     @Test
     fun `the elevation ladder matches the spec matrix`() {
-        assertLevel("Level 0", OrbitShadow.Level0, 0, 0, 0f, 0xFF2C2C2C)
-        assertLevel("Level 1", OrbitShadow.Level1, 2, 4, 0.05f, 0xFF1C1C1C)
-        assertLevel("Level 2", OrbitShadow.Level2, 4, 8, 0.08f, 0xFF252525)
-        assertLevel("Level 3", OrbitShadow.Level3, 6, 14, 0.12f, 0xFF2C2C2C)
-        assertLevel("Level 4", OrbitShadow.Level4, 12, 24, 0.16f, 0xFF3A3A3A)
+        assertLevel("Level 0", OrbitShadow.Level0, 0, 0, 0f, 0xFF2C2C2E)
+        assertLevel("Level 1", OrbitShadow.Level1, 2, 4, 0.05f, 0xFF1C1C1E)
+        assertLevel("Level 2", OrbitShadow.Level2, 4, 8, 0.08f, 0xFF252528)
+        assertLevel("Level 3", OrbitShadow.Level3, 6, 14, 0.12f, 0xFF2C2C2E)
+        assertLevel("Level 4", OrbitShadow.Level4, 12, 24, 0.16f, 0xFF3A3A3C)
     }
 
     @Test
@@ -217,7 +218,7 @@ class DesignSpecTest {
     fun `every rung lightens in the dark theme rather than darkening`() {
         // The inversion that makes dark mode work at all: depth is a lighter surface, because there
         // is no light on a near-black page for a raised object to block.
-        val background = Color(0xFF121212)
+        val background = Color(0xFF121214)
         listOf(
             "Level 1" to OrbitShadow.Level1,
             "Level 2" to OrbitShadow.Level2,
@@ -240,6 +241,70 @@ class DesignSpecTest {
         // have enough tonal separation to carry their own edge; the low ones do not.
         assertTrue(OrbitShadow.Level1.darkBorder, "cards need a rim in the dark theme")
         assertTrue(OrbitShadow.Level2.darkBorder, "dropdowns need a rim in the dark theme")
+    }
+
+    // ------------------------------------------------------------------- shapes
+
+    @Test
+    fun `controls are full pills and surfaces stay modestly rounded`() {
+        val pill = RoundedCornerShape(percent = 50)
+        assertEquals(pill, AndroidShapeTokens.button, "Android button")
+        assertEquals(pill, AndroidShapeTokens.chip, "Android chip")
+        assertEquals(pill, AndroidShapeTokens.badge, "Android badge")
+        assertEquals(pill, AndroidShapeTokens.progress, "Android progress")
+        assertEquals(RoundedCornerShape(8.dp), AndroidShapeTokens.field, "Android field")
+        assertEquals(RoundedCornerShape(12.dp), AndroidShapeTokens.card, "Android card")
+
+        assertEquals(pill, IosShapeTokens.button, "iOS button")
+        assertEquals(pill, IosShapeTokens.chip, "iOS chip")
+        assertEquals(pill, IosShapeTokens.badge, "iOS badge")
+        assertEquals(pill, IosShapeTokens.progress, "iOS progress")
+        assertEquals(RoundedCornerShape(10.dp), IosShapeTokens.field, "iOS field")
+        assertEquals(RoundedCornerShape(14.dp), IosShapeTokens.card, "iOS card")
+
+        assertEquals(AndroidShapeTokens, AndroidPlatformTokens.shapes)
+        assertEquals(IosShapeTokens, IosPlatformTokens.shapes)
+        assertEquals(pill, AndroidShapeTokens.avatar, "avatars stay circular")
+    }
+
+    // -------------------------------------------------------- controls
+
+    @Test
+    fun `button and field ladders match the spec`() {
+        val sizing = OrbitSizing()
+        assertEquals(32.dp, sizing.buttonHeightSm, "small button")
+        assertEquals(40.dp, sizing.buttonHeightMd, "medium button")
+        assertEquals(48.dp, sizing.buttonHeightLg, "large button")
+        assertEquals(14.dp, sizing.buttonPaddingSm, "small button padding")
+        assertEquals(18.dp, sizing.buttonPaddingMd, "medium button padding")
+        assertEquals(24.dp, sizing.buttonPaddingLg, "large button padding")
+        assertEquals(16.dp, sizing.buttonIconSm, "small button icon")
+        assertEquals(18.dp, sizing.buttonIconMd, "medium button icon")
+        assertEquals(20.dp, sizing.buttonIconLg, "large button icon")
+
+        assertEquals(48.dp, sizing.fieldHeightSm, "small field")
+        assertEquals(56.dp, sizing.fieldHeightMd, "medium field")
+        assertEquals(64.dp, sizing.fieldHeightLg, "large field")
+        assertEquals(12.dp, sizing.fieldPaddingSm, "small field padding")
+        assertEquals(16.dp, sizing.fieldPaddingMd, "medium field padding")
+        assertEquals(20.dp, sizing.fieldPaddingLg, "large field padding")
+        assertEquals(48.dp, sizing.otpCellSize, "otp cell")
+
+        assertEquals(32.dp, sizing.iconButtonSm, "small icon button")
+        assertEquals(40.dp, sizing.iconButtonMd, "medium icon button")
+        assertEquals(48.dp, sizing.iconButtonLg, "large icon button")
+        assertEquals(36.dp, sizing.chipHeight, "chip")
+        assertEquals(56.dp, sizing.appBarHeight, "app bar")
+    }
+
+    @Test
+    fun `control ink matches primary text in both themes`() {
+        assertEquals(Color(0xFF1C1C1E), OrbitLightControlColors.controlContent, "light control ink")
+        assertEquals(Color(0xFF1C1C1E), OrbitLightControlColors.actionContainer, "light action fill")
+        assertEquals(Color(0xFFF2F2F7), OrbitLightControlColors.onActionContainer, "light on-action")
+        assertEquals(Color(0xFFF2F2F7), OrbitDarkControlColors.controlContent, "dark control ink")
+        assertEquals(Color(0xFFF2F2F7), OrbitDarkControlColors.actionContainer, "dark action fill")
+        assertEquals(Color(0xFF1C1C1E), OrbitDarkControlColors.onActionContainer, "dark on-action")
     }
 
     // ------------------------------------------------------------------- icons

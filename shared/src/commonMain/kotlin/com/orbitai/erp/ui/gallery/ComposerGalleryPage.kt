@@ -58,7 +58,7 @@ internal fun ComposerGalleryPage() {
     }
 
     // Attach via the plus menu — thumbnails queue above the composer in a horizontal strip.
-    GallerySection("Message composer · chat and AI prompt") {
+    GallerySection("Message composer") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             MessageComposer(
                 modifier = Modifier.fillMaxWidth(),
@@ -75,7 +75,7 @@ internal fun ComposerGalleryPage() {
         }
     }
 
-    GallerySection("Composer · grown, scrolled, disabled") {
+    GallerySection("Composer states") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             // Starts past one line, so the squared-off shape is visible without anyone having to
             // type. Deleting back down to a single line is the fastest way to see the morph.
@@ -120,7 +120,7 @@ internal fun ComposerGalleryPage() {
         }
     }
 
-    GallerySection("Waveform · silence to full") {
+    GallerySection("Waveform") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
             OrbitAudioWave(
                 amplitudes = List(60) { 0f },
@@ -138,7 +138,7 @@ internal fun ComposerGalleryPage() {
         }
     }
 
-    GallerySection("Voice notes · play, scrub, delete") {
+    GallerySection("Voice notes") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             SampleVoiceNote(
                 seconds = 14,

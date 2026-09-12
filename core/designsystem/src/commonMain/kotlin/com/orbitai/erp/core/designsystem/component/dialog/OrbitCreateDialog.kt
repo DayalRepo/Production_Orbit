@@ -12,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import com.orbitai.erp.core.designsystem.component.button.OrbitButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
@@ -102,7 +101,7 @@ fun OrbitCreateDialog(
                     // above and the label below are both set heavier, so anything but regular here
                     // gives a dialog with no plain text in it at all.
                     style = OrbitTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = OrbitTheme.fontWeights.body,
                     color = OrbitTheme.contentColors.textSecondary,
                 )
             }

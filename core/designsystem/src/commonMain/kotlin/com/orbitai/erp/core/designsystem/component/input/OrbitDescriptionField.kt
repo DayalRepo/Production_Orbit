@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -38,7 +37,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -192,7 +190,7 @@ fun OrbitDescriptionField(
                                 .semantics { contentDescription = label },
                             enabled = enabled,
                             readOnly = readOnly,
-                            textStyle = base.copy(color = ink, fontWeight = FontWeight.Medium),
+                            textStyle = base.copy(color = ink, fontWeight = OrbitTheme.fontWeights.title),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
                             interactionSource = interactionSource,
                             cursorBrush = SolidColor(control.actionContainer),
@@ -202,7 +200,7 @@ fun OrbitDescriptionField(
                     if (value.isEmpty() && placeholder != null) {
                         Text(
                             text = placeholder,
-                            style = base.copy(fontWeight = FontWeight.Medium),
+                            style = base.copy(fontWeight = OrbitTheme.fontWeights.title),
                             color = hint,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -256,7 +254,7 @@ private fun DescriptionToolbarIconButton(
     Box(
         modifier = Modifier
             .size(sizing.minTouchTarget)
-            .clip(CircleShape)
+            .clip(OrbitTheme.shapeTokens.avatar)
             .orbitHandCursor()
             .clickable(
                 interactionSource = interactionSource,

@@ -47,7 +47,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -332,7 +331,7 @@ private fun StagesHeader(
         ) {
             Text(
                 text = "STAGES",
-                style = mono.copy(fontWeight = FontWeight.SemiBold),
+                style = mono.copy(fontWeight = OrbitTheme.fontWeights.heading),
                 color = colors.headerLabel,
             )
             Text(
@@ -376,7 +375,7 @@ private fun StageColumnHeadings(
 ) {
     val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
-    val style = OrbitTheme.extendedTypography.reference.copy(fontWeight = FontWeight.SemiBold)
+    val style = OrbitTheme.extendedTypography.reference.copy(fontWeight = OrbitTheme.fontWeights.heading)
 
     Row(
         modifier = Modifier
@@ -426,7 +425,7 @@ private fun StageTotalRow(
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
-    val style = OrbitTheme.extendedTypography.reference.copy(fontWeight = FontWeight.SemiBold)
+    val style = OrbitTheme.extendedTypography.reference.copy(fontWeight = OrbitTheme.fontWeights.heading)
 
     OrbitDivider(
         modifier = Modifier.padding(top = spacing.sm, bottom = spacing.sm),
@@ -545,7 +544,7 @@ private fun StepRow(
                 Text(
                     text = step.label,
                     style = OrbitTheme.extendedTypography.reference.copy(
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = OrbitTheme.fontWeights.heading,
                     ),
                     color = labelColor,
                     maxLines = 2,
@@ -626,7 +625,7 @@ private fun StepNumberMark(
         }
         Text(
             text = digit,
-            style = OrbitTheme.extendedTypography.reference.copy(fontWeight = FontWeight.SemiBold),
+            style = OrbitTheme.extendedTypography.reference.copy(fontWeight = OrbitTheme.fontWeights.heading),
             color = when (phase) {
                 OrbitStepPhase.Completed -> colors.onActive
                 OrbitStepPhase.Current -> colors.onActive

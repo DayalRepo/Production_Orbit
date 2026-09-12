@@ -7,11 +7,12 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import com.orbitai.erp.core.designsystem.component.container.OrbitScrollbarDefaults
 import com.orbitai.erp.core.designsystem.component.container.OrbitVerticalScrollbar
 import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.foundation.orbitGlassShadow
@@ -168,22 +170,40 @@ internal fun OrbitDropdownMenu(
                 header?.invoke(this)
 
                 val listScroll = rememberScrollState()
+                val listOverflows = listScroll.maxValue > 0
 
-                Row(
-                    modifier = Modifier.heightIn(
-                        max = if (embedded) sizing.dropdownMaxHeight / 2 else sizing.dropdownMaxHeight,
-                    ),
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(
+                            max = if (embedded) {
+                                sizing.dropdownMaxHeight / 2
+                            } else {
+                                sizing.dropdownMaxHeight
+                            },
+                        ),
                 ) {
                     Column(
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxWidth()
+                            .then(
+                                if (listOverflows) {
+                                    Modifier.padding(end = OrbitScrollbarDefaults.Thickness + spacing.sm)
+                                } else {
+                                    Modifier
+                                },
+                            )
                             .verticalScroll(listScroll),
                         content = content,
                     )
-                    if (listScroll.maxValue > 0) {
+                    if (listOverflows) {
                         OrbitVerticalScrollbar(
                             scrollState = listScroll,
-                            modifier = Modifier.padding(end = spacing.xs),
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .fillMaxHeight()
+                                .padding(vertical = spacing.xs)
+                                .padding(end = spacing.xxs),
                         )
                     }
                 }

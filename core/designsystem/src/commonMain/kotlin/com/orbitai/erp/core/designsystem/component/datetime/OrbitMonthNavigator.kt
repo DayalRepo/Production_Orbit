@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +31,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonState
@@ -186,7 +184,7 @@ private fun MonthYearTrigger(
     val sizing = OrbitTheme.sizing
     val control = OrbitTheme.controlColors
     val content = OrbitTheme.contentColors
-    val shape = RoundedCornerShape(percent = 50)
+    val shape = OrbitTheme.shapeTokens.button
     val highlight = if (OrbitTheme.isDark) OrbitGlass.SurfaceHighlightDark else OrbitGlass.SurfaceHighlightLight
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -226,7 +224,7 @@ private fun MonthYearTrigger(
         Text(
             text = label,
             style = OrbitTheme.typography.labelLarge,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = OrbitTheme.fontWeights.heading,
             color = content.textPrimary,
             maxLines = 1,
         )

@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -198,6 +197,7 @@ fun OrbitIconButton(
     val shade = if (isDark) effective.darkShade else effective.lightShade
     val content = when (effective) {
         OrbitIconButtonStyle.Neutral -> contentColors.iconPrimary
+        OrbitIconButtonStyle.Accent -> contentColors.iconAccent
         else -> tone?.let { shade(it).copy(alpha = 1f) } ?: contentColors.iconPrimary
     }
 
@@ -234,7 +234,7 @@ fun OrbitIconButton(
     Box(
         modifier = modifier
             .size(maxOf(diameter, sizing.minTouchTarget))
-            .clip(CircleShape)
+            .clip(shape)
             .orbitHandCursor()
             .clickable(
                 interactionSource = interactionSource,

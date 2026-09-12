@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
 import com.orbitai.erp.core.designsystem.foundation.orbitPressIndication
@@ -93,7 +92,7 @@ fun OrbitDropdownAddRow(
             // A shade heavier than an option row. This is an action and they are values, and the
             // panel is easier to scan when the one control in it is not competing at the same
             // weight as the hundred things it sits above.
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = OrbitTheme.fontWeights.heading,
             color = content.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

@@ -12,11 +12,9 @@ import androidx.compose.ui.unit.sp
 /**
  * Weight assignments, gathered so boldness is one edit rather than forty.
  *
- * Starting point, open to revision: SemiBold for display and headings, Medium for titles and labels,
- * Regular for body, Bold for KPI figures. Google Sans Flex is a fairly low-contrast geometric face,
- * so SemiBold reads as a confident heading where Bold tends to look shouty at 32sp; on iOS, where
- * the system face is heavier, Bold headings may suit better. All nine weights are bundled, so
- * changing any of these is a one-line change with no asset work.
+ * Starting point, open to revision: Bold for display, SemiBold for headings, Medium for titles and
+ * labels, Regular for body and metrics. Weights live in this object so every component picks them
+ * up from one place.
  */
 @Immutable
 data class OrbitFontWeights(
@@ -37,8 +35,8 @@ data class OrbitFontWeights(
      *
      * A dashboard number is already the largest thing on its card, so size alone gives it all the
      * emphasis it needs; adding weight on top makes it shout, and a screen of six shouting cards has
-     * no hierarchy left. Metric figures use DM Sans at Regular — open counters stay clear with ₹ / %
-     * at large sizes, and Bold would close 8 and 9 into a block on glass cards.
+     * no hierarchy left. Regular is where DM Sans digits stay open — Bold closes the counters on
+     * 8 and 9, so a long ₹ / % figure reads as a block on glass.
      */
     val metric: FontWeight = FontWeight.Normal,
 )
@@ -47,7 +45,7 @@ data class OrbitFontWeights(
  * The Material scale, built from a platform [OrbitTypeScale].
  *
  * Letter spacing comes from the scale, per tier, rather than from Material's defaults — those were
- * tuned for Roboto and loosen Google Sans Flex slightly at every size. See
+ * tuned for Roboto and loosen DM Sans slightly at every size. See
  * [OrbitFontMetrics.tracking] for why it varies by tier instead of being one number.
  *
  * Takes the family as a parameter because resource-backed fonts can only be loaded from a
@@ -144,10 +142,9 @@ internal fun orbitTypographyTokens(
     sans: FontFamily,
     scale: OrbitTypeScale,
     weights: OrbitFontWeights = OrbitFontWeights(),
-    metric: FontFamily = sans,
 ): OrbitTypographyTokens = OrbitTypographyTokens(
     metricLarge = TextStyle(
-        fontFamily = metric,
+        fontFamily = sans,
         fontWeight = weights.metric,
         fontSize = scale.h1.size,
         lineHeight = scale.h1.lineHeight,
@@ -155,7 +152,7 @@ internal fun orbitTypographyTokens(
         fontFeatureSettings = TabularNumbers,
     ),
     metricMedium = TextStyle(
-        fontFamily = metric,
+        fontFamily = sans,
         fontWeight = weights.metric,
         fontSize = scale.h3.size,
         lineHeight = scale.h3.lineHeight,
@@ -163,7 +160,7 @@ internal fun orbitTypographyTokens(
         fontFeatureSettings = TabularNumbers,
     ),
     metricSmall = TextStyle(
-        fontFamily = metric,
+        fontFamily = sans,
         fontWeight = weights.metric,
         fontSize = scale.h4.size,
         lineHeight = scale.h4.lineHeight,
@@ -180,14 +177,14 @@ internal fun orbitTypographyTokens(
     // The one place tracking is not 0: all-caps text at 12sp sets too tightly without it.
     sectionLabel = TextStyle(
         fontFamily = sans,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = weights.heading,
         fontSize = scale.caption.size,
         lineHeight = scale.caption.lineHeight,
         letterSpacing = 1.sp,
     ),
     cardLabel = TextStyle(
         fontFamily = sans,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = weights.heading,
         // Derived from the caption rather than hardcoded, so it keeps following the platform's base
         // size and the user's font-scale setting instead of pinning itself to one device's idea of
         // small.
@@ -260,3 +257,5 @@ private const val FieldLargeRatio = 1.125f
 internal val LocalOrbitTypography = staticCompositionLocalOf {
     orbitTypographyTokens(FontFamily.Default, AndroidTypeScale)
 }
+
+internal val LocalOrbitFontWeights = staticCompositionLocalOf { OrbitFontWeights() }

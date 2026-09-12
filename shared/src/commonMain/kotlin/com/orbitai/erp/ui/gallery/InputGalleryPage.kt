@@ -65,7 +65,7 @@ internal fun InputGalleryPage() {
     var compactSheets by remember { mutableStateOf(8) }
 
 
-    GallerySection("Text field · three sizes") {
+    GallerySection("Text field") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             OrbitFieldSize.entries.forEach { size ->
                 OrbitTextField(
@@ -80,7 +80,7 @@ internal fun InputGalleryPage() {
         }
     }
 
-    GallerySection("Quantity · three sizes") {
+    GallerySection("Quantity") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             OrbitQuantityField(
                 value = bags,
@@ -108,7 +108,7 @@ internal fun InputGalleryPage() {
 
     // Width is the modifier's job — these sit beside the full-width tiers above so a narrow table
     // cell and a compact inline counter can be compared without guessing from a stretched field.
-    GallerySection("Quantity · compact width") {
+    GallerySection("Quantity compact") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -142,7 +142,7 @@ internal fun InputGalleryPage() {
     // The two ends of the range and a disabled control, which is where the steppers have to show
     // their state: `sheets` starts at the floor and `rods` at the ceiling above, so one arm of each
     // of those is already greyed without anyone having to tap to see it.
-    GallerySection("Quantity · disabled, and in error") {
+    GallerySection("Quantity states") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             OrbitQuantityField(
                 value = 24,
@@ -161,7 +161,7 @@ internal fun InputGalleryPage() {
         }
     }
 
-    GallerySection("Text field · states") {
+    GallerySection("Text field states") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             OrbitTextField(
                 value = filled,
@@ -212,7 +212,7 @@ internal fun InputGalleryPage() {
         }
     }
 
-    GallerySection("Search · pill, three sizes") {
+    GallerySection("Search") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             OrbitFieldSize.entries.forEach { size ->
                 OrbitSearchField(
@@ -231,7 +231,7 @@ internal fun InputGalleryPage() {
         }
     }
 
-    GallerySection("Dropdown · stages from the work sequence") {
+    GallerySection("Dropdown") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             // The real list, ~100 stages. Open it on a device: the pinned search and add row, the
             // scrolling list beneath them and the truncation on the longer names are all things a
@@ -252,14 +252,14 @@ internal fun InputGalleryPage() {
         }
     }
 
-    GallerySection("Dropdown · units") {
+    GallerySection("Units") {
         ManagedUnitsDropdown(
             label = "Unit",
             modifier = Modifier.fillMaxWidth(),
         )
     }
 
-    GallerySection("Dropdown · materials, multi select") {
+    GallerySection("Materials") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             ManagedMaterialsDropdown(
                 label = "Materials",
@@ -276,7 +276,7 @@ internal fun InputGalleryPage() {
         }
     }
 
-    GallerySection("Multi-select field · raw OrbitMultiSelectField") {
+    GallerySection("Multi-select") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             var selected by remember {
                 mutableStateOf(
@@ -312,7 +312,7 @@ internal fun InputGalleryPage() {
         }
     }
 
-    GallerySection("Dropdown · materials, single select") {
+    GallerySection("Material") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             ManagedMaterialDropdown(
                 label = "Material",
@@ -326,19 +326,19 @@ internal fun InputGalleryPage() {
         }
     }
 
-    GallerySection("Quantity + unit · single field") {
+    GallerySection("Quantity and unit") {
         ManagedQuantityUnitField(
             modifier = Modifier.fillMaxWidth(),
         )
     }
 
-    GallerySection("Materials used · site log") {
+    GallerySection("Materials used") {
         ManagedMaterialUsageLog(
             modifier = Modifier.fillMaxWidth(),
         )
     }
 
-    GallerySection("Description · overflow affordance") {
+    GallerySection("Description") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.fieldGap)) {
             ManagedDescriptionField(
                 value = description,

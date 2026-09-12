@@ -20,6 +20,7 @@ data class OrbitPlatformTokens(
     val sizing: OrbitSizing,
     val lightContentColors: OrbitContentColors,
     val darkContentColors: OrbitContentColors,
+    val shapes: OrbitShapeTokens,
     val topBarTitleAlignment: OrbitTitleAlignment,
 )
 
@@ -64,6 +65,7 @@ internal val AndroidPlatformTokens = OrbitPlatformTokens(
     ),
     lightContentColors = AndroidLightContentColors,
     darkContentColors = AndroidDarkContentColors,
+    shapes = AndroidShapeTokens,
     topBarTitleAlignment = OrbitTitleAlignment.Start,
 )
 
@@ -113,6 +115,7 @@ internal val IosPlatformTokens = OrbitPlatformTokens(
     ),
     lightContentColors = IosLightContentColors,
     darkContentColors = IosDarkContentColors,
+    shapes = IosShapeTokens,
     topBarTitleAlignment = OrbitTitleAlignment.Center,
 )
 
