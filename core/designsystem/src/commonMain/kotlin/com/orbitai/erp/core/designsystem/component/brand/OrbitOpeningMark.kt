@@ -34,22 +34,23 @@ fun OrbitOpeningMark(
 /**
  * Brand-intro horizontal lockup sizes.
  *
- * - Mark: 72dp capital O
- * - Word: 44sp display weight in theme ink
+ * - Mark: 56dp capital O — sized to sit as the cap of `Orbit.ai`
+ * - Word: 32sp heading weight in theme ink, so `rbit.ai` does not overpower the mark
  * - Gap: lettermark kerning; whole lockup stays screen-centred
  */
 object OrbitOpeningLockup {
     /** Pixel O — brand-intro capital letter size. */
-    val MarkSize: Dp = 72.dp
+    val MarkSize: Dp = 56.dp
 
     /**
-     * Wordmark size beside the mark.
+     * Wordmark size beside the mark. Heading (SemiBold) rather than display (Bold):
+     * Bold at this size next to the pixel O reads as a second logo, not the rest of the word.
      */
-    val WordSize: TextUnit = 44.sp
+    val WordSize: TextUnit = 32.sp
 
-    /** Mark-to-type gap — lettermark kerning scaled with the larger lockup. */
-    val MarkToWordGap: Dp = 8.dp
+    /** Mark-to-type gap — lettermark kerning scaled with the lockup. */
+    val MarkToWordGap: Dp = 6.dp
 
-    /** Slight positive tracking for a light (300) wordmark. */
-    val WordTracking: TextUnit = 0.4.sp
+    /** Slight positive tracking so SemiBold letters stay open next to the mark. */
+    val WordTracking: TextUnit = 0.2.sp
 }

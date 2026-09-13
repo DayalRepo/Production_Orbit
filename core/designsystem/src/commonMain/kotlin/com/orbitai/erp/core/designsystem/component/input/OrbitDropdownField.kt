@@ -100,6 +100,11 @@ fun OrbitDropdownField(
     size: OrbitFieldSize = OrbitFieldSize.Medium,
     state: OrbitFieldState = OrbitFieldState.Default,
     enabled: Boolean = true,
+    /**
+     * Short catalogues (villa, floor, tower, unit) pass false so the panel is just the list
+     * plus a scrollbar. Long vocabularies keep search.
+     */
+    searchable: Boolean = true,
     /** Override chevron size; defaults follow [size]. */
     iconSize: Dp? = null,
 ) {
@@ -139,7 +144,7 @@ fun OrbitDropdownField(
         label = "orbit-dropdown-chevron",
     )
 
-    val visible = options.filterByQuery(query)
+    val visible = if (searchable) options.filterByQuery(query) else options
 
     fun close() {
         expanded = false
@@ -194,22 +199,27 @@ fun OrbitDropdownField(
             expanded = expanded,
             onDismiss = { close() },
             width = anchorWidth,
-            header = {
-                OrbitDropdownHeader(
-                    query = query,
-                    onQueryChange = { query = it },
-                    searchPlaceholder = searchPlaceholder,
-                    addLabel = addLabel,
-                    onAdd = onAddRequest?.let {
-                        {
-                            // Closing first. The dialog it opens is a second layer over the same
-                            // screen, and a dropdown left open underneath it both steals the back
-                            // gesture and covers the dialog's own dismiss area.
-                            close()
-                            it()
-                        }
-                    },
-                )
+            header = if (searchable || onAddRequest != null) {
+                {
+                    OrbitDropdownHeader(
+                        query = query,
+                        onQueryChange = { query = it },
+                        searchPlaceholder = searchPlaceholder,
+                        searchable = searchable,
+                        addLabel = addLabel,
+                        onAdd = onAddRequest?.let {
+                            {
+                                // Closing first. The dialog it opens is a second layer over the same
+                                // screen, and a dropdown left open underneath it both steals the back
+                                // gesture and covers the dialog's own dismiss area.
+                                close()
+                                it()
+                            }
+                        },
+                    )
+                }
+            } else {
+                null
             },
         ) {
             visible.forEach { option ->

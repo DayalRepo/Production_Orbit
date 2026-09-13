@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.orbitai.erp.core.designsystem.component.dialog.OrbitConfirmDialog
 import com.orbitai.erp.core.designsystem.component.display.OrbitAttachmentLeading
 import com.orbitai.erp.core.designsystem.component.input.OrbitAttachMenu
@@ -49,6 +50,28 @@ object OrbitComposerPlaceholder {
     const val Ai = "Ask Orbit AI"
 }
 
+@Stable
+data class ComposerMention(
+    val token: String,
+    val label: String,
+    val icon: ImageVector,
+)
+
+fun mentionDraftOf(text: String, completeTokens: Set<String> = emptySet()): String? {
+    val last = text.substringAfterLast(' ')
+    if (!last.startsWith("@")) return null
+    val typed = last.drop(1)
+    if (typed.contains('@')) return null
+    val done = completeTokens.any { it.equals(typed, ignoreCase = true) }
+    return if (done) null else typed
+}
+
+fun replaceMentionDraft(text: String, token: String): String {
+    val at = text.lastIndexOf('@')
+    if (at < 0) return "$text@$token "
+    return text.substring(0, at) + "@$token "
+}
+
 fun formatDuration(seconds: Int): String {
     val m = seconds / 60
     val s = seconds % 60
@@ -60,6 +83,7 @@ fun MessageComposer(
     modifier: Modifier = Modifier,
     placeholder: String = OrbitComposerPlaceholder.Message,
     label: String = "Message",
+    mentions: List<ComposerMention> = emptyList(),
     onSend: (text: String, clip: VoiceClip?, attachments: List<ComposerAttachment>) -> Unit =
         { _, _, _ -> },
     onClipRecorded: (VoiceClip) -> Unit = {},
@@ -82,6 +106,17 @@ fun MessageComposer(
         if (picked != null) {
             attachments += ComposerAttachment(picked)
         }
+    }
+
+    val mentionQuery = mentionDraftOf(
+        text = text,
+        completeTokens = mentions.map { it.token }.toSet(),
+    )
+    val mentionOpen = mentions.isNotEmpty() && mentionQuery != null
+    val visibleMentions = mentions.filter { mention ->
+        val query = mentionQuery.orEmpty()
+        query.isEmpty() || mention.token.startsWith(query, ignoreCase = true) ||
+            mention.label.startsWith(query, ignoreCase = true)
     }
 
     LaunchedEffect(recording, paused) {
@@ -139,7 +174,7 @@ fun MessageComposer(
         label = label,
         placeholder = placeholder,
         mode = mode,
-        attachExpanded = menuOpen,
+        attachExpanded = menuOpen || mentionOpen,
         attachments = stripItems,
         onRemoveAttachment = { id ->
             removeTarget = attachments.firstOrNull { it.picked.id == id }
@@ -167,14 +202,26 @@ fun MessageComposer(
         onPauseRecording = { paused = !paused },
         onAttachClick = { menuOpen = !menuOpen },
         attachMenu = {
-            OrbitAttachMenu(
-                expanded = menuOpen,
-                onDismiss = { menuOpen = false },
-                items = listOf(
-                    OrbitAttachOption("Upload image", OrbitIcons.ImageUpload, launchImagePicker),
-                    OrbitAttachOption("Attach file", OrbitIcons.FileUpload, launchDocumentPicker),
-                ),
-            )
+            if (mentionOpen) {
+                OrbitAttachMenu(
+                    expanded = true,
+                    onDismiss = {},
+                    items = visibleMentions.map { mention ->
+                        OrbitAttachOption(mention.label, mention.icon) {
+                            text = replaceMentionDraft(text, mention.token)
+                        }
+                    },
+                )
+            } else {
+                OrbitAttachMenu(
+                    expanded = menuOpen,
+                    onDismiss = { menuOpen = false },
+                    items = listOf(
+                        OrbitAttachOption("Upload image", OrbitIcons.ImageUpload, launchImagePicker),
+                        OrbitAttachOption("Attach file", OrbitIcons.FileUpload, launchDocumentPicker),
+                    ),
+                )
+            }
         },
     )
 

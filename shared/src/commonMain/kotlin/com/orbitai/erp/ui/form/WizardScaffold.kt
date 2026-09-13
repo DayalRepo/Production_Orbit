@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.platform.OrbitBackHandler
 import com.orbitai.erp.ui.component.button.ActionButtonRow
 import com.orbitai.erp.ui.component.button.ActionKind
 
@@ -39,6 +40,8 @@ fun WizardScaffold(
 ) {
     val spacing = OrbitTheme.spacing
     val safe = WindowInsets.safeDrawing.asPaddingValues()
+
+    OrbitBackHandler(onBack = onDismiss)
 
     Column(
         modifier = modifier

@@ -20,7 +20,8 @@ class OrbitBadgeTest {
     fun `badge heights ascend with size`() {
         platforms.forEach { (platform, sizing) ->
             assertTrue(
-                sizing.badgeHeightSm < sizing.badgeHeightMd &&
+                sizing.badgeHeightXs < sizing.badgeHeightSm &&
+                    sizing.badgeHeightSm < sizing.badgeHeightMd &&
                     sizing.badgeHeightMd < sizing.badgeHeightLg,
                 "$platform badge heights do not ascend: ${sizing.badgeHeightSm}, " +
                     "${sizing.badgeHeightMd}, ${sizing.badgeHeightLg}",
@@ -46,6 +47,7 @@ class OrbitBadgeTest {
         val minimumPadding = 4
         platforms.forEach { (platform, sizing) ->
             val pairs = listOf(
+                "Compact" to (sizing.badgeHeightXs to sizing.badgeIconXs),
                 "Small" to (sizing.badgeHeightSm to sizing.badgeIconSm),
                 "Medium" to (sizing.badgeHeightMd to sizing.badgeIconMd),
                 "Large" to (sizing.badgeHeightLg to sizing.badgeIconLg),
@@ -76,6 +78,6 @@ class OrbitBadgeTest {
     @Test
     fun `every emphasis and size is covered`() {
         assertTrue(OrbitBadgeEmphasis.entries.size == 3, "expected Glass, Solid, Outline")
-        assertTrue(OrbitBadgeSize.entries.size == 3, "expected Small, Medium, Large")
+        assertTrue(OrbitBadgeSize.entries.size == 4, "expected Compact, Small, Medium, Large")
     }
 }

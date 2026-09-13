@@ -76,6 +76,27 @@ fun rememberGalleryContractors(): List<OrbitAssignMember> {
     }
 }
 
+@Composable
+fun rememberGalleryProcurementManagers(): List<OrbitAssignMember> {
+    val painters = rememberGalleryPainters()
+    return remember(painters) {
+        listOf(
+            MockDirectory.userById("u-proc").toAssignMember("fatima.sheikh", painters.avatar04),
+        )
+    }
+}
+
+@Composable
+fun rememberGalleryWarehouseManagers(): List<OrbitAssignMember> {
+    val painters = rememberGalleryPainters()
+    return remember(painters) {
+        listOf(
+            MockDirectory.userById("u-wh-villas").toAssignMember("deepak.iyer", painters.avatar01),
+            MockDirectory.userById("u-wh-apt").toAssignMember("meera.nair", painters.avatar05),
+        )
+    }
+}
+
 /** Account-menu preview: CEO (org) and site engineer on the apartment project. */
 internal object GalleryAccountSamples {
     private val ceo = MockDirectory.userById("u-ceo")

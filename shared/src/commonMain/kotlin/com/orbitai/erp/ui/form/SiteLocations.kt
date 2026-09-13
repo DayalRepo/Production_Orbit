@@ -19,8 +19,9 @@ object SiteLocations {
 
     val floors = listOf(
         "Ground",
-        "First",
-        "Second",
+        "1st floor",
+        "2nd floor",
+        "3rd floor",
         "Terrace",
     )
 

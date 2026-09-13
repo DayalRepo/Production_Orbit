@@ -19,7 +19,7 @@ import com.orbitai.erp.ui.component.badge.SeverityBadge
 import com.orbitai.erp.ui.form.FormFieldLabel
 
 /**
- * Tappable severity badges on one row. Selected is solid; the rest stay glass.
+ * Tappable severity badges on one row. Selected is glass; the rest stay outlined.
  *
  * Small size so Low / Medium / High / Critical stay on a single line for both villa and
  * apartment forms, matching the issue card.
@@ -48,9 +48,9 @@ fun SeverityPicker(
                     severity = severity,
                     size = OrbitBadgeSize.Small,
                     emphasis = if (isSelected) {
-                        OrbitBadgeEmphasis.Solid
-                    } else {
                         OrbitBadgeEmphasis.Glass
+                    } else {
+                        OrbitBadgeEmphasis.Outline
                     },
                     modifier = Modifier
                         .semantics {

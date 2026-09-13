@@ -51,7 +51,7 @@ fun OrbitSplashScreen(
     val wordStyle = OrbitTheme.typography.displayLarge.copy(
         fontSize = OrbitOpeningLockup.WordSize,
         lineHeight = OrbitOpeningLockup.WordSize,
-        fontWeight = OrbitTheme.fontWeights.display,
+        fontWeight = OrbitTheme.fontWeights.heading,
         letterSpacing = OrbitOpeningLockup.WordTracking,
         lineHeightStyle = LineHeightStyle(
             alignment = LineHeightStyle.Alignment.Proportional,

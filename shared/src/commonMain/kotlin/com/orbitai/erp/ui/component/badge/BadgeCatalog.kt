@@ -57,6 +57,9 @@ enum class BadgeKind(val label: String, val tone: OrbitBadgeTone) {
     // Documents and submissions.
     Submitted("Submitted", OrbitBadgeTone.Indigo),
     Upload("Uploaded", OrbitBadgeTone.Indigo),
+    PurchaseOrder("PO", OrbitBadgeTone.Indigo),
+    Ordered("Ordered", OrbitBadgeTone.Indigo),
+    Received("Received", OrbitBadgeTone.Teal),
 
     // Time.
     Scheduled("Scheduled", OrbitBadgeTone.Cyan),
@@ -97,6 +100,9 @@ enum class BadgeKind(val label: String, val tone: OrbitBadgeTone) {
             Deleted -> OrbitIcons.Delete
             Submitted -> OrbitIcons.Mail
             Upload -> OrbitIcons.Upload
+            PurchaseOrder -> OrbitIcons.ShoppingCart
+            Ordered -> OrbitIcons.ShoppingCart
+            Received -> OrbitIcons.CircleCheck
             Scheduled -> OrbitIcons.Calendar
             Delayed -> OrbitIcons.TimeQuarter
             Overdue -> OrbitIcons.StopWatch
@@ -172,4 +178,23 @@ val ProjectHealth.badgeKind: BadgeKind
         ProjectHealth.OnTrack -> BadgeKind.Healthy
         ProjectHealth.AtRisk -> BadgeKind.AtRisk
         ProjectHealth.Delayed -> BadgeKind.Critical
+    }
+
+/** Purchase-order cards: Ordered → In progress → Done → Received. */
+val WorkStatus.purchaseOrderBadgeKind: BadgeKind
+    get() = when (this) {
+        WorkStatus.Open -> BadgeKind.Ordered
+        WorkStatus.InProgress -> BadgeKind.InProgress
+        WorkStatus.InReview -> BadgeKind.Done
+        WorkStatus.Completed -> BadgeKind.Received
+        else -> badgeKind
+    }
+
+val WorkStatus.purchaseOrderDisplayName: String
+    get() = when (this) {
+        WorkStatus.Open -> "Ordered"
+        WorkStatus.InProgress -> "In progress"
+        WorkStatus.InReview -> "Done"
+        WorkStatus.Completed -> "Received"
+        else -> displayName
     }

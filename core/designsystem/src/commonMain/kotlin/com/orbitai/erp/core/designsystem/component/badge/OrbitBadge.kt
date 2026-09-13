@@ -40,7 +40,7 @@ enum class OrbitBadgeEmphasis {
     Outline,
 }
 
-enum class OrbitBadgeSize { Small, Medium, Large }
+enum class OrbitBadgeSize { Compact, Small, Medium, Large }
 
 /**
  * A non-interactive status chip: modestly rounded, optional leading glyph, tinted per [tone].
@@ -84,21 +84,35 @@ fun OrbitBadge(
     val shape = OrbitTheme.shapeTokens.badge
 
     val minHeight = when (size) {
+        OrbitBadgeSize.Compact -> sizing.badgeHeightXs
         OrbitBadgeSize.Small -> sizing.badgeHeightSm
         OrbitBadgeSize.Medium -> sizing.badgeHeightMd
         OrbitBadgeSize.Large -> sizing.badgeHeightLg
     }
     val iconSize = when (size) {
+        OrbitBadgeSize.Compact -> sizing.badgeIconXs
         OrbitBadgeSize.Small -> sizing.badgeIconSm
         OrbitBadgeSize.Medium -> sizing.badgeIconMd
         OrbitBadgeSize.Large -> sizing.badgeIconLg
     }
     val horizontalPadding = when (size) {
+        OrbitBadgeSize.Compact -> spacing.sm
         OrbitBadgeSize.Small -> spacing.sm
         OrbitBadgeSize.Medium -> spacing.md
         OrbitBadgeSize.Large -> spacing.md
     }
+    val verticalPadding = when (size) {
+        OrbitBadgeSize.Compact -> spacing.xxs
+        OrbitBadgeSize.Small -> spacing.xs
+        OrbitBadgeSize.Medium -> spacing.xs
+        OrbitBadgeSize.Large -> spacing.xs
+    }
+    val iconGap = when (size) {
+        OrbitBadgeSize.Compact -> spacing.xs
+        else -> spacing.xs
+    }
     val textStyle = when (size) {
+        OrbitBadgeSize.Compact -> OrbitTheme.typography.labelSmall
         OrbitBadgeSize.Small -> OrbitTheme.typography.labelMedium
         OrbitBadgeSize.Medium -> OrbitTheme.typography.labelLarge
         OrbitBadgeSize.Large -> OrbitTheme.typography.titleSmall
@@ -158,9 +172,9 @@ fun OrbitBadge(
             )
             .clip(shape)
             .then(surface)
-            .padding(horizontal = horizontalPadding, vertical = spacing.xs)
+            .padding(horizontal = horizontalPadding, vertical = verticalPadding)
             .semantics(mergeDescendants = true) {},
-        horizontalArrangement = Arrangement.spacedBy(spacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(iconGap),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {

@@ -19,6 +19,10 @@ internal enum class FormPreview {
     SampleTaskApartment,
     SampleIssueVilla,
     SampleIssueApartment,
+    SampleOrderVilla,
+    SampleOrderApartment,
+    MaterialsOrderVilla,
+    MaterialsOrderApartment,
 }
 
 @Composable
@@ -61,6 +65,23 @@ internal fun FormGalleryPage(
         }
     }
 
+    GallerySection("Materials order") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Materials order — ${ProjectType.Villas.displayName}",
+                onClick = { onOpen(FormPreview.MaterialsOrderVilla) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Materials order — ${ProjectType.ApartmentCommunity.displayName}",
+                onClick = { onOpen(FormPreview.MaterialsOrderApartment) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
     GallerySection("Created cards") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
             ActionButton(
@@ -85,6 +106,18 @@ internal fun FormGalleryPage(
                 action = ActionKind.Open,
                 label = "Raised issue — ${ProjectType.ApartmentCommunity.displayName}",
                 onClick = { onOpen(FormPreview.SampleIssueApartment) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Materials order — ${ProjectType.Villas.displayName}",
+                onClick = { onOpen(FormPreview.SampleOrderVilla) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Materials order — ${ProjectType.ApartmentCommunity.displayName}",
+                onClick = { onOpen(FormPreview.SampleOrderApartment) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

@@ -40,6 +40,16 @@ ICONS = {
     "Progress": "Progress03Icon",
     "Clock": "Clock01Icon",
     "ListBullet": "LeftToRightListBulletIcon",
+    # [list](https://hugeicons.com/icon/list?style=stroke-rounded) stroke-rounded.
+    "List": "ListIcon",
+    # [shopping-cart-02](https://hugeicons.com/icon/shopping-cart-02?style=stroke-rounded) stroke-rounded.
+    "ShoppingCart": "ShoppingCart02Icon",
+    # [square-dashed](https://hugeicons.com/icon/square-dashed?style=stroke-rounded) stroke-rounded.
+    "SquareDashed": "SquareDashedIcon",
+    # [plus-minus-02](https://hugeicons.com/icon/plus-minus-02?style=stroke-rounded) stroke-rounded.
+    "PlusMinus": "PlusMinus02Icon",
+    # [weight](https://hugeicons.com/icon/weight?style=stroke-rounded) stroke-rounded.
+    "Weight": "WeightIcon",
     "CheckmarkBadge": "CheckmarkBadge02Icon",
     "CancelCircle": "CancelCircleHalfDotIcon",
     "Mail": "Mail02Icon",
@@ -78,7 +88,9 @@ ICONS = {
     # the rotation legible, which a closed circle would not be.
     "Loading": "Loading03Icon",
     "Cancel": "Cancel01Icon",
-    "Sent": "SentIcon",
+    # Submit / send — [sent-02](https://hugeicons.com/icon/sent-02?style=stroke-rounded)
+    # stroke-rounded. The paper plane with the cut fold, not sent-01.
+    "Sent": "Sent02Icon",
     "Note": "Note01Icon",
     # Input-field glyphs.
     "Attachment": "Attachment01Icon",
@@ -111,6 +123,9 @@ ICONS = {
     # `User` stays for places that still want the older plain mark.
     "User": "UserIcon",
     "UserRound": "UserRoundIcon",
+    # Workers / labour count on the PM and QA review screen —
+    # [users-round](https://hugeicons.com/icon/users-round?style=stroke-rounded) stroke-rounded.
+    "UsersRound": "UsersRoundIcon",
     "Settings": "Settings01Icon",
     "Languages": "LanguagesIcon",
     "Pen": "Pen01Icon",

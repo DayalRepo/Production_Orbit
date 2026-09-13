@@ -94,11 +94,15 @@ fun OrbitMaterialUsageLog(
     onMaterialSelect: (id: String, material: String) -> Unit,
     onQuantityChange: (id: String, quantity: Int) -> Unit,
     onUnitSelect: (id: String, unit: String) -> Unit,
-    onAdd: () -> Unit,
+    onAdd: (() -> Unit)? = null,
     onRemove: (id: String) -> Unit,
     modifier: Modifier = Modifier,
     title: String = "Materials used",
+    showTitle: Boolean = true,
     addLabel: String = "Add material",
+    addMaterialLabel: String? = null,
+    onAddMaterialRequest: ((id: String) -> Unit)? = null,
+    onAddUnitRequest: ((id: String) -> Unit)? = null,
     suggestedUnitForMaterial: (String) -> String? = ::orbitSuggestedUnitForMaterial,
 ) {
     val sizing = OrbitTheme.sizing
@@ -128,24 +132,26 @@ fun OrbitMaterialUsageLog(
             },
         verticalArrangement = Arrangement.spacedBy(spacing.md),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.xxs)) {
-            Text(
-                text = title,
-                style = OrbitTheme.typography.titleMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
-                color = content.textPrimary,
-            )
-            Text(
-                text = if (lines.isEmpty()) {
-                    "No materials logged"
-                } else {
-                    "$complete of ${lines.size} logged"
-                },
-                style = OrbitTheme.typography.bodySmall,
-                color = content.textSecondary,
-            )
-        }
+        if (showTitle) {
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.xxs)) {
+                Text(
+                    text = title,
+                    style = OrbitTheme.typography.titleMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
+                    color = content.textPrimary,
+                )
+                Text(
+                    text = if (lines.isEmpty()) {
+                        "No materials logged"
+                    } else {
+                        "$complete of ${lines.size} logged"
+                    },
+                    style = OrbitTheme.typography.bodySmall,
+                    color = content.textSecondary,
+                )
+            }
 
-        OrbitDivider(color = control.controlBorder)
+            OrbitDivider(color = control.controlBorder)
+        }
 
         lines.forEachIndexed { index, line ->
             if (index > 0) {
@@ -164,17 +170,23 @@ fun OrbitMaterialUsageLog(
                 onQuantityChange = { onQuantityChange(line.id, it) },
                 onUnitSelect = { onUnitSelect(line.id, it) },
                 onRemove = { onRemove(line.id) },
+                addMaterialLabel = addMaterialLabel,
+                onAddMaterialRequest = onAddMaterialRequest?.let { add -> { add(line.id) } },
+                onAddUnitRequest = onAddUnitRequest?.let { add -> { add(line.id) } },
             )
         }
 
-        OrbitButton(
-            label = addLabel,
-            onClick = onAdd,
-            modifier = Modifier.fillMaxWidth(),
-            variant = OrbitButtonVariant.Primary,
-            size = OrbitButtonSize.Medium,
-            icon = OrbitIcons.Add,
-        )
+        if (onAdd != null) {
+            OrbitButton(
+                label = addLabel,
+                onClick = onAdd,
+                modifier = Modifier.fillMaxWidth(),
+                variant = OrbitButtonVariant.Primary,
+                size = OrbitButtonSize.Medium,
+                icon = OrbitIcons.Add,
+                shape = OrbitTheme.shapeTokens.card,
+            )
+        }
     }
 }
 
@@ -189,6 +201,9 @@ private fun MaterialUsageRow(
     onQuantityChange: (Int) -> Unit,
     onUnitSelect: (String) -> Unit,
     onRemove: () -> Unit,
+    addMaterialLabel: String? = null,
+    onAddMaterialRequest: (() -> Unit)? = null,
+    onAddUnitRequest: (() -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
@@ -233,6 +248,8 @@ private fun MaterialUsageRow(
             label = "Material",
             placeholder = "Select material",
             searchPlaceholder = "Search materials",
+            addLabel = addMaterialLabel,
+            onAddRequest = onAddMaterialRequest,
             modifier = Modifier.fillMaxWidth(),
             size = OrbitFieldSize.Medium,
         )
@@ -247,6 +264,7 @@ private fun MaterialUsageRow(
             unitPlaceholder = "Unit",
             size = OrbitFieldSize.Medium,
             modifier = Modifier.fillMaxWidth(),
+            onAddUnitRequest = onAddUnitRequest,
         )
     }
 }

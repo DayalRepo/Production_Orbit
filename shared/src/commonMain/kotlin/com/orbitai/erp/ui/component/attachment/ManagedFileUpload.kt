@@ -13,8 +13,13 @@ import com.orbitai.erp.core.designsystem.component.display.OrbitAttachmentLeadin
 import com.orbitai.erp.core.designsystem.component.input.OrbitFileUpload
 import com.orbitai.erp.core.designsystem.component.input.OrbitUploadItem
 import com.orbitai.erp.core.designsystem.component.input.OrbitUploadState
+import com.orbitai.erp.core.designsystem.component.media.OrbitImageCarousel
+import com.orbitai.erp.core.designsystem.component.media.OrbitImageCarouselPage
+import com.orbitai.erp.core.designsystem.component.media.orbitIsImageFileName
 import com.orbitai.erp.platform.PickedFile
+import com.orbitai.erp.platform.rememberCameraPicker
 import com.orbitai.erp.platform.rememberFilePicker
+import com.orbitai.erp.platform.rememberImagePicker
 import com.orbitai.erp.resources.Res
 import com.orbitai.erp.resources.file_docs
 import com.orbitai.erp.resources.file_pdf
@@ -32,10 +37,17 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun ManagedFileUpload(
     modifier: Modifier = Modifier,
+    browseLabel: String = "Browse File",
+    cameraLabel: String? = "Click photo",
+    dropZoneTitle: String = "Choose a file or drag & drop it here.",
+    dropZoneHint: String = "JPEG, PNG, PDF, and MP4 formats, up to 50 MB.",
+    photosOnly: Boolean = false,
+    onCompleted: ((id: String, name: String, sizeLabel: String) -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
     val entries = remember { mutableStateListOf<UploadEntry>() }
     var deleteTarget by remember { mutableStateOf<UploadEntry?>(null) }
+    var viewingId by remember { mutableStateOf<String?>(null) }
     val jobs = remember { mutableMapOf<String, Job>() }
     val cancelledIds = remember { mutableSetOf<String>() }
 
@@ -55,11 +67,19 @@ fun ManagedFileUpload(
             ) { uploaded, fraction ->
                 val index = entries.indexOfFirst { it.id == entry.id }
                 if (index < 0) return@runUploadSimulation
+                val done = fraction >= 1f
                 entries[index] = entries[index].copy(
                     uploadedBytes = uploaded,
                     progress = fraction,
-                    state = if (fraction >= 1f) OrbitUploadState.Completed else OrbitUploadState.Uploading,
+                    state = if (done) OrbitUploadState.Completed else OrbitUploadState.Uploading,
                 )
+                if (done) {
+                    onCompleted?.invoke(
+                        picked.id,
+                        picked.name,
+                        formatBytes(picked.sizeBytes.coerceAtLeast(1L)),
+                    )
+                }
             }
             jobs.remove(entry.id)
             if (!finished) {
@@ -69,13 +89,24 @@ fun ManagedFileUpload(
         jobs[entry.id] = job
     }
 
-    val launchPicker = rememberFilePicker { picked ->
+    val launchFiles = rememberFilePicker { picked ->
+        picked?.let(::startUpload)
+    }
+    val launchImages = rememberImagePicker { picked ->
+        picked?.let(::startUpload)
+    }
+    val launchCamera = rememberCameraPicker { picked ->
         picked?.let(::startUpload)
     }
 
     OrbitFileUpload(
         items = entries.map { it.toOrbitItem() },
-        onBrowseClick = launchPicker,
+        onBrowseClick = if (photosOnly) launchImages else launchFiles,
+        dropZoneTitle = dropZoneTitle,
+        dropZoneHint = dropZoneHint,
+        browseLabel = browseLabel,
+        cameraLabel = cameraLabel,
+        onCameraClick = launchCamera,
         leadingFor = { item ->
             val entry = entries.firstOrNull { it.id == item.id }
             leadingForEntry(entry)
@@ -88,8 +119,30 @@ fun ManagedFileUpload(
         onRemove = { item ->
             entries.firstOrNull { it.id == item.id }?.let { deleteTarget = it }
         },
+        onItemClick = { item ->
+            if (orbitIsImageFileName(item.fileName)) viewingId = item.id
+        },
         modifier = modifier,
     )
+
+    val completedImages = entries.filter {
+        it.state == OrbitUploadState.Completed && orbitIsImageFileName(it.picked.name)
+    }
+    val viewingIndex = completedImages.indexOfFirst { it.id == viewingId }
+    if (viewingIndex >= 0) {
+        OrbitImageCarousel(
+            pages = completedImages.map { OrbitImageCarouselPage(it.id, it.picked.name) },
+            painterFor = { page ->
+                when (val leading = leadingForEntry(completedImages.firstOrNull { it.id == page.id })) {
+                    is OrbitAttachmentLeading.Preview -> leading.painter
+                    is OrbitAttachmentLeading.Artwork -> leading.painter
+                    else -> null
+                }
+            },
+            onDismiss = { viewingId = null },
+            startIndex = viewingIndex,
+        )
+    }
 
     deleteTarget?.let { target ->
         OrbitConfirmDialog(

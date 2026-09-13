@@ -15,11 +15,65 @@ import com.orbitai.erp.core.designsystem.component.datetime.OrbitDateRange
 import com.orbitai.erp.core.designsystem.component.datetime.OrbitDateTimeField
 import com.orbitai.erp.core.designsystem.component.datetime.OrbitDateTimePicker
 import com.orbitai.erp.core.designsystem.component.input.OrbitDropdownField
+import com.orbitai.erp.core.designsystem.component.input.OrbitFieldSize
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.model.ProjectType
 import com.orbitai.erp.ui.datetime.orbitToday
 import com.orbitai.erp.ui.form.FormFieldLabel
 import com.orbitai.erp.ui.form.SiteLocations
+
+/**
+ * Project name and a date range — used by materials orders, which sit at the project
+ * rather than a villa, tower or unit.
+ */
+@Composable
+fun OrderProjectSchedulePage(
+    projects: List<String>,
+    projectName: String?,
+    onProjectSelect: (String) -> Unit,
+    dateRange: OrbitDateRange?,
+    onDateRangeChange: (OrbitDateRange) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = OrbitTheme.spacing
+    val bounds = remember { OrbitCalendarBounds(today = orbitToday()) }
+    var rangeOpen by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(spacing.fieldGap),
+    ) {
+        LocationField(
+            heading = "Project",
+            selected = projectName,
+            options = projects,
+            onSelect = onProjectSelect,
+            placeholder = projects.firstOrNull() ?: "Project",
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            FormFieldLabel("Date range")
+            OrbitDateTimeField(
+                value = dateRange?.format(),
+                placeholder = "Start – end dates",
+                onClick = { rangeOpen = !rangeOpen },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (rangeOpen) {
+                OrbitDateTimePicker(
+                    bounds = bounds,
+                    selection = dateRange,
+                    confirmLabel = "Set dates",
+                    onCancel = { rangeOpen = false },
+                    onConfirm = {
+                        onDateRangeChange(it)
+                        rangeOpen = false
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
 
 /**
  * Villa + floor, or tower + floor + unit on one row, then a date-range field.
@@ -59,8 +113,7 @@ fun LocationSchedulePage(
                         selected = villa,
                         options = SiteLocations.villas,
                         onSelect = onVillaSelect,
-                        placeholder = "Select a villa",
-                        searchPlaceholder = "Search villas",
+                        placeholder = "Villa 12",
                         modifier = Modifier.weight(1f),
                     )
                     LocationField(
@@ -68,8 +121,7 @@ fun LocationSchedulePage(
                         selected = floor,
                         options = SiteLocations.floors,
                         onSelect = onFloorSelect,
-                        placeholder = "Select a floor",
-                        searchPlaceholder = "Search floors",
+                        placeholder = "1st floor",
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -84,8 +136,8 @@ fun LocationSchedulePage(
                         selected = tower,
                         options = SiteLocations.towers,
                         onSelect = onTowerSelect,
-                        placeholder = "Select a tower",
-                        searchPlaceholder = "Search towers",
+                        placeholder = "A",
+                        size = OrbitFieldSize.Small,
                         modifier = Modifier.weight(1f),
                     )
                     LocationField(
@@ -93,8 +145,8 @@ fun LocationSchedulePage(
                         selected = floor,
                         options = SiteLocations.floors,
                         onSelect = onFloorSelect,
-                        placeholder = "Select a floor",
-                        searchPlaceholder = "Search floors",
+                        placeholder = "1st",
+                        size = OrbitFieldSize.Small,
                         modifier = Modifier.weight(1f),
                     )
                     LocationField(
@@ -102,12 +154,8 @@ fun LocationSchedulePage(
                         selected = apartmentUnit,
                         options = units,
                         onSelect = onApartmentUnitSelect,
-                        placeholder = if (tower == null) {
-                            "Select a tower first"
-                        } else {
-                            "Select a unit"
-                        },
-                        searchPlaceholder = "Search units",
+                        placeholder = if (tower == null) "—" else "101",
+                        size = OrbitFieldSize.Small,
                         enabled = tower != null,
                         modifier = Modifier.weight(1f),
                     )
@@ -147,9 +195,9 @@ private fun LocationField(
     options: List<String>,
     onSelect: (String) -> Unit,
     placeholder: String,
-    searchPlaceholder: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: OrbitFieldSize = OrbitFieldSize.Medium,
 ) {
     val spacing = OrbitTheme.spacing
     Column(
@@ -163,8 +211,9 @@ private fun LocationField(
             onSelect = onSelect,
             label = heading,
             placeholder = placeholder,
-            searchPlaceholder = searchPlaceholder,
             enabled = enabled,
+            searchable = false,
+            size = size,
             modifier = Modifier.fillMaxWidth(),
         )
     }

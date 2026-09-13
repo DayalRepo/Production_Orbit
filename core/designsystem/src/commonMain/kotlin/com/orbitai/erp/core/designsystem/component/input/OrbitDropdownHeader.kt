@@ -39,28 +39,34 @@ internal fun OrbitDropdownHeader(
     onQueryChange: (String) -> Unit,
     searchPlaceholder: String,
     modifier: Modifier = Modifier,
+    searchable: Boolean = true,
     addLabel: String? = null,
     onAdd: (() -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
+    val canAdd = addLabel != null && onAdd != null
 
-    OrbitSearchField(
-        value = query,
-        onValueChange = onQueryChange,
-        placeholder = searchPlaceholder,
-        label = searchPlaceholder,
-        // The smallest field size. This is a tool inside a panel, not a field on a form, and at the
-        // panel's own field size it would be as tall as the control that opened it — which makes the
-        // dropdown look like it contains a second form rather than a filter.
-        size = OrbitFieldSize.Small,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = spacing.sm, vertical = spacing.xxs),
-    )
+    if (searchable) {
+        OrbitSearchField(
+            value = query,
+            onValueChange = onQueryChange,
+            placeholder = searchPlaceholder,
+            label = searchPlaceholder,
+            // The smallest field size. This is a tool inside a panel, not a field on a form, and at the
+            // panel's own field size it would be as tall as the control that opened it — which makes the
+            // dropdown look like it contains a second form rather than a filter.
+            size = OrbitFieldSize.Small,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = spacing.sm, vertical = spacing.xxs),
+        )
+    }
 
     if (addLabel != null && onAdd != null) {
         OrbitDropdownAddRow(label = addLabel, onClick = onAdd)
     }
 
-    OrbitDivider()
+    if (searchable || canAdd) {
+        OrbitDivider()
+    }
 }

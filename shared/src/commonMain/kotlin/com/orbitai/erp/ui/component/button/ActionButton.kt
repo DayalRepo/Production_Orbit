@@ -104,6 +104,32 @@ enum class ActionKind(
 
     /** Opens the edit screen for a created task or issue. Text-only on purpose. */
     Update("Update", OrbitButtonVariant.Primary, null),
+
+    /** Project manager starts work that is still in Created. */
+    Start("Start", OrbitButtonVariant.Primary, OrbitIcons.Play),
+
+    /** Opens a created card read-only. */
+    View(
+        "View",
+        OrbitButtonVariant.Primary,
+        OrbitIcons.ArrowRight,
+        OrbitButtonIconPosition.Trailing,
+    ),
+
+    /** Site engineer / contractor hands work up for review. */
+    Submit("Submit", OrbitButtonVariant.Primary, OrbitIcons.Sent),
+
+    /** QA/QC sends the work back. Pairs with [Approve]. */
+    Rework("Rework", OrbitButtonVariant.Destructive, OrbitIcons.Repeat),
+
+    /** Commits a Need request. Pairs with [Cancel]. */
+    Done("Done", OrbitButtonVariant.Primary, OrbitIcons.Tick),
+
+    /** Places a materials order. Pairs with [Cancel]. */
+    Confirm("Confirm", OrbitButtonVariant.Primary, OrbitIcons.Tick),
+
+    /** Warehouse marks a purchase order received. */
+    Receive("Received", OrbitButtonVariant.Primary, OrbitIcons.Tick),
     ;
 
     /** In-flight wording, so a button that is working says what it is doing. */
@@ -120,6 +146,13 @@ enum class ActionKind(
             Next -> "Continuing"
             Raise -> "Raising"
             Update -> "Updating"
+            Start -> "Starting"
+            View -> "Viewing"
+            Submit -> "Submitting"
+            Rework -> "Sending back"
+            Done -> "Saving"
+            Confirm -> "Confirming"
+            Receive -> "Receiving"
         }
 }
 
@@ -143,6 +176,7 @@ fun ActionButton(
     size: OrbitButtonSize = OrbitButtonSize.Large,
     state: OrbitButtonState = OrbitButtonState.Active,
     loading: Boolean = false,
+    showIcon: Boolean = true,
 ) {
     OrbitButton(
         label = label ?: if (loading) action.busyLabel else action.label,
@@ -152,10 +186,10 @@ fun ActionButton(
         size = size,
         // Skipped while loading: the spinner takes the glyph's slot, so passing both would be a
         // mark and a spinner competing for one position. [ActionKind.Update] is text-only.
-        icon = if (loading) null else action.icon,
+        icon = if (loading || !showIcon) null else action.icon,
         iconPosition = action.iconPosition,
         state = state,
         loading = loading,
-        shape = OrbitTheme.shapeTokens.dialog,
+        shape = OrbitTheme.shapeTokens.card,
     )
 }

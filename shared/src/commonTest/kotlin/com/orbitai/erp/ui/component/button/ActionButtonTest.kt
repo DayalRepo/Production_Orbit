@@ -69,7 +69,11 @@ class ActionButtonTest {
             ActionKind.Cancel to ActionKind.Send,
             ActionKind.Cancel to ActionKind.Create,
             ActionKind.Cancel to ActionKind.Raise,
+            ActionKind.Cancel to ActionKind.Approve,
+            ActionKind.Rework to ActionKind.Approve,
             ActionKind.Back to ActionKind.Next,
+            ActionKind.Cancel to ActionKind.Done,
+            ActionKind.Cancel to ActionKind.Confirm,
         )
         pairs.forEach { (dismiss, confirm) ->
             assertEquals(

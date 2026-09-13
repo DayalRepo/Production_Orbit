@@ -31,10 +31,13 @@ import com.orbitai.erp.ui.card.WorkItemKind
 import com.orbitai.erp.ui.card.WorkItemRecord
 import com.orbitai.erp.ui.card.sampleIssueApartment
 import com.orbitai.erp.ui.card.sampleIssueVilla
+import com.orbitai.erp.ui.card.sampleOrderApartment
+import com.orbitai.erp.ui.card.sampleOrderVilla
 import com.orbitai.erp.ui.card.sampleTaskApartment
 import com.orbitai.erp.ui.card.sampleTaskVilla
 import com.orbitai.erp.ui.card.toRecord
 import com.orbitai.erp.ui.form.CreateTaskForm
+import com.orbitai.erp.ui.form.MaterialsOrderForm
 import com.orbitai.erp.ui.form.RaiseIssueForm
 
 /**
@@ -115,6 +118,22 @@ fun ComponentGalleryScreen(
                 openCards(createdItems.toList(), "Created items")
             },
         )
+        openForm == FormPreview.MaterialsOrderVilla -> MaterialsOrderForm(
+            projectType = ProjectType.Villas,
+            onDismiss = { openForm = null },
+            onCreate = { draft ->
+                createdItems.add(0, draft.toRecord(ProjectType.Villas))
+                openCards(createdItems.toList(), "Created items")
+            },
+        )
+        openForm == FormPreview.MaterialsOrderApartment -> MaterialsOrderForm(
+            projectType = ProjectType.ApartmentCommunity,
+            onDismiss = { openForm = null },
+            onCreate = { draft ->
+                createdItems.add(0, draft.toRecord(ProjectType.ApartmentCommunity))
+                openCards(createdItems.toList(), "Created items")
+            },
+        )
         else -> GalleryIndex(
             isDark = isDark,
             onToggleTheme = onToggleTheme,
@@ -128,6 +147,10 @@ fun ComponentGalleryScreen(
                         openCards(listOf(sampleIssueVilla()), "Raised issue")
                     FormPreview.SampleIssueApartment ->
                         openCards(listOf(sampleIssueApartment()), "Raised issue")
+                    FormPreview.SampleOrderVilla ->
+                        openCards(listOf(sampleOrderVilla()), "Materials order")
+                    FormPreview.SampleOrderApartment ->
+                        openCards(listOf(sampleOrderApartment()), "Materials order")
                     else -> openForm = preview
                 }
             },

@@ -16,6 +16,8 @@ import com.orbitai.erp.core.designsystem.component.display.OrbitAttachmentLeadin
 import com.orbitai.erp.core.designsystem.component.input.OrbitFileUpload
 import com.orbitai.erp.core.designsystem.component.input.OrbitUploadItem
 import com.orbitai.erp.core.designsystem.component.input.OrbitUploadState
+import com.orbitai.erp.core.designsystem.component.media.OrbitImageCarousel
+import com.orbitai.erp.core.designsystem.component.media.OrbitImageCarouselPage
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.platform.PickedFile
 import com.orbitai.erp.platform.rememberCameraPicker
@@ -29,22 +31,47 @@ import com.orbitai.erp.ui.component.attachment.formatBytes
 import com.orbitai.erp.ui.component.attachment.formatByteProgress
 import com.orbitai.erp.ui.component.attachment.imageUploadLeading
 import com.orbitai.erp.ui.component.attachment.runUploadSimulation
+import com.orbitai.erp.ui.card.WorkItemPhoto
+import com.orbitai.erp.ui.card.workItemPhotoPainter
+import com.orbitai.erp.ui.component.input.ManagedDescriptionField
+import com.orbitai.erp.ui.form.DraftPhoto
 import com.orbitai.erp.ui.form.FormFieldLabel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 /**
- * Issue photo upload: drop zone plus in-flight rows, then completed files as attachment thumbnails.
+ * Issue description plus photo upload: drop zone, in-flight rows, then completed thumbnails.
  */
 @Composable
 fun IssuePhotosPage(
     modifier: Modifier = Modifier,
+    description: String = "",
+    initialPhotos: List<DraftPhoto> = emptyList(),
+    onDescriptionChange: ((String) -> Unit)? = null,
+    onPhotoCompleted: ((id: String, name: String, size: String) -> Unit)? = null,
+    onPhotoRemoved: ((id: String) -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
     val scope = rememberCoroutineScope()
-    val entries = remember { mutableStateListOf<PhotoEntry>() }
+    val seeded = initialPhotos.map { photo ->
+        PhotoEntry(
+            picked = PickedFile(
+                id = photo.id,
+                name = photo.fileName,
+                sizeBytes = parseFileSizeLabel(photo.fileSize),
+            ),
+            uploadedBytes = parseFileSizeLabel(photo.fileSize),
+            state = OrbitUploadState.Completed,
+            progress = 1f,
+            preview = workItemPhotoPainter(WorkItemPhoto(photo.id, photo.fileName, photo.fileSize)),
+        )
+    }
+    val entries = remember(initialPhotos.map { it.id }) {
+        mutableStateListOf<PhotoEntry>().also { it.addAll(seeded) }
+    }
     var deleteTarget by remember { mutableStateOf<PhotoEntry?>(null) }
+    var viewingId by remember { mutableStateOf<String?>(null) }
     val jobs = remember { mutableMapOf<String, Job>() }
     val cancelledIds = remember { mutableSetOf<String>() }
 
@@ -76,6 +103,13 @@ fun IssuePhotosPage(
                         OrbitUploadState.Uploading
                     },
                 )
+                if (fraction >= 1f) {
+                    onPhotoCompleted?.invoke(
+                        named.id,
+                        named.name,
+                        formatBytes(named.sizeBytes.coerceAtLeast(0L)),
+                    )
+                }
             }
             jobs.remove(entry.id)
             if (!finished) {
@@ -99,6 +133,18 @@ fun IssuePhotosPage(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.fieldGap),
     ) {
+        if (onDescriptionChange != null) {
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                FormFieldLabel("Issue description")
+                ManagedDescriptionField(
+                    value = description,
+                    onValueChange = onDescriptionChange,
+                    label = "Issue description",
+                    placeholder = "What is wrong on site",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
             FormFieldLabel("Photos")
             OrbitFileUpload(
@@ -113,7 +159,7 @@ fun IssuePhotosPage(
                     jobs.remove(item.id)?.cancel()
                     entries.removeAll { it.id == item.id }
                 },
-                dropZoneTitle = "Upload or click a photo of the issue.",
+                dropZoneTitle = "Add a photo of the issue.",
                 dropZoneHint = "JPEG, PNG, and HEIC, up to 50 MB.",
                 browseLabel = "Upload photo",
                 cameraLabel = "Click photo",
@@ -132,10 +178,27 @@ fun IssuePhotosPage(
                         fileSize = formatBytes(entry.picked.sizeBytes.coerceAtLeast(0L)),
                         preview = preview,
                         onRemove = { deleteTarget = entry },
+                        onClick = { viewingId = entry.id },
                     )
                 }
             }
         }
+    }
+
+    val viewingIndex = completed.indexOfFirst { it.id == viewingId }
+    if (viewingIndex >= 0) {
+        OrbitImageCarousel(
+            pages = completed.map { OrbitImageCarouselPage(it.id, it.picked.name) },
+            painterFor = { page ->
+                when (val leading = leadingForEntry(completed.firstOrNull { it.id == page.id })) {
+                    is OrbitAttachmentLeading.Preview -> leading.painter
+                    is OrbitAttachmentLeading.Artwork -> leading.painter
+                    else -> null
+                }
+            },
+            onDismiss = { viewingId = null },
+            startIndex = viewingIndex,
+        )
     }
 
     deleteTarget?.let { target ->
@@ -147,6 +210,7 @@ fun IssuePhotosPage(
                 cancelledIds += target.id
                 jobs.remove(target.id)?.cancel()
                 entries.removeAll { it.id == target.id }
+                onPhotoRemoved?.invoke(target.id)
                 deleteTarget = null
             },
             onDismiss = { deleteTarget = null },
@@ -154,8 +218,19 @@ fun IssuePhotosPage(
     }
 }
 
+private fun parseFileSizeLabel(label: String): Long {
+    val number = label.substringBefore(' ').toDoubleOrNull() ?: return 0L
+    return when {
+        "GB" in label.uppercase() -> (number * 1024 * 1024 * 1024).toLong()
+        "MB" in label.uppercase() -> (number * 1024 * 1024).toLong()
+        "KB" in label.uppercase() -> (number * 1024).toLong()
+        else -> number.toLong()
+    }
+}
+
 @Composable
 private fun leadingForEntry(entry: PhotoEntry?): OrbitAttachmentLeading {
+    entry?.preview?.let { return OrbitAttachmentLeading.Preview(it) }
     val picked = entry?.picked ?: return OrbitAttachmentLeading.Glyph
     imageUploadLeading(picked.previewUri, picked.name)?.let { return it }
     return when (picked.name.substringAfterLast('.', "").lowercase()) {
@@ -173,6 +248,7 @@ private data class PhotoEntry(
     val uploadedBytes: Long,
     val state: OrbitUploadState,
     val progress: Float,
+    val preview: androidx.compose.ui.graphics.painter.Painter? = null,
 ) {
     val id: String get() = picked.id
 

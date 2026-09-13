@@ -10,9 +10,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.component.dialog.OrbitCreateDialog
-import com.orbitai.erp.core.designsystem.component.input.OrbitDropdownField
 import com.orbitai.erp.core.designsystem.component.input.OrbitFieldState
-import com.orbitai.erp.core.designsystem.component.input.OrbitQuantityUnitField
+import com.orbitai.erp.core.designsystem.component.input.OrbitMaterialUsageLine
+import com.orbitai.erp.core.designsystem.component.input.OrbitMaterialUsageLog
 import com.orbitai.erp.core.designsystem.component.input.orbitSuggestedUnitForMaterial
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.ui.component.dropdown.ConstructionMaterials
@@ -20,77 +20,65 @@ import com.orbitai.erp.ui.component.dropdown.ConstructionUnits
 import com.orbitai.erp.ui.form.FormFieldLabel
 
 /**
- * One material, then quantity + unit. Creating a material or unit grows the local catalogues.
+ * Several material lines, each with its own quantity and unit.
+ *
+ * Creating a material or unit grows the local catalogues and fills the line that asked.
  */
 @Composable
 fun MaterialsPage(
-    material: String?,
-    onMaterialSelect: (String) -> Unit,
+    lines: List<OrbitMaterialUsageLine>,
     extraMaterials: List<String>,
-    onMaterialCreated: (String) -> Unit,
-    quantity: Int,
-    onQuantityChange: (Int) -> Unit,
-    unit: String?,
-    onUnitSelect: (String) -> Unit,
     extraUnits: List<String>,
+    onMaterialSelect: (id: String, material: String) -> Unit,
+    onQuantityChange: (id: String, quantity: Int) -> Unit,
+    onUnitSelect: (id: String, unit: String) -> Unit,
+    onAddLine: () -> Unit,
+    onRemoveLine: (id: String) -> Unit,
+    onMaterialCreated: (String) -> Unit,
     onUnitCreated: (String) -> Unit,
     modifier: Modifier = Modifier,
+    label: String = "Materials",
+    allowMultipleLines: Boolean = true,
 ) {
-    val spacing = OrbitTheme.spacing
     val materials = remember(extraMaterials) { ConstructionMaterials + extraMaterials }
     val units = remember(extraUnits) { ConstructionUnits + extraUnits }
-    var creatingMaterial by remember { mutableStateOf(false) }
-    var creatingUnit by remember { mutableStateOf(false) }
+    var creatingMaterialFor by remember { mutableStateOf<String?>(null) }
+    var creatingUnitFor by remember { mutableStateOf<String?>(null) }
     var duplicateMaterial by remember { mutableStateOf(false) }
     var duplicateUnit by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(spacing.fieldGap),
+        verticalArrangement = Arrangement.spacedBy(OrbitTheme.spacing.sm),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            FormFieldLabel("Material")
-            OrbitDropdownField(
-                selected = material,
-                options = materials,
-                onSelect = { chosen ->
-                    onMaterialSelect(chosen)
-                    if (unit == null) {
-                        orbitSuggestedUnitForMaterial(chosen)?.let(onUnitSelect)
-                    }
-                },
-                label = "Material",
-                placeholder = "Select material",
-                searchPlaceholder = "Search materials",
-                addLabel = "Add material",
-                onAddRequest = {
-                    duplicateMaterial = false
-                    creatingMaterial = true
-                },
-                modifier = Modifier.fillMaxWidth(),
-            )
+        if (label.isNotBlank()) {
+            FormFieldLabel(label)
         }
-
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
-            FormFieldLabel("Quantity and unit")
-            OrbitQuantityUnitField(
-                value = quantity,
-                onValueChange = onQuantityChange,
-                selectedUnit = unit,
-                units = units,
-                onUnitSelect = onUnitSelect,
-                quantityLabel = "Quantity",
-                unitLabel = "Unit",
-                modifier = Modifier.fillMaxWidth(),
-                onAddUnitRequest = {
-                    duplicateUnit = false
-                    creatingUnit = true
-                },
-            )
-        }
+        OrbitMaterialUsageLog(
+            lines = lines,
+            materials = materials,
+            units = units,
+            onMaterialSelect = onMaterialSelect,
+            onQuantityChange = onQuantityChange,
+            onUnitSelect = onUnitSelect,
+            onAdd = if (allowMultipleLines) onAddLine else null,
+            onRemove = onRemoveLine,
+            modifier = Modifier.fillMaxWidth(),
+            showTitle = false,
+            addMaterialLabel = "Add material",
+            onAddMaterialRequest = { lineId ->
+                duplicateMaterial = false
+                creatingMaterialFor = lineId
+            },
+            onAddUnitRequest = { lineId ->
+                duplicateUnit = false
+                creatingUnitFor = lineId
+            },
+        )
     }
 
-    if (creatingMaterial) {
+    val creatingMaterialId = creatingMaterialFor
+    if (creatingMaterialId != null) {
         OrbitCreateDialog(
             title = "Add material",
             info = "Include the grade or size — that is what gets ordered.",
@@ -100,21 +88,22 @@ fun MaterialsPage(
             onCreate = { name ->
                 val existing = materials.firstOrNull { it.equals(name, ignoreCase = true) }
                 if (existing != null) {
-                    onMaterialSelect(existing)
+                    onMaterialSelect(creatingMaterialId, existing)
                     duplicateMaterial = true
-                    creatingMaterial = false
+                    creatingMaterialFor = null
                 } else {
                     onMaterialCreated(name)
-                    onMaterialSelect(name)
-                    orbitSuggestedUnitForMaterial(name)?.let(onUnitSelect)
-                    creatingMaterial = false
+                    onMaterialSelect(creatingMaterialId, name)
+                    orbitSuggestedUnitForMaterial(name)?.let { onUnitSelect(creatingMaterialId, it) }
+                    creatingMaterialFor = null
                 }
             },
-            onDismiss = { creatingMaterial = false },
+            onDismiss = { creatingMaterialFor = null },
         )
     }
 
-    if (creatingUnit) {
+    val creatingUnitId = creatingUnitFor
+    if (creatingUnitId != null) {
         OrbitCreateDialog(
             title = "Add unit",
             info = "Shared across the project. Use the unit the store issues against.",
@@ -124,16 +113,16 @@ fun MaterialsPage(
             onCreate = { name ->
                 val existing = units.firstOrNull { it.equals(name, ignoreCase = true) }
                 if (existing != null) {
-                    onUnitSelect(existing)
+                    onUnitSelect(creatingUnitId, existing)
                     duplicateUnit = true
-                    creatingUnit = false
+                    creatingUnitFor = null
                 } else {
                     onUnitCreated(name)
-                    onUnitSelect(name)
-                    creatingUnit = false
+                    onUnitSelect(creatingUnitId, name)
+                    creatingUnitFor = null
                 }
             },
-            onDismiss = { creatingUnit = false },
+            onDismiss = { creatingUnitFor = null },
         )
     }
 }

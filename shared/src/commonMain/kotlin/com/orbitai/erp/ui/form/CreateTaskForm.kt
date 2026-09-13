@@ -4,8 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.orbitai.erp.core.designsystem.component.display.OrbitChecklistItem
+import com.orbitai.erp.core.designsystem.component.input.OrbitMaterialUsageLine
 import com.orbitai.erp.core.model.ProjectType
 import com.orbitai.erp.core.model.Severity
+import com.orbitai.erp.ui.card.WorkItemRecord
+import com.orbitai.erp.ui.card.toWorkItemDraft
 import com.orbitai.erp.ui.component.button.ActionKind
 import com.orbitai.erp.ui.form.page.AssignPage
 import com.orbitai.erp.ui.form.page.ChecklistPage
@@ -19,37 +22,54 @@ fun CreateTaskForm(
     projectType: ProjectType,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    editing: WorkItemRecord? = null,
     onCreate: (WorkItemDraft) -> Unit = {},
 ) {
-    val draft = remember { CreateTaskDraft() }.work
+    val draft = remember(editing?.id) {
+        editing?.toWorkItemDraft() ?: CreateTaskDraft().work
+    }
 
     WizardScaffold(
-        title = "Create task",
+        title = if (editing != null) "Edit task" else "Create task",
         subtitle = projectType.displayName,
         dismiss = ActionKind.Cancel,
-        confirm = ActionKind.Create,
+        confirm = if (editing != null) ActionKind.Update else ActionKind.Create,
         onDismiss = onDismiss,
         onConfirm = { onCreate(draft) },
         modifier = modifier,
     ) {
-        FormSection("Stage and task", showDivider = false) {
+        FormSection(showDivider = false) {
             StageAndTaskFields(draft = draft, projectType = projectType)
         }
-        FormSection("Materials") {
+        FormSection {
             MaterialsPage(
-                material = draft.material,
-                onMaterialSelect = { draft.material = it },
+                lines = draft.materialLines.toList(),
                 extraMaterials = draft.extraMaterials,
-                onMaterialCreated = { draft.extraMaterials = draft.extraMaterials + it },
-                quantity = draft.quantity,
-                onQuantityChange = { draft.quantity = it },
-                unit = draft.materialUnit,
-                onUnitSelect = { draft.materialUnit = it },
                 extraUnits = draft.extraUnits,
+                onMaterialSelect = { id, material ->
+                    draft.replaceMaterialLine(id) { it.copy(material = material) }
+                },
+                onQuantityChange = { id, quantity ->
+                    draft.replaceMaterialLine(id) { it.copy(quantity = quantity) }
+                },
+                onUnitSelect = { id, unit ->
+                    draft.replaceMaterialLine(id) { it.copy(unit = unit) }
+                },
+                onAddLine = {
+                    draft.materialLines += OrbitMaterialUsageLine(id = "m${Random.nextLong()}")
+                },
+                onRemoveLine = { id ->
+                    if (draft.materialLines.size == 1) {
+                        draft.materialLines[0] = OrbitMaterialUsageLine(id = draft.materialLines[0].id)
+                    } else {
+                        draft.materialLines.removeAll { it.id == id }
+                    }
+                },
+                onMaterialCreated = { draft.extraMaterials = draft.extraMaterials + it },
                 onUnitCreated = { draft.extraUnits = draft.extraUnits + it },
             )
         }
-        FormSection("Checklist") {
+        FormSection {
             ChecklistPage(
                 title = draft.checklistTitle,
                 onTitleChange = { draft.checklistTitle = it },
@@ -60,7 +80,7 @@ fun CreateTaskForm(
                 onRemoveItem = { id -> draft.checklistItems.removeAll { it.id == id } },
             )
         }
-        FormSection("Location") {
+        FormSection {
             LocationSchedulePage(
                 projectType = projectType,
                 villa = draft.villa,
@@ -81,7 +101,7 @@ fun CreateTaskForm(
                 onDateRangeChange = { draft.dateRange = it },
             )
         }
-        FormSection("Assigned") {
+        FormSection {
             AssignPage(
                 siteEngineerIds = draft.siteEngineerIds,
                 onSiteEngineerToggle = { id ->

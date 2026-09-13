@@ -99,6 +99,7 @@ fun OrbitFileUpload(
     onCameraClick: (() -> Unit)? = null,
     onCancelUpload: ((OrbitUploadItem) -> Unit)? = null,
     onRemove: ((OrbitUploadItem) -> Unit)? = null,
+    onItemClick: ((OrbitUploadItem) -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
 
@@ -127,6 +128,11 @@ fun OrbitFileUpload(
                 },
                 onRemove = if (item.state == OrbitUploadState.Completed) {
                     onRemove?.let { { it(item) } }
+                } else {
+                    null
+                },
+                onItemClick = if (item.state == OrbitUploadState.Completed) {
+                    onItemClick?.let { { it(item) } }
                 } else {
                     null
                 },
@@ -212,6 +218,11 @@ fun OrbitFileUploadDropZone(
                 onClick = onBrowseClick,
             )
             if (cameraLabel != null && onCameraClick != null) {
+                Text(
+                    text = "OR",
+                    style = OrbitTheme.extendedTypography.cardLabel,
+                    color = content.textTertiary,
+                )
                 UploadBrowseButton(
                     label = cameraLabel,
                     enabled = enabled,
@@ -271,6 +282,7 @@ private fun OrbitFileUploadItemRow(
     leading: OrbitAttachmentLeading,
     onCancel: (() -> Unit)?,
     onRemove: (() -> Unit)?,
+    onItemClick: (() -> Unit)?,
 ) {
     val spacing = OrbitTheme.spacing
     val sizing = OrbitTheme.sizing
@@ -302,31 +314,50 @@ private fun OrbitFileUploadItemRow(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                modifier = Modifier.size(mark),
-                contentAlignment = Alignment.Center,
-            ) {
-                UploadLeading(leading = leading, mark = mark)
-            }
-
-            Spacer(Modifier.size(spacing.md))
-
-            Column(
+            Row(
                 modifier = Modifier
                     .weight(1f)
-                    .semantics(mergeDescendants = true) {
-                        contentDescription = "${item.fileName}, ${item.progressLabel}"
-                    },
-                verticalArrangement = Arrangement.spacedBy(spacing.xxs),
+                    .then(
+                        if (onItemClick != null) {
+                            Modifier
+                                .clip(OrbitTheme.shapeTokens.tooltip)
+                                .orbitHandCursor()
+                                .clickable(
+                                    role = Role.Button,
+                                    onClick = onItemClick,
+                                )
+                        } else {
+                            Modifier
+                        },
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = item.fileName,
-                    style = OrbitTheme.typography.bodyLarge,
-                    color = content.textPrimary,
-                    maxLines = 1,
-                    overflow = TextOverflow.MiddleEllipsis,
-                )
-                UploadStatusLine(item = item)
+                Box(
+                    modifier = Modifier.size(mark),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    UploadLeading(leading = leading, mark = mark)
+                }
+
+                Spacer(Modifier.size(spacing.md))
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .semantics(mergeDescendants = true) {
+                            contentDescription = "${item.fileName}, ${item.progressLabel}"
+                        },
+                    verticalArrangement = Arrangement.spacedBy(spacing.xxs),
+                ) {
+                    Text(
+                        text = item.fileName,
+                        style = OrbitTheme.typography.bodyLarge,
+                        color = content.textPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.MiddleEllipsis,
+                    )
+                    UploadStatusLine(item = item)
+                }
             }
 
             when {

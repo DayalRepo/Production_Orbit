@@ -65,6 +65,21 @@ fun SeverityBadge(
     )
 }
 
+/** Purchase-order wording: Ordered, In progress, Done, Received. */
+@Composable
+fun PurchaseOrderStatusBadge(
+    status: WorkStatus,
+    modifier: Modifier = Modifier,
+    size: OrbitBadgeSize = OrbitBadgeSize.Medium,
+) {
+    StatusBadge(
+        kind = status.purchaseOrderBadgeKind,
+        modifier = modifier,
+        label = status.purchaseOrderDisplayName,
+        size = size,
+    )
+}
+
 /** Uses [WorkStatus.displayName] so the badge and the rest of the screen never drift apart. */
 @Composable
 fun WorkStatusBadge(

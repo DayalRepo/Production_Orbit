@@ -95,11 +95,17 @@ internal fun OrbitFieldShell(
         label = "orbit-field-rim-width",
     )
 
-    val highlight = if (isDark) OrbitGlass.SurfaceHighlightDark else OrbitGlass.SurfaceHighlightLight
-    val fill = if (enabled) {
-        control.cardContainer
-    } else {
-        control.cardContainer.copy(alpha = control.cardContainer.alpha * OrbitAlpha.Disabled)
+    val highlight = when {
+        !enabled && !isDark -> 0f
+        isDark -> OrbitGlass.SurfaceHighlightDark
+        else -> OrbitGlass.SurfaceHighlightLight
+    }
+    val fill = when {
+        enabled -> control.cardContainer
+        // Light: keep the pane opaque. Fading cardContainer to 38% lets the page punch a
+        // white hole through the glass — the same wash as a light-theme button highlight.
+        isDark -> control.cardContainer.copy(alpha = control.cardContainer.alpha * OrbitAlpha.Disabled)
+        else -> control.cardContainer
     }
 
     Row(

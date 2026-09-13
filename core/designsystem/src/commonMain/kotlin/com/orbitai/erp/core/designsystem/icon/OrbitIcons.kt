@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
  * `@hugeicons/core-free-icons`). Licence text is in `licenses/MIT-Hugeicons.txt`.
  *
  * Every glyph is authored on a 24x24 viewport with a 1.5-unit stroke, square caps and round joins,
- * so the set reads as straight strokes with modestly rounded corners — not fully rounded sausages.
+ * so the set reads as straight strokes with modestly rounded corners â not fully rounded sausages.
  * which is where the set's uniform stroke weight comes from. Because the stroke is in viewport
  * units it scales with the glyph: at `iconMd` (24dp) it draws 1.5dp, at a 16dp badge icon it draws
  * 1dp. That is intended ? holding the stroke at a literal 1.5dp on a 16dp glyph fills in the
@@ -323,8 +323,9 @@ object OrbitIcons {
         vector(
             name = "Sent",
             stroke = listOf(
-                "M21.0477 3.05293C18.8697 0.707363 2.48648 6.4532 2.50001 8.551C2.51535 10.9299 8.89809 11.6617 10.6672 12.1581C11.7311 12.4565 12.016 12.7625 12.2613 13.8781C13.3723 18.9305 13.9301 21.4435 15.2014 21.4996C17.2278 21.5892 23.1733 5.342 21.0477 3.05293Z",
-                "M11.4999 12.5L14.9999 9",
+                "M9.49811 15L16.9981 7.5",
+                "M8.00634 7.67888L15.327 4.21881C18.3688 2.78111 19.8897 2.06226 20.8598 2.78341C21.8299 3.50455 21.5527 5.14799 20.9984 8.43486L20.0435 14.0968C19.6811 16.246 19.4998 17.3205 18.6989 17.7891C17.8979 18.2577 16.8574 17.8978 14.7765 17.178L8.41077 14.9762C4.51917 13.6301 2.57337 12.9571 2.50019 11.6365C2.427 10.3159 4.28678 9.43692 8.00634 7.67888Z",
+                "M9.49811 15.5V17.7274C9.49811 20.101 9.49811 21.2878 10.2083 21.4771C10.9185 21.6663 11.6664 20.6789 13.1622 18.7039L13.9981 17.5",
             ),
         )
     }
@@ -520,6 +521,18 @@ object OrbitIcons {
             stroke = listOf(
                 "M17 8.5C17 5.73858 14.7614 3.5 12 3.5C9.23858 3.5 7 5.73858 7 8.5C7 11.2614 9.23858 13.5 12 13.5C14.7614 13.5 17 11.2614 17 8.5Z",
                 "M19 20.5C19 16.634 15.866 13.5 12 13.5C8.13401 13.5 5 16.634 5 20.5",
+            ),
+        )
+    }
+
+    val UsersRound: ImageVector by lazy {
+        vector(
+            name = "UsersRound",
+            stroke = listOf(
+                "M13 11C13 8.79086 11.2091 7 9 7C6.79086 7 5 8.79086 5 11C5 13.2091 6.79086 15 9 15C11.2091 15 13 13.2091 13 11Z",
+                "M11.0386 7.55773C11.0131 7.37547 11 7.18927 11 7C11 4.79086 12.7909 3 15 3C17.2091 3 19 4.79086 19 7C19 9.20914 17.2091 11 15 11C14.2554 11 13.5584 10.7966 12.9614 10.4423",
+                "M15 21C15 17.6863 12.3137 15 9 15C5.68629 15 3 17.6863 3 21",
+                "M21 17C21 13.6863 18.3137 11 15 11",
             ),
         )
     }
@@ -768,7 +781,7 @@ object OrbitIcons {
         )
     }
 
-    /** [More vertical](https://hugeicons.com/icon/more-vertical?style=stroke-rounded) — stroke-rounded. */
+    /** [More vertical](https://hugeicons.com/icon/more-vertical?style=stroke-rounded) â stroke-rounded. */
     val MoreVertical: ImageVector by lazy {
         vector(
             name = "MoreVertical",
@@ -1149,6 +1162,69 @@ object OrbitIcons {
             name = "Heart",
             stroke = listOf(
                 "M10.4107 19.9677C7.58942 17.858 2 13.0348 2 8.69444C2 5.82563 4.10526 3.5 7 3.5C8.5 3.5 10 4 12 6C14 4 15.5 3.5 17 3.5C19.8947 3.5 22 5.82563 22 8.69444C22 13.0348 16.4106 17.858 13.5893 19.9677C12.6399 20.6776 11.3601 20.6776 10.4107 19.9677Z",
+            ),
+        )
+    }
+
+    /** [Shopping cart 02](https://hugeicons.com/icon/shopping-cart-02?style=stroke-rounded) stroke-rounded. */
+    val ShoppingCart: ImageVector by lazy {
+        vector(
+            name = "ShoppingCart",
+            stroke = listOf(
+                "M8 16L16.7201 15.2733C19.4486 15.046 20.0611 14.45 20.3635 11.7289L21 6",
+                "M6 6H22",
+                "M8 20C8 21.1046 7.10457 22 6 22C4.89543 22 4 21.1046 4 20C4 18.8954 4.89543 18 6 18C7.10457 18 8 18.8954 8 20Z",
+                "M19 20C19 21.1046 18.1046 22 17 22C15.8954 22 15 21.1046 15 20C15 18.8954 15.8954 18 17 18C18.1046 18 19 18.8954 19 20Z",
+                "M8 20L15 20",
+                "M2 2H2.966C3.91068 2 4.73414 2.62459 4.96326 3.51493L7.93852 15.0765C8.08887 15.6608 7.9602 16.2797 7.58824 16.7616L6.63213 18",
+            ),
+        )
+    }
+
+    /** [Square dashed](https://hugeicons.com/icon/square-dashed?style=stroke-rounded) stroke-rounded. */
+    val SquareDashed: ImageVector by lazy {
+        vector(
+            name = "SquareDashed",
+            stroke = listOf(
+                "M6.29219 2.75143C5.25295 2.94471 4.4881 3.28657 3.88343 3.89124C3.27876 4.49591 2.93689 5.26076 2.74361 6.3M17.6922 2.75143C18.7314 2.94471 19.4963 3.28657 20.1009 3.89124C20.7056 4.49591 21.0475 5.26076 21.2408 6.3M13.8922 2.50495C13.3078 2.5 12.6761 2.5 11.9922 2.5C11.3083 2.5 10.6766 2.5 10.0922 2.50495M21.4872 10.1C21.4922 10.6844 21.4922 11.3161 21.4922 12C21.4922 12.6839 21.4922 13.3156 21.4872 13.9001M2.49714 10.1C2.49219 10.6844 2.49219 11.3161 2.49219 12C2.49219 12.6839 2.49219 13.3156 2.49714 13.9001M2.74361 17.7C2.93689 18.7392 3.27876 19.5041 3.88343 20.1088C4.4881 20.7134 5.25295 21.0553 6.29219 21.2486M21.2408 17.7C21.0475 18.7392 20.7056 19.5041 20.1009 20.1088C19.4963 20.7134 18.7314 21.0553 17.6922 21.2486M13.8922 21.495C13.3078 21.5 12.6761 21.5 11.9922 21.5C11.3083 21.5 10.6767 21.5 10.0923 21.495",
+            ),
+        )
+    }
+
+    /** [Plus minus 02](https://hugeicons.com/icon/plus-minus-02?style=stroke-rounded) stroke-rounded. */
+    val PlusMinus: ImageVector by lazy {
+        vector(
+            name = "PlusMinus",
+            stroke = listOf(
+                "M3 21L21 3",
+                "M7 3V11M11 7L3 7",
+                "M21 18L13 18",
+            ),
+        )
+    }
+
+    /** [Weight](https://hugeicons.com/icon/weight?style=stroke-rounded) stroke-rounded. */
+    val Weight: ImageVector by lazy {
+        vector(
+            name = "Weight",
+            stroke = listOf(
+                "M12 9C13.6569 9 15 7.65685 15 6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6C9 7.65685 10.3431 9 12 9Z",
+                "M15.0708 9H8.92925C7.55843 9 6.87302 9 6.35701 9.37752C5.841 9.75503 5.62426 10.4151 5.19077 11.7351L3.8772 15.7351C3.08824 18.1376 2.69376 19.3388 3.28353 20.1694C3.87331 21 5.12076 21 7.61568 21H16.3843C18.8792 21 20.1267 21 20.7165 20.1694C21.3062 19.3388 20.9118 18.1376 20.1228 15.7351L18.8092 11.7351C18.3757 10.4151 18.159 9.75503 17.643 9.37752C17.127 9 16.4416 9 15.0708 9Z",
+            ),
+        )
+    }
+
+    /** [List](https://hugeicons.com/icon/list?style=stroke-rounded) stroke-rounded. */
+    val List: ImageVector by lazy {
+        vector(
+            name = "List",
+            stroke = listOf(
+                "M9.12109 5H21.1211",
+                "M9.12109 12H21.1211",
+                "M9.12109 19H21.1211",
+                "M3.24609 5H3.12109M3.37109 5C3.37109 5.13807 3.25916 5.25 3.12109 5.25C2.98302 5.25 2.87109 5.13807 2.87109 5C2.87109 4.86193 2.98302 4.75 3.12109 4.75C3.25916 4.75 3.37109 4.86193 3.37109 5Z",
+                "M3.24609 12H3.12109M3.37109 12C3.37109 12.1381 3.25916 12.25 3.12109 12.25C2.98302 12.25 2.87109 12.1381 2.87109 12C2.87109 11.8619 2.98302 11.75 3.12109 11.75C3.25916 11.75 3.37109 11.8619 3.37109 12Z",
+                "M3.24609 19H3.12109M3.37109 19C3.37109 19.1381 3.25916 19.25 3.12109 19.25C2.98302 19.25 2.87109 19.1381 2.87109 19C2.87109 18.8619 2.98302 18.75 3.12109 18.75C3.25916 18.75 3.37109 18.8619 3.37109 19Z",
             ),
         )
     }

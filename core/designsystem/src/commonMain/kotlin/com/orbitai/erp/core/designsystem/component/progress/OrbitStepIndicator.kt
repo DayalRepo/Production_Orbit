@@ -695,40 +695,30 @@ private fun StepDateTrail(
             },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            Text(
-                text = startText,
-                style = style,
-                color = color,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Visible,
-                textAlign = TextAlign.Start,
-            )
-        }
+        Text(
+            text = startText,
+            style = style,
+            color = color,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
+            textAlign = TextAlign.Start,
+        )
         Text(
             text = "·",
             style = style,
             color = color,
             modifier = Modifier.padding(horizontal = spacing.xxs),
         )
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            Text(
-                text = endText,
-                style = style,
-                color = color,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Visible,
-                textAlign = TextAlign.Start,
-            )
-        }
+        Text(
+            text = endText,
+            style = style,
+            color = color,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
+            textAlign = TextAlign.Start,
+        )
     }
 }
 

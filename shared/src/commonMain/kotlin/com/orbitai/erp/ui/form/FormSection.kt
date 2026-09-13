@@ -17,8 +17,8 @@ import com.orbitai.erp.core.designsystem.theme.controlColors
  */
 @Composable
 internal fun FormSection(
-    title: String,
     modifier: Modifier = Modifier,
+    title: String? = null,
     showDivider: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -34,11 +34,13 @@ internal fun FormSection(
                 color = OrbitTheme.controlColors.dividerElevated,
             )
         }
-        Text(
-            text = title.uppercase(),
-            style = OrbitTheme.extendedTypography.sectionLabel,
-            color = OrbitTheme.contentColors.textSecondary,
-        )
+        if (!title.isNullOrBlank()) {
+            Text(
+                text = title.uppercase(),
+                style = OrbitTheme.extendedTypography.sectionLabel,
+                color = OrbitTheme.contentColors.textSecondary,
+            )
+        }
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(spacing.fieldGap),

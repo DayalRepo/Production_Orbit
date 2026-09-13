@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -207,7 +209,10 @@ fun OrbitButton(
 
     val container = when {
         tone != null && solid -> tone.solidContainer
+        tone != null && !isDark -> frostLightFill(tone.container)
         tone != null -> tone.container
+        variant == OrbitButtonVariant.Secondary && !isDark ->
+            frostLightFill(control.controlContainer)
         variant == OrbitButtonVariant.Secondary -> control.controlContainer
         else -> Color.Transparent
     }
@@ -289,11 +294,13 @@ fun OrbitButton(
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
 
-    // Badge highlight: these are badge tones on a badge fill, verified against this gradient.
+    // Buttons use the button highlight pair, not the badge pair. BadgeHighlightLight (0.22)
+    // paints a white film over the pale light-theme tint and reads as a white plate behind
+    // the label. ButtonHighlightLight (0.14) is the value contrast tests already verify.
     val baseHighlight = when {
         resolvedSolid || !glassHighlight -> 0f
-        isDark -> OrbitGlass.BadgeHighlightDark
-        else -> OrbitGlass.BadgeHighlightLight
+        isDark -> OrbitGlass.ButtonHighlightDark
+        else -> OrbitGlass.ButtonHighlightLight
     }
     val highlight by animateFloatAsState(
         targetValue = when {
@@ -304,7 +311,12 @@ fun OrbitButton(
         animationSpec = tween(HoverMs),
         label = "orbit-button-highlight",
     )
-    val glassSheen = if (resolvedSolid || !glassHighlight) 1f else OrbitGlass.Sheen
+    val glassSheen = when {
+        resolvedSolid || !glassHighlight -> 1f
+        isDark -> OrbitGlass.Sheen
+        // Light frost is already opaque; sheen would thin the top back to a white wash.
+        else -> 1f
+    }
 
     // Compact painted heights need less vertical pad or the label overflows the surface.
     val verticalPad = when {
@@ -456,3 +468,14 @@ private data class Dim(val container: Float, val ring: Float, val content: Float
 
 /** Hover animation duration for glass highlight lift. */
 private const val HoverMs = 120
+
+/**
+ * Light-theme frost: an opaque tinted pane so the page cannot punch a white hole through
+ * the button. Pale hues (blue glass) stay close to their container colour. Saturated hues
+ * (red glass) are lifted with white so the label stays readable and the chip still reads red.
+ */
+private fun frostLightFill(tint: Color): Color {
+    val hue = tint.copy(alpha = 1f)
+    val lift = if (hue.luminance() < 0.5f) 0.70f else 0.10f
+    return Color.White.copy(alpha = lift).compositeOver(hue)
+}
