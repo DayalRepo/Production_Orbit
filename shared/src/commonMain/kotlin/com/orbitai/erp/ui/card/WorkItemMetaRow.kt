@@ -18,7 +18,8 @@ import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 /**
  * Icon + uppercase heading on the left, value on the right.
  *
- * Used for Remaining, Where, Severity and Assigned on work-item cards.
+ * Shared meta row for glass cards — work items (Remaining, Where, Severity, Assigned) and
+ * unit cards (Initiated & Target, Expected delay, Issues, Assigned).
  */
 @Composable
 fun WorkItemMetaRow(

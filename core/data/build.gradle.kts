@@ -10,7 +10,7 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    androidLibrary {
+    android {
         namespace = "com.orbitai.erp.core.data"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -24,8 +24,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(projects.core.model)
-            implementation(projects.core.common)
+            api(project(":core:model"))
+            implementation(project(":core:common"))
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)

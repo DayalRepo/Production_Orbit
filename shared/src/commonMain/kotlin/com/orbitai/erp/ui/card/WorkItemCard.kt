@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,7 +19,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.component.badge.OrbitBadgeSize
 import com.orbitai.erp.core.designsystem.component.container.OrbitCard
-import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.component.progress.OrbitStepIndicator
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
@@ -128,7 +126,7 @@ fun WorkItemCard(
                 }
             }
 
-            CardRule()
+            OrbitCardRule()
 
             if (!isOrder) {
                 if (record.kind == WorkItemKind.Issue) {
@@ -139,7 +137,7 @@ fun WorkItemCard(
                         titleStyle = titleStyle,
                     )
                 }
-                CardRule()
+                OrbitCardRule()
             }
 
             Column {
@@ -166,7 +164,7 @@ fun WorkItemCard(
                         if (severity != null) {
                             SeverityBadge(severity = severity)
                         } else {
-                            MetaDash()
+                            OrbitCardMetaDash()
                         }
                     }
                 }
@@ -175,7 +173,7 @@ fun WorkItemCard(
                     heading = "Assigned to",
                 ) {
                     if (assignees.isEmpty()) {
-                        MetaDash()
+                        OrbitCardMetaDash()
                     } else {
                         TeamAvatarGroup(
                             members = assignees,
@@ -186,7 +184,7 @@ fun WorkItemCard(
             }
 
             if (!isOrder) {
-                CardRule()
+                OrbitCardRule()
                 OrbitStepIndicator(
                     steps = record.workflowSteps,
                     currentIndex = record.workflowCurrentIndex,
@@ -194,7 +192,7 @@ fun WorkItemCard(
                 )
             }
 
-            CardRule()
+            OrbitCardRule()
 
             Column(
                 modifier = Modifier
@@ -217,7 +215,7 @@ fun WorkItemCard(
                 )
             }
 
-            CardRule()
+            OrbitCardRule()
 
             WorkItemRoleActions(
                 record = record,
@@ -284,25 +282,6 @@ internal fun WorkItemStageTitle(
             overflow = TextOverflow.Ellipsis,
         )
     }
-}
-
-@Composable
-private fun CardRule() {
-    OrbitDivider(
-        modifier = Modifier.padding(vertical = OrbitTheme.spacing.xxs),
-        color = OrbitTheme.controlColors.dividerElevated,
-    )
-}
-
-@Composable
-private fun MetaDash() {
-    Text(
-        text = "—",
-        style = OrbitTheme.typography.bodyMedium.copy(
-            fontWeight = OrbitTheme.fontWeights.title,
-        ),
-        color = OrbitTheme.contentColors.textTertiary,
-    )
 }
 
 @Composable

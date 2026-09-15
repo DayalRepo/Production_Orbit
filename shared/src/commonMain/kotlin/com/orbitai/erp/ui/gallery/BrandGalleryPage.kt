@@ -74,7 +74,7 @@ internal fun BrandGalleryPage() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(160.dp)
+                    .height(200.dp)
                     .clip(OrbitTheme.shapeTokens.card),
                 contentAlignment = Alignment.Center,
             ) {

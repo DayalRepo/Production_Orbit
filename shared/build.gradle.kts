@@ -19,7 +19,7 @@ kotlin {
         }
     }
 
-    androidLibrary {
+    android {
         namespace = "com.orbitai.erp.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -44,10 +44,10 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
-            api(projects.core.designsystem)
-            api(projects.core.model)
-            implementation(projects.core.common)
-            implementation(projects.core.data)
+            api(project(":core:designsystem"))
+            api(project(":core:model"))
+            implementation(project(":core:common"))
+            implementation(project(":core:data"))
 
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.components.resources)

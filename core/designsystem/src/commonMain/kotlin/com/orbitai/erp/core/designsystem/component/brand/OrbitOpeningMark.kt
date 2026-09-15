@@ -9,8 +9,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * Pixel letter O for the brand-intro / opening splash — sized to the horizontal lockup next to
- * `rbit.ai` (see [OrbitOpeningLockup]).
+ * Pixel letter O for the brand-intro / opening splash.
+ *
+ * Default [size] matches the compact gallery / lockup mark. [OrbitSplashScreen] uses
+ * [OrbitOpeningLockup.SplashMarkSize] so the centred solo mark reads as the product icon.
  *
  * @param spread 0f = dots packed at the O centre; 1f = default mark geometry.
  */
@@ -32,23 +34,25 @@ fun OrbitOpeningMark(
 }
 
 /**
- * Brand-intro horizontal lockup sizes.
+ * Brand-intro mark sizes.
  *
- * - Mark: 56dp capital O — sized to sit as the cap of `Orbit.ai`
- * - Word: 32sp heading weight in theme ink, so `rbit.ai` does not overpower the mark
- * - Gap: lettermark kerning; whole lockup stays screen-centred
+ * - [MarkSize]: compact capital O for gallery samples and chrome next to type
+ * - [SplashMarkSize]: centred solo mark on the opening splash
  */
 object OrbitOpeningLockup {
-    /** Pixel O — brand-intro capital letter size. */
+    /** Pixel O — compact brand-intro capital letter size. */
     val MarkSize: Dp = 56.dp
 
+    /** Centred splash mark — large enough to read as the product icon alone. */
+    val SplashMarkSize: Dp = 88.dp
+
     /**
-     * Wordmark size beside the mark. Heading (SemiBold) rather than display (Bold):
-     * Bold at this size next to the pixel O reads as a second logo, not the rest of the word.
+     * Wordmark size beside the mark when a typed lockup is needed elsewhere.
+     * Heading (SemiBold) rather than display (Bold).
      */
     val WordSize: TextUnit = 32.sp
 
-    /** Mark-to-type gap — lettermark kerning scaled with the lockup. */
+    /** Mark-to-type gap — lettermark kerning scaled with a horizontal lockup. */
     val MarkToWordGap: Dp = 6.dp
 
     /** Slight positive tracking so SemiBold letters stay open next to the mark. */

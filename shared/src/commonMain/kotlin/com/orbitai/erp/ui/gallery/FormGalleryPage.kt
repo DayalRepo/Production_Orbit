@@ -21,6 +21,8 @@ internal enum class FormPreview {
     SampleIssueApartment,
     SampleOrderVilla,
     SampleOrderApartment,
+    SampleUnitVilla,
+    SampleUnitApartment,
     MaterialsOrderVilla,
     MaterialsOrderApartment,
 }
@@ -118,6 +120,23 @@ internal fun FormGalleryPage(
                 action = ActionKind.Open,
                 label = "Materials order — ${ProjectType.ApartmentCommunity.displayName}",
                 onClick = { onOpen(FormPreview.SampleOrderApartment) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
+    GallerySection("Unit cards") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Unit card — ${ProjectType.Villas.displayName}",
+                onClick = { onOpen(FormPreview.SampleUnitVilla) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Unit card — ${ProjectType.ApartmentCommunity.displayName}",
+                onClick = { onOpen(FormPreview.SampleUnitApartment) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

@@ -27,6 +27,8 @@ import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.model.ProjectType
 import com.orbitai.erp.ui.card.CreatedItemsScreen
+import com.orbitai.erp.ui.card.UnitCardsScreen
+import com.orbitai.erp.ui.card.UnitRecord
 import com.orbitai.erp.ui.card.WorkItemKind
 import com.orbitai.erp.ui.card.WorkItemRecord
 import com.orbitai.erp.ui.card.sampleIssueApartment
@@ -35,6 +37,8 @@ import com.orbitai.erp.ui.card.sampleOrderApartment
 import com.orbitai.erp.ui.card.sampleOrderVilla
 import com.orbitai.erp.ui.card.sampleTaskApartment
 import com.orbitai.erp.ui.card.sampleTaskVilla
+import com.orbitai.erp.ui.card.sampleUnitApartment
+import com.orbitai.erp.ui.card.sampleUnitVilla
 import com.orbitai.erp.ui.card.toRecord
 import com.orbitai.erp.ui.form.CreateTaskForm
 import com.orbitai.erp.ui.form.MaterialsOrderForm
@@ -62,15 +66,32 @@ fun ComponentGalleryScreen(
     val createdItems = remember { mutableStateListOf<WorkItemRecord>() }
     var viewing by remember { mutableStateOf<List<WorkItemRecord>?>(null) }
     var viewingTitle by remember { mutableStateOf("Created items") }
+    var viewingUnits by remember { mutableStateOf<List<UnitRecord>?>(null) }
+    var viewingUnitsTitle by remember { mutableStateOf("Units") }
 
     fun openCards(items: List<WorkItemRecord>, title: String) {
         viewingTitle = title
         viewing = items
+        viewingUnits = null
         openForm = null
     }
 
+    fun openUnits(units: List<UnitRecord>, title: String) {
+        viewingUnitsTitle = title
+        viewingUnits = units
+        viewing = null
+        openForm = null
+    }
+
+    val units = viewingUnits
     val cards = viewing
     when {
+        units != null -> UnitCardsScreen(
+            units = units,
+            title = viewingUnitsTitle,
+            onBack = { viewingUnits = null },
+            modifier = modifier,
+        )
         cards != null -> CreatedItemsScreen(
             items = cards,
             title = viewingTitle,
@@ -151,6 +172,13 @@ fun ComponentGalleryScreen(
                         openCards(listOf(sampleOrderVilla()), "Materials order")
                     FormPreview.SampleOrderApartment ->
                         openCards(listOf(sampleOrderApartment()), "Materials order")
+                    FormPreview.SampleUnitVilla ->
+                        openUnits(listOf(sampleUnitVilla()), "Unit card — Villas")
+                    FormPreview.SampleUnitApartment ->
+                        openUnits(
+                            listOf(sampleUnitApartment()),
+                            "Unit card — Apartment / Community",
+                        )
                     else -> openForm = preview
                 }
             },
