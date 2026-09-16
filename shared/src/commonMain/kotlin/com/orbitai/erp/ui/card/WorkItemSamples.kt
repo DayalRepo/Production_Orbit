@@ -180,6 +180,50 @@ fun sampleIssueVilla(): WorkItemRecord {
     )
 }
 
+/** Issue addressed to Villa 12 — pairs with [sampleTaskVilla] on the unit detail log. */
+fun sampleIssueVilla12(): WorkItemRecord {
+    val range = sampleRange(days = 2)
+    return WorkItemRecord(
+        id = "sample-issue-villa-12",
+        number = "I-2040",
+        kind = WorkItemKind.Issue,
+        projectType = ProjectType.Villas,
+        stage = WorkStage.Structure,
+        customStage = null,
+        task = "Slab Formwork",
+        villa = "Villa 12",
+        floor = "1st floor",
+        tower = null,
+        apartmentUnit = null,
+        dateRange = range,
+        assigneeIds = setOf("u-se-villas", "u-con-villas"),
+        progress = 0.55f,
+        progressDelta = 2f,
+        severity = Severity.Medium,
+        status = WorkStatus.InProgress,
+        materials = listOf(
+            OrbitMaterialUsageLine("m-v12i1", "Plywood Shutters", 24, "Nos"),
+        ),
+        usedMaterials = listOf(
+            OrbitMaterialUsageLine("u-v12i1", "Plywood Shutters", 20, "Nos"),
+            OrbitMaterialUsageLine("u-v12i2", "Binding Wire", 3, "Kg"),
+        ),
+        labourUsed = 5,
+        description = "Formwork bow at mid-span. Props added; awaiting re-check before pour.",
+        checklistTitle = "Formwork checks",
+        checklistItems = listOf(
+            OrbitChecklistItem("c-v12i1", "Props set", checked = true),
+            OrbitChecklistItem("c-v12i2", "Level re-checked", checked = false),
+        ),
+        photos = listOf(
+            WorkItemPhoto("p-v12i1", "formwork1.jpg", "1.9 MB"),
+        ),
+        comments = listOf(
+            WorkItemComment("u-v12i1", "Arun · SE", "Props are in. Recheck tomorrow.", "Today"),
+        ),
+    )
+}
+
 fun sampleOrderVilla(): WorkItemRecord {
     val range = sampleRange(days = 4)
     return WorkItemRecord(
@@ -293,6 +337,50 @@ fun sampleIssueApartment(): WorkItemRecord {
                 unit = "Kg",
                 status = MaterialRequestStatus.Ordered,
             ),
+        ),
+    )
+}
+
+/** Issue addressed to A-101 — pairs with [sampleTaskApartment] on the unit detail log. */
+fun sampleIssueApartment101(): WorkItemRecord {
+    val range = sampleRange(days = 4)
+    return WorkItemRecord(
+        id = "sample-issue-apt-101",
+        number = "I-2218",
+        kind = WorkItemKind.Issue,
+        projectType = ProjectType.ApartmentCommunity,
+        stage = WorkStage.UnitInternal,
+        customStage = null,
+        task = "Door Frame Fixing",
+        villa = null,
+        floor = "1st floor",
+        tower = "Tower A",
+        apartmentUnit = "A-101",
+        dateRange = range,
+        assigneeIds = setOf("u-se-apt"),
+        progress = 0.3f,
+        progressDelta = -1f,
+        severity = Severity.High,
+        status = WorkStatus.Blocked,
+        materials = listOf(
+            OrbitMaterialUsageLine("m-a101i1", "Timber Frames", 4, "Nos"),
+        ),
+        usedMaterials = listOf(
+            OrbitMaterialUsageLine("u-a101i1", "Timber Frames", 2, "Nos"),
+            OrbitMaterialUsageLine("u-a101i2", "Cement Putty", 3, "Kg"),
+        ),
+        labourUsed = 2,
+        description = "Frame out of plumb at the kitchen opening. Hold block work until reset.",
+        checklistTitle = "Frame checks",
+        checklistItems = listOf(
+            OrbitChecklistItem("c-a101i1", "Opening measured", checked = true),
+            OrbitChecklistItem("c-a101i2", "Frame reset", checked = false),
+        ),
+        photos = listOf(
+            WorkItemPhoto("p-a101i1", "frame1.jpg", "1.7 MB"),
+        ),
+        comments = listOf(
+            WorkItemComment("u-a101i1", "Kavya · CONTR", "Waiting on a replacement frame.", "Yesterday"),
         ),
     )
 }

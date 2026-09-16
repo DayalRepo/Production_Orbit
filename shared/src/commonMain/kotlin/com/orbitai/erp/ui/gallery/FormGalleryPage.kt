@@ -25,6 +25,10 @@ internal enum class FormPreview {
     SampleUnitApartment,
     MaterialsOrderVilla,
     MaterialsOrderApartment,
+    CreateInvoiceVilla,
+    CreateInvoiceApartment,
+    SampleInvoiceVilla,
+    SampleInvoiceApartment,
 }
 
 @Composable
@@ -79,6 +83,35 @@ internal fun FormGalleryPage(
                 action = ActionKind.Open,
                 label = "Materials order — ${ProjectType.ApartmentCommunity.displayName}",
                 onClick = { onOpen(FormPreview.MaterialsOrderApartment) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
+    GallerySection("Invoice") {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Create invoice — ${ProjectType.Villas.displayName}",
+                onClick = { onOpen(FormPreview.CreateInvoiceVilla) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Create invoice — ${ProjectType.ApartmentCommunity.displayName}",
+                onClick = { onOpen(FormPreview.CreateInvoiceApartment) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Created invoice — ${ProjectType.Villas.displayName}",
+                onClick = { onOpen(FormPreview.SampleInvoiceVilla) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Created invoice — ${ProjectType.ApartmentCommunity.displayName}",
+                onClick = { onOpen(FormPreview.SampleInvoiceApartment) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

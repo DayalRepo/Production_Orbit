@@ -18,8 +18,6 @@ data class UnitRecord(
     val numberLabel: String,
     val projectType: ProjectType,
     val health: ProjectHealth,
-    /** Planned duration from initiation to target handover, in whole months. */
-    val plannedMonths: Int,
     /** Expected delay vs plan; `0` means on track. */
     val delayMonths: Int,
     val issueCount: Int,
@@ -36,9 +34,6 @@ data class UnitRecord(
             ProjectType.Villas -> OrbitStageProofKind.Villa
             ProjectType.ApartmentCommunity -> OrbitStageProofKind.Building
         }
-
-    val plannedDurationLabel: String
-        get() = unitMonthsLabel(plannedMonths.coerceAtLeast(0))
 
     val delayLabel: String
         get() = when {

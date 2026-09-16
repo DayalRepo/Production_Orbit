@@ -24,16 +24,14 @@ class UnitRecordTest {
     }
 
     @Test
-    fun `duration delay and issues labels read cleanly`() {
-        assertEquals("14 months", sampleUnitVilla().plannedDurationLabel)
+    fun `delay and issues labels read cleanly`() {
         assertEquals("No delay", sampleUnitVilla().delayLabel)
-        assertEquals("No issues", sampleUnitVilla().issuesLabel)
+        assertEquals("1 issue", sampleUnitVilla().issuesLabel)
 
-        assertEquals("18 months", sampleUnitApartment().plannedDurationLabel)
         assertEquals("5 months", sampleUnitApartment().delayLabel)
-        assertEquals("10 issues", sampleUnitApartment().issuesLabel)
+        assertEquals("1 issue", sampleUnitApartment().issuesLabel)
 
         assertEquals("1 month", unitMonthsLabel(1))
-        assertEquals("1 issue", sampleUnitVilla().copy(issueCount = 1).issuesLabel)
+        assertEquals("2 issues", sampleUnitVilla().copy(issueCount = 2).issuesLabel)
     }
 }

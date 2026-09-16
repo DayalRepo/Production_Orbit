@@ -13,8 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import com.orbitai.erp.core.designsystem.component.badge.OrbitBadgeSize
@@ -31,8 +29,7 @@ import com.orbitai.erp.ui.component.badge.PurchaseOrderStatusBadge
 import com.orbitai.erp.ui.component.badge.SeverityBadge
 import com.orbitai.erp.ui.component.badge.StatusBadge
 import com.orbitai.erp.ui.component.badge.WorkStatusBadge
-import com.orbitai.erp.ui.component.progress.ProgressSection
-import com.orbitai.erp.ui.component.progress.progressAnnouncement
+import com.orbitai.erp.ui.component.progress.ProgressCard
 import com.orbitai.erp.ui.component.team.TeamAvatarGroup
 import com.orbitai.erp.ui.component.team.TeamMember
 import com.orbitai.erp.ui.datetime.orbitRemainingCountdown
@@ -41,7 +38,6 @@ import com.orbitai.erp.ui.gallery.rememberGalleryProcurementManagers
 import com.orbitai.erp.ui.gallery.rememberGallerySiteEngineers
 import com.orbitai.erp.ui.gallery.rememberGalleryWarehouseManagers
 import kotlinx.coroutines.delay
-import kotlin.math.roundToInt
 
 private const val RemainingPlaceholder = "Days · 00d 00h:00m:00s"
 
@@ -60,7 +56,6 @@ fun WorkItemCard(
     val content = OrbitTheme.contentColors
     val assignees = rememberAssignedMembers(record.assigneeIds)
     var remaining by remember(record.dateRange) { mutableStateOf<String?>(null) }
-    val percent = (record.progress.coerceIn(0f, 1f) * 100f).roundToInt()
     val showOverflow = viewerRole == UserRole.ProjectManager
     val titleStyle = OrbitTheme.typography.titleLarge
     val isOrder = record.kind == WorkItemKind.PurchaseOrder
@@ -194,26 +189,13 @@ fun WorkItemCard(
 
             OrbitCardRule()
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .semantics {
-                        contentDescription = progressAnnouncement(
-                            label = "Progress",
-                            percent = percent,
-                            delta = record.progressDelta,
-                            comparisonLabel = "vs last week",
-                        )
-                    },
-            ) {
-                ProgressSection(
-                    label = "Progress",
-                    progress = record.progress,
-                    delta = record.progressDelta,
-                    comparisonLabel = "vs last week",
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+            ProgressCard(
+                label = "Progress",
+                progress = record.progress,
+                delta = record.progressDelta,
+                comparisonLabel = "vs last week",
+                modifier = Modifier.fillMaxWidth(),
+            )
 
             OrbitCardRule()
 

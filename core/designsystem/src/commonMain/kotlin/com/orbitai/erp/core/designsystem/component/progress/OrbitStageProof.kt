@@ -204,6 +204,9 @@ object OrbitStageProofDefaults {
  * Matches [OrbitStepIndicator] rhythm: solid rail after done stages, dashed for current/upcoming,
  * coloured number marks, Done / In progress badges on the right, TOTAL days footer, and the
  * current stage shown while collapsed.
+ *
+ * @param embedded when true, skips the nested glass plate and side inset so the track can use the
+ *   full width of a parent card (unit cards) without truncating dates or badges.
  */
 @Composable
 fun OrbitStageProof(
@@ -215,6 +218,7 @@ fun OrbitStageProof(
     colors: OrbitStageProofColors = OrbitStageProofDefaults.colors,
     expanded: Boolean? = null,
     onExpandedChange: ((Boolean) -> Unit)? = null,
+    embedded: Boolean = false,
 ) {
     if (stages.isEmpty()) return
 
@@ -232,8 +236,20 @@ fun OrbitStageProof(
     val current = stages[currentIndex]
     val mono = OrbitTheme.extendedTypography.reference
 
-    Column(
-        modifier = modifier
+    val chrome = if (embedded) {
+        Modifier
+            .fillMaxWidth()
+            .orbitHandCursor()
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                role = Role.Button,
+                onClick = { setExpanded(!isExpanded) },
+            )
+            .indication(interaction, orbitPressIndication())
+            .padding(vertical = spacing.xs)
+    } else {
+        Modifier
             .fillMaxWidth()
             .orbitGlassShadow(shape = shape, elevation = sizing.shadowButton)
             .clip(shape)
@@ -254,6 +270,11 @@ fun OrbitStageProof(
             )
             .indication(interaction, orbitPressIndication())
             .padding(horizontal = spacing.lg, vertical = spacing.md)
+    }
+
+    Column(
+        modifier = modifier
+            .then(chrome)
             .semantics {
                 contentDescription = buildString {
                     append("STAGEPROOF, ")

@@ -26,11 +26,16 @@ import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
 import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.model.ProjectType
+import com.orbitai.erp.ui.card.CreatedInvoiceScreen
 import com.orbitai.erp.ui.card.CreatedItemsScreen
+import com.orbitai.erp.ui.card.InvoiceAttachedWorkScreen
+import com.orbitai.erp.ui.card.InvoiceRecord
 import com.orbitai.erp.ui.card.UnitCardsScreen
 import com.orbitai.erp.ui.card.UnitRecord
 import com.orbitai.erp.ui.card.WorkItemKind
 import com.orbitai.erp.ui.card.WorkItemRecord
+import com.orbitai.erp.ui.card.sampleInvoiceApartment
+import com.orbitai.erp.ui.card.sampleInvoiceVilla
 import com.orbitai.erp.ui.card.sampleIssueApartment
 import com.orbitai.erp.ui.card.sampleIssueVilla
 import com.orbitai.erp.ui.card.sampleOrderApartment
@@ -40,9 +45,12 @@ import com.orbitai.erp.ui.card.sampleTaskVilla
 import com.orbitai.erp.ui.card.sampleUnitApartment
 import com.orbitai.erp.ui.card.sampleUnitVilla
 import com.orbitai.erp.ui.card.toRecord
+import com.orbitai.erp.ui.card.unitWorkLogSamples
 import com.orbitai.erp.ui.form.CreateTaskForm
+import com.orbitai.erp.ui.form.InvoiceForm
 import com.orbitai.erp.ui.form.MaterialsOrderForm
 import com.orbitai.erp.ui.form.RaiseIssueForm
+import com.orbitai.erp.ui.form.toRecord as invoiceDraftToRecord
 
 /**
  * A scrolling gallery of everything in the design system, for reviewing it on a real device.
@@ -64,15 +72,20 @@ fun ComponentGalleryScreen(
 ) {
     var openForm by remember { mutableStateOf<FormPreview?>(null) }
     val createdItems = remember { mutableStateListOf<WorkItemRecord>() }
+    val createdInvoices = remember { mutableStateListOf<InvoiceRecord>() }
     var viewing by remember { mutableStateOf<List<WorkItemRecord>?>(null) }
     var viewingTitle by remember { mutableStateOf("Created items") }
     var viewingUnits by remember { mutableStateOf<List<UnitRecord>?>(null) }
     var viewingUnitsTitle by remember { mutableStateOf("Units") }
+    var viewingInvoice by remember { mutableStateOf<InvoiceRecord?>(null) }
+    var viewingInvoiceAttached by remember { mutableStateOf(false) }
 
     fun openCards(items: List<WorkItemRecord>, title: String) {
         viewingTitle = title
         viewing = items
         viewingUnits = null
+        viewingInvoice = null
+        viewingInvoiceAttached = false
         openForm = null
     }
 
@@ -80,16 +93,39 @@ fun ComponentGalleryScreen(
         viewingUnitsTitle = title
         viewingUnits = units
         viewing = null
+        viewingInvoice = null
+        viewingInvoiceAttached = false
+        openForm = null
+    }
+
+    fun openInvoice(record: InvoiceRecord) {
+        viewingInvoice = record
+        viewingInvoiceAttached = false
+        viewing = null
+        viewingUnits = null
         openForm = null
     }
 
     val units = viewingUnits
     val cards = viewing
+    val invoice = viewingInvoice
     when {
+        invoice != null && viewingInvoiceAttached -> InvoiceAttachedWorkScreen(
+            invoice = invoice,
+            onBack = { viewingInvoiceAttached = false },
+            modifier = modifier,
+        )
+        invoice != null -> CreatedInvoiceScreen(
+            record = invoice,
+            onBack = { viewingInvoice = null },
+            onOpenAttachedWork = { viewingInvoiceAttached = true },
+            modifier = modifier,
+        )
         units != null -> UnitCardsScreen(
             units = units,
             title = viewingUnitsTitle,
             onBack = { viewingUnits = null },
+            workItems = unitWorkLogSamples(),
             modifier = modifier,
         )
         cards != null -> CreatedItemsScreen(
@@ -155,6 +191,24 @@ fun ComponentGalleryScreen(
                 openCards(createdItems.toList(), "Created items")
             },
         )
+        openForm == FormPreview.CreateInvoiceVilla -> InvoiceForm(
+            projectType = ProjectType.Villas,
+            onDismiss = { openForm = null },
+            onCreate = { draft ->
+                val record = draft.invoiceDraftToRecord(ProjectType.Villas)
+                createdInvoices.add(0, record)
+                openInvoice(record)
+            },
+        )
+        openForm == FormPreview.CreateInvoiceApartment -> InvoiceForm(
+            projectType = ProjectType.ApartmentCommunity,
+            onDismiss = { openForm = null },
+            onCreate = { draft ->
+                val record = draft.invoiceDraftToRecord(ProjectType.ApartmentCommunity)
+                createdInvoices.add(0, record)
+                openInvoice(record)
+            },
+        )
         else -> GalleryIndex(
             isDark = isDark,
             onToggleTheme = onToggleTheme,
@@ -179,6 +233,8 @@ fun ComponentGalleryScreen(
                             listOf(sampleUnitApartment()),
                             "Unit card — Apartment / Community",
                         )
+                    FormPreview.SampleInvoiceVilla -> openInvoice(sampleInvoiceVilla())
+                    FormPreview.SampleInvoiceApartment -> openInvoice(sampleInvoiceApartment())
                     else -> openForm = preview
                 }
             },
