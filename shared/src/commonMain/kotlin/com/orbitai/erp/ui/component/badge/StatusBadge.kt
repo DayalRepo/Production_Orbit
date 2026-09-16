@@ -114,6 +114,31 @@ fun ApprovalStatusBadge(
     )
 }
 
+/**
+ * Invoice chrome badge — short labels so Pending does not read "Pending Approval".
+ */
+@Composable
+fun InvoiceStatusBadge(
+    status: ApprovalStatus,
+    modifier: Modifier = Modifier,
+    size: OrbitBadgeSize = OrbitBadgeSize.Small,
+) {
+    StatusBadge(
+        kind = status.badgeKind,
+        modifier = modifier,
+        label = status.invoiceBadgeLabel,
+        size = size,
+    )
+}
+
+private val ApprovalStatus.invoiceBadgeLabel: String
+    get() = when (this) {
+        ApprovalStatus.Draft -> "Draft"
+        ApprovalStatus.Pending -> "Pending"
+        ApprovalStatus.Approved -> "Done"
+        ApprovalStatus.Rejected -> "Rejected"
+    }
+
 /** Out of stock blocks work on site, so it is the one stock level that shouts. */
 @Composable
 fun StockLevelBadge(

@@ -15,24 +15,39 @@ import com.orbitai.erp.core.designsystem.component.input.OrbitFieldState
  *
  * Same split as [ManagedStageDropdown]: the design system draws the field and dialog; this owns the
  * catalogue of units and what happens when the user adds one.
+ *
+ * Pass [selected] + [onSelect] for controlled use (invoice lines); omit them for standalone demos.
  */
 @Composable
 fun ManagedUnitsDropdown(
     label: String,
     modifier: Modifier = Modifier,
+    selected: String? = null,
+    onSelect: ((String) -> Unit)? = null,
     initialUnits: List<String> = ConstructionUnits,
     placeholder: String = "Select unit",
     onCreate: (String) -> Unit = {},
 ) {
     var units by remember { mutableStateOf(initialUnits) }
-    var selected by remember { mutableStateOf<String?>(null) }
+    var internalSelected by remember { mutableStateOf<String?>(null) }
     var creating by remember { mutableStateOf(false) }
     var duplicate by remember { mutableStateOf(false) }
+    val current = selected ?: internalSelected
+    val merged = remember(units, current) {
+        if (current.isNullOrBlank() || units.any { it.equals(current, ignoreCase = true) }) {
+            units
+        } else {
+            units + current
+        }
+    }
+    fun choose(value: String) {
+        if (onSelect != null) onSelect(value) else internalSelected = value
+    }
 
     OrbitDropdownField(
-        selected = selected,
-        options = units,
-        onSelect = { selected = it },
+        selected = current,
+        options = merged,
+        onSelect = ::choose,
         label = label,
         placeholder = placeholder,
         searchPlaceholder = "Search units",
@@ -54,12 +69,12 @@ fun ManagedUnitsDropdown(
             onCreate = { name ->
                 val existing = units.firstOrNull { it.equals(name, ignoreCase = true) }
                 if (existing != null) {
-                    selected = existing
+                    choose(existing)
                     duplicate = true
                     creating = false
                 } else {
                     units = units + name
-                    selected = name
+                    choose(name)
                     onCreate(name)
                     creating = false
                 }

@@ -3,12 +3,14 @@ package com.orbitai.erp.ui.form
 import com.orbitai.erp.core.model.ProjectType
 import com.orbitai.erp.ui.card.amountInWordsInr
 import com.orbitai.erp.ui.card.formatInr
-import com.orbitai.erp.ui.card.invoiceTextSnapshot
 import com.orbitai.erp.ui.card.isValidIfsc
 import com.orbitai.erp.ui.card.sampleInvoiceVilla
+import com.orbitai.erp.ui.card.toInvoiceMarkdown
+import com.orbitai.erp.ui.card.toPdfModel
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class InvoiceDraftTest {
@@ -27,7 +29,7 @@ class InvoiceDraftTest {
         assertEquals(9_000.0, draft.sgstAmount)
         assertEquals(118_000.0, draft.grandTotal)
         assertEquals("₹ 1,18,000.00", formatInr(draft.grandTotal))
-        assertEquals("Rupees One Lakh Eighteen Thousand Only", amountInWordsInr(draft.grandTotal))
+        assertEquals("Rupees: One Lakh Eighteen Thousand Only", amountInWordsInr(draft.grandTotal))
     }
 
     @Test
@@ -53,13 +55,23 @@ class InvoiceDraftTest {
         assertTrue(draft.isReadyToCreate())
         val record = draft.toRecord(ProjectType.Villas)
         assertEquals(1, record.lines.size)
-        assertTrue(record.invoiceTextSnapshot().contains("INVOICE"))
+        assertTrue(record.toInvoiceMarkdown().contains("# INVOICE"))
+        assertTrue(record.toInvoiceMarkdown().contains("## From"))
     }
 
     @Test
     fun `sample invoice snapshot is non empty`() {
         val sample = sampleInvoiceVilla()
         assertTrue(sample.attachedTaskIds.isNotEmpty())
-        assertTrue(sample.invoiceTextSnapshot().contains(sample.number))
+        assertTrue(sample.toInvoiceMarkdown().contains(sample.number))
+    }
+
+    @Test
+    fun `pdf model drops qr and dedupes uploads`() {
+        val sample = sampleInvoiceVilla()
+        assertNull(sample.bank.qrAttachment)
+        val model = sample.toPdfModel()
+        assertEquals(sample.uploads.map { it.id }, model.files.map { it.id })
+        assertTrue(model.files.none { it.fileName.contains("upi-qr", ignoreCase = true) })
     }
 }

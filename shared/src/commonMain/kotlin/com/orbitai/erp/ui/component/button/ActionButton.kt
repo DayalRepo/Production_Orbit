@@ -105,6 +105,9 @@ enum class ActionKind(
     /** Opens the edit screen for a created task or issue. Text-only on purpose. */
     Update("Update", OrbitButtonVariant.Primary, null),
 
+    /** Saves edits to an existing invoice (or similar). */
+    Edit("Edit", OrbitButtonVariant.Primary, OrbitIcons.SquarePen),
+
     /** Project manager starts work that is still in Created. */
     Start("Start", OrbitButtonVariant.Primary, OrbitIcons.Play),
 
@@ -146,6 +149,7 @@ enum class ActionKind(
             Next -> "Continuing"
             Raise -> "Raising"
             Update -> "Updating"
+            Edit -> "Saving"
             Start -> "Starting"
             View -> "Viewing"
             Submit -> "Submitting"

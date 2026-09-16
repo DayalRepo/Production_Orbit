@@ -12,18 +12,60 @@ data class InvoiceLineItem(
     val quantity: Double,
     val rate: Double,
     val hsnSac: String? = null,
+    val unit: String = "Nos",
 ) {
     val amount: Double get() = quantity * rate
+
+    /** Unit of measure shown on the plate (Rate is kept for totals, not shown when redundant). */
+    val displayUnit: String
+        get() = unit.trim().ifBlank { "Nos" }
 }
 
 /** Seller or client party on an invoice. */
 data class InvoiceParty(
     val name: String = "",
-    val address: String = "",
+    val doorNo: String = "",
+    val apartmentName: String = "",
+    val street: String = "",
+    val city: String = "",
+    val state: String = "",
+    val pincode: String = "",
     val gstin: String = "",
     val phone: String = "",
     val email: String = "",
-)
+) {
+    /** Formatted multi-line address from structured parts. */
+    val address: String
+        get() = formatInvoiceAddress(
+            doorNo = doorNo,
+            apartmentName = apartmentName,
+            street = street,
+            city = city,
+            state = state,
+            pincode = pincode,
+        )
+}
+
+fun formatInvoiceAddress(
+    doorNo: String = "",
+    apartmentName: String = "",
+    street: String = "",
+    city: String = "",
+    state: String = "",
+    pincode: String = "",
+): String {
+    val line1 = listOfNotNull(
+        doorNo.takeIf { it.isNotBlank() },
+        apartmentName.takeIf { it.isNotBlank() },
+    ).joinToString(", ")
+    val line2 = street.takeIf { it.isNotBlank() }.orEmpty()
+    val line3 = listOfNotNull(
+        city.takeIf { it.isNotBlank() },
+        state.takeIf { it.isNotBlank() },
+        pincode.takeIf { it.isNotBlank() },
+    ).joinToString(", ")
+    return listOf(line1, line2, line3).filter { it.isNotBlank() }.joinToString("\n")
+}
 
 /** Indian bank / UPI payment block. */
 data class InvoiceBankDetails(
@@ -130,8 +172,8 @@ fun isValidIfsc(value: String): Boolean {
 
 fun amountInWordsInr(amount: Double): String {
     val rupees = amount.roundToLong().coerceAtLeast(0)
-    if (rupees == 0L) return "Rupees Zero Only"
-    return "Rupees ${numberToWords(rupees)} Only"
+    if (rupees == 0L) return "Rupees: Zero Only"
+    return "Rupees: ${numberToWords(rupees)} Only"
 }
 
 private fun numberToWords(n: Long): String {
@@ -186,54 +228,94 @@ private fun belowThousand(n: Int): String {
     return builder.toString()
 }
 
-fun InvoiceRecord.invoiceTextSnapshot(): String = buildString {
-    appendLine("INVOICE $number")
-    appendLine("Status: ${status.displayName}")
-    appendLine("Issued: ${issued.formatSlashed()}  Due: ${due.formatSlashed()}")
-    if (locationLine.isNotBlank()) appendLine(locationLine)
+fun InvoiceRecord.toInvoiceMarkdown(): String = buildString {
+    appendLine("# INVOICE")
+    append(number)
+    append(" · Issued ")
+    append(issued.formatSlashed())
+    append(" · Due ")
+    append(due.formatSlashed())
+    if (locationLine.isNotBlank()) {
+        append(" · ")
+        append(locationLine)
+    }
     appendLine()
-    appendLine("FROM")
-    appendParty(from)
     appendLine()
-    appendLine("BILL TO")
-    appendParty(billTo)
+    appendLine("## From")
+    appendMarkdownParty(from)
     appendLine()
-    appendLine("LINE ITEMS")
+    appendLine("## Bill to")
+    appendMarkdownParty(billTo)
+    appendLine()
+    appendLine("## Line items")
+    appendLine("| # | Description | Qty | Rate | Amount |")
+    appendLine("| --- | --- | --- | --- | --- |")
     lines.forEachIndexed { index, line ->
-        appendLine(
-            "${index + 1}. ${line.description}  qty ${line.quantity} × ${formatInr(line.rate)} = ${formatInr(line.amount)}",
-        )
+        append("| ")
+        append(index + 1)
+        append(" | ")
+        append(line.description.replace('|', '/'))
+        append(" | ")
+        append(line.quantity.toLong())
+        append(" | ")
+        append(formatInr(line.rate))
+        append(" | ")
+        append(formatInr(line.amount))
+        appendLine(" |")
     }
-    appendLine("Subtotal: ${formatInr(subtotal)}")
-    if (applyGst) {
-        appendLine("CGST ${cgstPercent}%: ${formatInr(cgstAmount)}")
-        appendLine("SGST ${sgstPercent}%: ${formatInr(sgstAmount)}")
-    }
-    appendLine("TOTAL: ${formatInr(grandTotal)}")
-    appendLine(amountInWordsInr(grandTotal))
     appendLine()
-    appendLine("BANK DETAILS")
-    appendLine("Account holder: ${bank.accountHolder}")
-    appendLine("Bank: ${bank.bankName}")
-    appendLine("Account number: ${bank.accountNumber}")
-    appendLine("IFSC: ${bank.ifsc}")
-    if (bank.upiId.isNotBlank()) appendLine("UPI: ${bank.upiId}")
+    append("**Subtotal** ")
+    appendLine(formatInr(subtotal))
+    if (applyGst) {
+        append("**CGST ")
+        append(cgstPercent.toLong())
+        append("%** ")
+        appendLine(formatInr(cgstAmount))
+        append("**SGST ")
+        append(sgstPercent.toLong())
+        append("%** ")
+        appendLine(formatInr(sgstAmount))
+    }
+    append("**Total** ")
+    appendLine(formatInr(grandTotal))
+    append('*')
+    append(amountInWordsInr(grandTotal))
+    appendLine('*')
+    appendLine()
+    appendLine("## Bank details")
+    if (bank.accountHolder.isNotBlank()) appendLine(bank.accountHolder)
+    if (bank.bankName.isNotBlank()) appendLine(bank.bankName)
+    if (bank.accountNumber.isNotBlank()) {
+        append("A/c ")
+        appendLine(bank.accountNumber)
+    }
+    if (bank.ifsc.isNotBlank()) {
+        append("IFSC ")
+        appendLine(bank.ifsc)
+    }
+    if (bank.upiId.isNotBlank()) {
+        append("UPI ")
+        appendLine(bank.upiId)
+    }
     if (notes.isNotBlank()) {
         appendLine()
-        appendLine("Notes: $notes")
-    }
-    if (attachedTaskIds.isNotEmpty() || attachedIssueIds.isNotEmpty()) {
-        appendLine()
-        appendLine("Attached work: ${(attachedTaskIds + attachedIssueIds).joinToString()}")
+        appendLine(notes)
     }
 }
 
-private fun StringBuilder.appendParty(party: InvoiceParty) {
+fun InvoiceRecord.invoiceTextSnapshot(): String = toInvoiceMarkdown()
+
+private fun StringBuilder.appendMarkdownParty(party: InvoiceParty) {
     if (party.name.isNotBlank()) appendLine(party.name)
     if (party.address.isNotBlank()) appendLine(party.address)
-    if (party.gstin.isNotBlank()) appendLine("GSTIN: ${party.gstin}")
-    if (party.phone.isNotBlank()) appendLine("Phone: ${party.phone}")
-    if (party.email.isNotBlank()) appendLine("Email: ${party.email}")
+    if (party.gstin.isNotBlank()) {
+        append("GSTIN ")
+        appendLine(party.gstin)
+    }
+    if (party.phone.isNotBlank()) {
+        append("Phone ")
+        appendLine(party.phone)
+    }
 }
 
 private var invoiceSeq = 50

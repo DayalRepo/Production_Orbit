@@ -45,8 +45,6 @@ fun InvoiceMetaPage(
     onFromChange: (InvoiceParty) -> Unit,
     billTo: InvoiceParty,
     onBillToChange: (InvoiceParty) -> Unit,
-    placeOfSupply: String,
-    onPlaceOfSupplyChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val spacing = OrbitTheme.spacing
@@ -58,14 +56,16 @@ fun InvoiceMetaPage(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.md),
     ) {
-        FormSection(title = "Invoice meta", showDivider = false) {
-            OrbitTextField(
-                value = number,
-                onValueChange = onNumberChange,
-                label = "Invoice number",
-                placeholder = "INV-2026-001",
-                modifier = Modifier.fillMaxWidth(),
-            )
+        FormSection(title = "Details", showDivider = false) {
+            LabeledField("Invoice number") {
+                OrbitTextField(
+                    value = number,
+                    onValueChange = onNumberChange,
+                    label = "Invoice number",
+                    placeholder = "INV-2026-001",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                 FormFieldLabel("Issued – due")
                 OrbitDateTimeField(
@@ -90,7 +90,7 @@ fun InvoiceMetaPage(
             }
         }
 
-        FormSection(title = "Project & location") {
+        FormSection(title = "Location") {
             InvoiceDropdown(
                 heading = "Project",
                 selected = projectName,
@@ -131,66 +131,136 @@ fun InvoiceMetaPage(
                     )
                 }
             }
-            OrbitTextField(
-                value = placeOfSupply,
-                onValueChange = onPlaceOfSupplyChange,
-                label = "Place of supply",
-                placeholder = "Karnataka",
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
 
-        FormSection(title = "From (seller)") {
-            PartyFields(party = from, onChange = onFromChange)
+        FormSection(title = "From") {
+            LabeledField("Organisation") {
+                OrbitTextField(
+                    value = from.name,
+                    onValueChange = { onFromChange(from.copy(name = it)) },
+                    label = "Organisation",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            PartyAddressFields(party = from, onChange = onFromChange)
+            LabeledField("GSTIN") {
+                OrbitTextField(
+                    value = from.gstin,
+                    onValueChange = { onFromChange(from.copy(gstin = it.uppercase())) },
+                    label = "GSTIN",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
 
-        FormSection(title = "Bill to (client)") {
-            PartyFields(party = billTo, onChange = onBillToChange)
+        FormSection(title = "Bill to") {
+            LabeledField("Name") {
+                OrbitTextField(
+                    value = billTo.name,
+                    onValueChange = { onBillToChange(billTo.copy(name = it)) },
+                    label = "Name",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            PartyAddressFields(party = billTo, onChange = onBillToChange)
+            LabeledField("GSTIN") {
+                OrbitTextField(
+                    value = billTo.gstin,
+                    onValueChange = { onBillToChange(billTo.copy(gstin = it.uppercase())) },
+                    label = "GSTIN",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            LabeledField("Phone") {
+                OrbitTextField(
+                    value = billTo.phone,
+                    onValueChange = { onBillToChange(billTo.copy(phone = it)) },
+                    label = "Phone",
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun PartyFields(
+private fun PartyAddressFields(
     party: InvoiceParty,
     onChange: (InvoiceParty) -> Unit,
 ) {
     val spacing = OrbitTheme.spacing
-    OrbitTextField(
-        value = party.name,
-        onValueChange = { onChange(party.copy(name = it)) },
-        label = "Name",
-        modifier = Modifier.fillMaxWidth(),
-    )
-    OrbitTextField(
-        value = party.address,
-        onValueChange = { onChange(party.copy(address = it)) },
-        label = "Address",
-        singleLine = false,
-        modifier = Modifier.fillMaxWidth(),
-    )
-    OrbitTextField(
-        value = party.gstin,
-        onValueChange = { onChange(party.copy(gstin = it.uppercase())) },
-        label = "GSTIN",
-        modifier = Modifier.fillMaxWidth(),
-    )
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
+        LabeledField("Door no", modifier = Modifier.weight(1f)) {
+            OrbitTextField(
+                value = party.doorNo,
+                onValueChange = { onChange(party.copy(doorNo = it)) },
+                label = "Door no",
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        LabeledField("Apartment", modifier = Modifier.weight(1f)) {
+            OrbitTextField(
+                value = party.apartmentName,
+                onValueChange = { onChange(party.copy(apartmentName = it)) },
+                label = "Apartment name",
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+    LabeledField("Street") {
         OrbitTextField(
-            value = party.phone,
-            onValueChange = { onChange(party.copy(phone = it)) },
-            label = "Phone",
-            modifier = Modifier.weight(1f),
+            value = party.street,
+            onValueChange = { onChange(party.copy(street = it)) },
+            label = "Street",
+            modifier = Modifier.fillMaxWidth(),
         )
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+    ) {
+        LabeledField("City", modifier = Modifier.weight(1f)) {
+            OrbitTextField(
+                value = party.city,
+                onValueChange = { onChange(party.copy(city = it)) },
+                label = "City",
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        LabeledField("State", modifier = Modifier.weight(1f)) {
+            OrbitTextField(
+                value = party.state,
+                onValueChange = { onChange(party.copy(state = it)) },
+                label = "State",
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+    LabeledField("Pincode") {
         OrbitTextField(
-            value = party.email,
-            onValueChange = { onChange(party.copy(email = it)) },
-            label = "Email",
-            modifier = Modifier.weight(1f),
+            value = party.pincode,
+            onValueChange = { onChange(party.copy(pincode = it.filter { ch -> ch.isDigit() }.take(6))) },
+            label = "Pincode",
+            modifier = Modifier.fillMaxWidth(),
         )
+    }
+}
+
+@Composable
+private fun LabeledField(
+    heading: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(OrbitTheme.spacing.sm),
+    ) {
+        FormFieldLabel(heading)
+        content()
     }
 }
 

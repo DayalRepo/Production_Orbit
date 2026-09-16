@@ -27,8 +27,10 @@ internal enum class FormPreview {
     MaterialsOrderApartment,
     CreateInvoiceVilla,
     CreateInvoiceApartment,
-    SampleInvoiceVilla,
-    SampleInvoiceApartment,
+    SampleInvoiceSentVilla,
+    SampleInvoiceSentApartment,
+    SampleInvoiceReceivedVilla,
+    SampleInvoiceReceivedApartment,
 }
 
 @Composable
@@ -104,14 +106,26 @@ internal fun FormGalleryPage(
             )
             ActionButton(
                 action = ActionKind.Open,
-                label = "Created invoice — ${ProjectType.Villas.displayName}",
-                onClick = { onOpen(FormPreview.SampleInvoiceVilla) },
+                label = "Sent invoice — ${ProjectType.Villas.displayName}",
+                onClick = { onOpen(FormPreview.SampleInvoiceSentVilla) },
                 modifier = Modifier.fillMaxWidth(),
             )
             ActionButton(
                 action = ActionKind.Open,
-                label = "Created invoice — ${ProjectType.ApartmentCommunity.displayName}",
-                onClick = { onOpen(FormPreview.SampleInvoiceApartment) },
+                label = "Sent invoice — ${ProjectType.ApartmentCommunity.displayName}",
+                onClick = { onOpen(FormPreview.SampleInvoiceSentApartment) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Received invoice — ${ProjectType.Villas.displayName}",
+                onClick = { onOpen(FormPreview.SampleInvoiceReceivedVilla) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ActionButton(
+                action = ActionKind.Open,
+                label = "Received invoice — ${ProjectType.ApartmentCommunity.displayName}",
+                onClick = { onOpen(FormPreview.SampleInvoiceReceivedApartment) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

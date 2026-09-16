@@ -28,7 +28,12 @@ fun sampleInvoiceVilla(): InvoiceRecord {
         from = defaultSellerParty(),
         billTo = InvoiceParty(
             name = "Mr. Ramesh Krishnan",
-            address = "Villa 12, Prestige Golfshire, Bengaluru 560064",
+            doorNo = "12",
+            apartmentName = "Prestige Golfshire",
+            street = "Nandi Hills Road",
+            city = "Bengaluru",
+            state = "Karnataka",
+            pincode = "560064",
             gstin = "29AABCR1234Q1Z5",
             phone = "+91 98450 11223",
             email = "ramesh.krishnan@example.com",
@@ -46,7 +51,7 @@ fun sampleInvoiceVilla(): InvoiceRecord {
         attachedTaskIds = listOf(task.id),
         attachedIssueIds = listOf(issue.id),
         uploads = listOf(
-            InvoiceAttachment("inv-u1", "measurement.pdf", "420 KB"),
+            InvoiceAttachment("inv-u1", "pdf1.pdf", "420 KB"),
         ),
     )
 }
@@ -71,7 +76,12 @@ fun sampleInvoiceApartment(): InvoiceRecord {
         from = defaultSellerParty(),
         billTo = InvoiceParty(
             name = "Sneha Reddy",
-            address = "A-101, Tower A, Prestige Lakeside Habitat, Bengaluru 560037",
+            doorNo = "A-101",
+            apartmentName = "Prestige Lakeside Habitat",
+            street = "Varthur Road",
+            city = "Bengaluru",
+            state = "Karnataka",
+            pincode = "560037",
             gstin = "29AADCS9988P1Z2",
             phone = "+91 99001 44556",
             email = "sneha.reddy@example.com",
@@ -89,14 +99,19 @@ fun sampleInvoiceApartment(): InvoiceRecord {
         attachedTaskIds = listOf(task.id),
         attachedIssueIds = listOf(issue.id),
         uploads = listOf(
-            InvoiceAttachment("inv-u2", "site-photo.jpg", "1.1 MB"),
+            InvoiceAttachment("inv-u2", "image1.jpg", "1.1 MB"),
         ),
     )
 }
 
 fun defaultSellerParty(): InvoiceParty = InvoiceParty(
     name = MockDirectory.OrganisationName,
-    address = "Prestige Falcon Towers, Brunton Road, Bengaluru 560025",
+    doorNo = "Prestige Falcon Towers",
+    apartmentName = "",
+    street = "Brunton Road",
+    city = "Bengaluru",
+    state = "Karnataka",
+    pincode = "560025",
     gstin = "29AABCP1234F1Z8",
     phone = "+91 80 2555 0101",
     email = "accounts@prestigeestates.example",
@@ -108,5 +123,5 @@ fun defaultBankDetails(): InvoiceBankDetails = InvoiceBankDetails(
     accountNumber = "50200011223344",
     ifsc = "HDFC0001234",
     upiId = "prestige@hdfcbank",
-    qrAttachment = InvoiceAttachment("qr-sample", "upi-qr.png", "86 KB"),
+    qrAttachment = null,
 )

@@ -2,24 +2,15 @@ package com.orbitai.erp.ui.form.page
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
-import com.orbitai.erp.core.designsystem.component.container.OrbitCard
-import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
-import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
-import com.orbitai.erp.core.designsystem.theme.controlColors
 import com.orbitai.erp.core.model.ProjectType
+import com.orbitai.erp.ui.card.InvoiceWorkItemCard
 import com.orbitai.erp.ui.card.WorkItemKind
 import com.orbitai.erp.ui.card.WorkItemRecord
 import com.orbitai.erp.ui.card.sampleIssueApartment
@@ -43,9 +34,6 @@ fun InvoiceAttachWorkPage(
     val catalogue = remember(projectType) { invoiceWorkCatalogue(projectType) }
     val tasks = catalogue.filter { it.kind == WorkItemKind.Task }
     val issues = catalogue.filter { it.kind == WorkItemKind.Issue }
-    val selectedIds = catalogue
-        .filter { it.id in attachedTaskIds || it.id in attachedIssueIds }
-        .map { it.number }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -56,11 +44,10 @@ fun InvoiceAttachWorkPage(
                 EmptyAttachNote("No tasks available")
             } else {
                 tasks.forEach { item ->
-                    AttachWorkIdRow(
-                        number = item.number,
+                    InvoiceWorkItemCard(
+                        record = item,
                         selected = item.id in attachedTaskIds,
-                        kindLabel = "task",
-                        onToggle = { onTaskToggle(item.id) },
+                        onSelect = { onTaskToggle(item.id) },
                     )
                 }
             }
@@ -71,67 +58,13 @@ fun InvoiceAttachWorkPage(
                 EmptyAttachNote("No issues available")
             } else {
                 issues.forEach { item ->
-                    AttachWorkIdRow(
-                        number = item.number,
+                    InvoiceWorkItemCard(
+                        record = item,
                         selected = item.id in attachedIssueIds,
-                        kindLabel = "issue",
-                        onToggle = { onIssueToggle(item.id) },
+                        onSelect = { onIssueToggle(item.id) },
                     )
                 }
             }
-        }
-
-        if (selectedIds.isNotEmpty()) {
-            FormSection(title = "Selected") {
-                Text(
-                    text = selectedIds.joinToString(" · "),
-                    style = OrbitTheme.extendedTypography.reference,
-                    color = OrbitTheme.contentColors.textPrimary,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AttachWorkIdRow(
-    number: String,
-    selected: Boolean,
-    kindLabel: String,
-    onToggle: () -> Unit,
-) {
-    val content = OrbitTheme.contentColors
-    OrbitCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics {
-                contentDescription = "Select $kindLabel $number"
-                role = Role.Checkbox
-            },
-        onClick = onToggle,
-        container = if (selected) {
-            OrbitTheme.controlColors.actionContainer.copy(alpha = 0.12f)
-        } else {
-            OrbitTheme.controlColors.cardContainer
-        },
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(OrbitTheme.spacing.sm),
-        ) {
-            OrbitGlyph(
-                icon = if (selected) OrbitIcons.Tick else OrbitIcons.Add,
-                size = OrbitTheme.sizing.iconMd,
-                tint = if (selected) content.iconAccent else content.iconInactive,
-                contentDescription = null,
-            )
-            Text(
-                text = number,
-                style = OrbitTheme.extendedTypography.reference,
-                color = content.textPrimary,
-                modifier = Modifier.weight(1f),
-            )
         }
     }
 }

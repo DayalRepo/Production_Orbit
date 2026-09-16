@@ -51,6 +51,7 @@ fun WorkItemCard(
     onView: () -> Unit,
     onStart: () -> Unit,
     modifier: Modifier = Modifier,
+    showActions: Boolean = true,
 ) {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
@@ -197,15 +198,17 @@ fun WorkItemCard(
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            OrbitCardRule()
+            if (showActions) {
+                OrbitCardRule()
 
-            WorkItemRoleActions(
-                record = record,
-                viewerRole = viewerRole,
-                onStart = onStart,
-                onView = onView,
-                onUpdate = onUpdate,
-            )
+                WorkItemRoleActions(
+                    record = record,
+                    viewerRole = viewerRole,
+                    onStart = onStart,
+                    onView = onView,
+                    onUpdate = onUpdate,
+                )
+            }
         }
     }
 }

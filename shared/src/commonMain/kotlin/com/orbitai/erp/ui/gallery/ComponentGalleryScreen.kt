@@ -30,6 +30,7 @@ import com.orbitai.erp.ui.card.CreatedInvoiceScreen
 import com.orbitai.erp.ui.card.CreatedItemsScreen
 import com.orbitai.erp.ui.card.InvoiceAttachedWorkScreen
 import com.orbitai.erp.ui.card.InvoiceRecord
+import com.orbitai.erp.ui.card.InvoiceViewerRole
 import com.orbitai.erp.ui.card.UnitCardsScreen
 import com.orbitai.erp.ui.card.UnitRecord
 import com.orbitai.erp.ui.card.WorkItemKind
@@ -78,7 +79,9 @@ fun ComponentGalleryScreen(
     var viewingUnits by remember { mutableStateOf<List<UnitRecord>?>(null) }
     var viewingUnitsTitle by remember { mutableStateOf("Units") }
     var viewingInvoice by remember { mutableStateOf<InvoiceRecord?>(null) }
+    var viewingInvoiceRole by remember { mutableStateOf(InvoiceViewerRole.Sender) }
     var viewingInvoiceAttached by remember { mutableStateOf(false) }
+    var editingInvoice by remember { mutableStateOf<InvoiceRecord?>(null) }
 
     fun openCards(items: List<WorkItemRecord>, title: String) {
         viewingTitle = title
@@ -86,6 +89,7 @@ fun ComponentGalleryScreen(
         viewingUnits = null
         viewingInvoice = null
         viewingInvoiceAttached = false
+        editingInvoice = null
         openForm = null
     }
 
@@ -95,12 +99,15 @@ fun ComponentGalleryScreen(
         viewing = null
         viewingInvoice = null
         viewingInvoiceAttached = false
+        editingInvoice = null
         openForm = null
     }
 
-    fun openInvoice(record: InvoiceRecord) {
+    fun openInvoice(record: InvoiceRecord, role: InvoiceViewerRole = InvoiceViewerRole.Sender) {
         viewingInvoice = record
+        viewingInvoiceRole = role
         viewingInvoiceAttached = false
+        editingInvoice = null
         viewing = null
         viewingUnits = null
         openForm = null
@@ -109,7 +116,29 @@ fun ComponentGalleryScreen(
     val units = viewingUnits
     val cards = viewing
     val invoice = viewingInvoice
+    val invoiceBeingEdited = editingInvoice
     when {
+        invoiceBeingEdited != null -> InvoiceForm(
+            projectType = invoiceBeingEdited.projectType,
+            editing = invoiceBeingEdited,
+            onDismiss = { editingInvoice = null },
+            onCreate = { draft ->
+                val updated = draft.invoiceDraftToRecord(
+                    projectType = invoiceBeingEdited.projectType,
+                    existingId = invoiceBeingEdited.id,
+                    existingStatus = invoiceBeingEdited.status,
+                )
+                val index = createdInvoices.indexOfFirst { it.id == updated.id }
+                if (index >= 0) {
+                    createdInvoices[index] = updated
+                } else {
+                    createdInvoices.add(0, updated)
+                }
+                editingInvoice = null
+                openInvoice(updated, InvoiceViewerRole.Sender)
+            },
+            modifier = modifier,
+        )
         invoice != null && viewingInvoiceAttached -> InvoiceAttachedWorkScreen(
             invoice = invoice,
             onBack = { viewingInvoiceAttached = false },
@@ -117,8 +146,10 @@ fun ComponentGalleryScreen(
         )
         invoice != null -> CreatedInvoiceScreen(
             record = invoice,
+            role = viewingInvoiceRole,
             onBack = { viewingInvoice = null },
             onOpenAttachedWork = { viewingInvoiceAttached = true },
+            onEdit = { editingInvoice = invoice },
             modifier = modifier,
         )
         units != null -> UnitCardsScreen(
@@ -233,8 +264,14 @@ fun ComponentGalleryScreen(
                             listOf(sampleUnitApartment()),
                             "Unit card — Apartment / Community",
                         )
-                    FormPreview.SampleInvoiceVilla -> openInvoice(sampleInvoiceVilla())
-                    FormPreview.SampleInvoiceApartment -> openInvoice(sampleInvoiceApartment())
+                    FormPreview.SampleInvoiceSentVilla ->
+                        openInvoice(sampleInvoiceVilla(), InvoiceViewerRole.Sender)
+                    FormPreview.SampleInvoiceSentApartment ->
+                        openInvoice(sampleInvoiceApartment(), InvoiceViewerRole.Sender)
+                    FormPreview.SampleInvoiceReceivedVilla ->
+                        openInvoice(sampleInvoiceVilla(), InvoiceViewerRole.Receiver)
+                    FormPreview.SampleInvoiceReceivedApartment ->
+                        openInvoice(sampleInvoiceApartment(), InvoiceViewerRole.Receiver)
                     else -> openForm = preview
                 }
             },

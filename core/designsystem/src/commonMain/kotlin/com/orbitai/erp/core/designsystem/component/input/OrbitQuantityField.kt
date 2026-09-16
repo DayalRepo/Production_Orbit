@@ -112,6 +112,11 @@ fun OrbitQuantityField(
         OrbitTheme.sizing.iconSm,
         OrbitTheme.sizing.iconMd,
     )
+    val stepperSize = size.pick(
+        OrbitTheme.sizing.minTouchTarget - 8.dp,
+        OrbitTheme.sizing.minTouchTarget,
+        OrbitTheme.sizing.minTouchTarget,
+    )
     val textStyle = size.pick(
         OrbitTheme.typography.bodyMedium,
         OrbitTheme.typography.bodyLarge,
@@ -143,12 +148,13 @@ fun OrbitQuantityField(
             contentDescription = "Decrease $label",
             enabled = enabled && value > range.first,
             iconSize = iconSize,
+            buttonSize = stepperSize,
             onClick = { onValueChange((value - step).coerceIn(range)) },
         )
 
         Box(
             modifier = Modifier
-                .weight(1f)
+                .weight(1f, fill = true)
                 .widthIn(min = numberMinWidth)
                 .onSizeChanged { slotWidth = it.width },
             contentAlignment = Alignment.Center,
@@ -212,6 +218,7 @@ fun OrbitQuantityField(
             contentDescription = "Increase $label",
             enabled = enabled && value < range.last,
             iconSize = iconSize,
+            buttonSize = stepperSize,
             onClick = { onValueChange((value + step).coerceIn(range)) },
         )
     }
@@ -224,6 +231,7 @@ internal fun QuantityStepperButton(
     enabled: Boolean,
     iconSize: Dp,
     onClick: () -> Unit,
+    buttonSize: Dp = OrbitTheme.sizing.minTouchTarget,
 ) {
     val content = OrbitTheme.contentColors
     val sizing = OrbitTheme.sizing
@@ -231,7 +239,7 @@ internal fun QuantityStepperButton(
 
     Box(
         modifier = Modifier
-            .size(sizing.minTouchTarget)
+            .size(buttonSize)
             .clip(OrbitTheme.shapeTokens.avatar)
             .then(
                 if (enabled) {

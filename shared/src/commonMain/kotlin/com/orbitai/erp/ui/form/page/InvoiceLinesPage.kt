@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import com.orbitai.erp.core.designsystem.component.button.OrbitButton
+import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.button.OrbitButtonSize
-import com.orbitai.erp.core.designsystem.component.button.OrbitButtonVariant
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButton
 import com.orbitai.erp.core.designsystem.component.button.OrbitIconButtonStyle
+import com.orbitai.erp.core.designsystem.component.input.OrbitFieldSize
 import com.orbitai.erp.core.designsystem.component.input.OrbitQuantityField
 import com.orbitai.erp.core.designsystem.component.input.OrbitSwitch
 import com.orbitai.erp.core.designsystem.component.input.OrbitTextField
@@ -22,6 +22,10 @@ import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.ui.card.amountInWordsInr
 import com.orbitai.erp.ui.card.formatInr
+import com.orbitai.erp.ui.component.button.ActionButton
+import com.orbitai.erp.ui.component.button.ActionKind
+import com.orbitai.erp.ui.component.dropdown.ManagedInvoiceLineDropdown
+import com.orbitai.erp.ui.component.dropdown.ManagedUnitsDropdown
 import com.orbitai.erp.ui.form.FormFieldLabel
 import com.orbitai.erp.ui.form.FormSection
 import com.orbitai.erp.ui.form.InvoiceLineDraft
@@ -52,15 +56,15 @@ fun InvoiceLinesPage(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.md),
     ) {
-        FormSection(title = "Line items", showDivider = false) {
-            lines.forEach { line ->
+        FormSection(title = "Items", showDivider = false) {
+            lines.forEachIndexed { index, line ->
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                     ) {
-                        FormFieldLabel("Line item", modifier = Modifier.weight(1f))
+                        FormFieldLabel("${index + 1}. Line item", modifier = Modifier.weight(1f))
                         if (lines.size > 1) {
                             OrbitIconButton(
                                 contentDescription = "Remove line",
@@ -70,28 +74,54 @@ fun InvoiceLinesPage(
                             )
                         }
                     }
-                    OrbitTextField(
-                        value = line.description,
-                        onValueChange = { value ->
-                            onReplaceLine(line.id) { it.copy(description = value) }
-                        },
-                        label = "Description",
-                        placeholder = "Slab concreting",
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                        FormFieldLabel("Description")
+                        ManagedInvoiceLineDropdown(
+                            selected = line.description.takeIf { it.isNotBlank() },
+                            onSelect = { value ->
+                                onReplaceLine(line.id) { it.copy(description = value) }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                     ) {
-                        OrbitQuantityField(
-                            value = line.quantity.toInt().coerceAtLeast(1),
-                            onValueChange = { qty ->
-                                onReplaceLine(line.id) { it.copy(quantity = qty.toDouble()) }
-                            },
-                            label = "Qty",
-                            range = 1..999_999,
+                        Column(
                             modifier = Modifier.weight(1f),
-                        )
+                            verticalArrangement = Arrangement.spacedBy(spacing.sm),
+                        ) {
+                            FormFieldLabel("Qty")
+                            OrbitQuantityField(
+                                value = line.quantity.toInt().coerceAtLeast(1),
+                                onValueChange = { qty ->
+                                    onReplaceLine(line.id) { it.copy(quantity = qty.toDouble()) }
+                                },
+                                label = "Qty",
+                                range = 1..999_999,
+                                size = OrbitFieldSize.Small,
+                                numberMinWidth = 40.dp,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(spacing.sm),
+                        ) {
+                            FormFieldLabel("Unit")
+                            ManagedUnitsDropdown(
+                                label = "Unit",
+                                selected = line.unit.takeIf { it.isNotBlank() },
+                                onSelect = { value ->
+                                    onReplaceLine(line.id) { it.copy(unit = value) }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
+                        FormFieldLabel("Rate")
                         OrbitTextField(
                             value = if (line.rate == 0.0) "" else line.rate.trimZeros(),
                             onValueChange = { raw ->
@@ -101,7 +131,7 @@ fun InvoiceLinesPage(
                             label = "Rate (₹)",
                             placeholder = "0",
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                     Text(
@@ -111,17 +141,16 @@ fun InvoiceLinesPage(
                     )
                 }
             }
-            OrbitButton(
-                label = "Add line",
+            ActionButton(
+                action = ActionKind.Create,
                 onClick = onAddLine,
-                variant = OrbitButtonVariant.Secondary,
+                label = "Add line",
                 size = OrbitButtonSize.Medium,
-                icon = OrbitIcons.Add,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
 
-        FormSection(title = "GST & totals") {
+        FormSection(title = "Tax & total") {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -144,28 +173,40 @@ fun InvoiceLinesPage(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                 ) {
-                    OrbitTextField(
-                        value = cgstPercent.trimZeros(),
-                        onValueChange = { raw ->
-                            onCgstPercentChange(
-                                raw.filter { it.isDigit() || it == '.' }.toDoubleOrNull() ?: 0.0,
-                            )
-                        },
-                        label = "CGST %",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    Column(
                         modifier = Modifier.weight(1f),
-                    )
-                    OrbitTextField(
-                        value = sgstPercent.trimZeros(),
-                        onValueChange = { raw ->
-                            onSgstPercentChange(
-                                raw.filter { it.isDigit() || it == '.' }.toDoubleOrNull() ?: 0.0,
-                            )
-                        },
-                        label = "SGST %",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        verticalArrangement = Arrangement.spacedBy(spacing.sm),
+                    ) {
+                        FormFieldLabel("CGST %")
+                        OrbitTextField(
+                            value = cgstPercent.trimZeros(),
+                            onValueChange = { raw ->
+                                onCgstPercentChange(
+                                    raw.filter { it.isDigit() || it == '.' }.toDoubleOrNull() ?: 0.0,
+                                )
+                            },
+                            label = "CGST %",
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    Column(
                         modifier = Modifier.weight(1f),
-                    )
+                        verticalArrangement = Arrangement.spacedBy(spacing.sm),
+                    ) {
+                        FormFieldLabel("SGST %")
+                        OrbitTextField(
+                            value = sgstPercent.trimZeros(),
+                            onValueChange = { raw ->
+                                onSgstPercentChange(
+                                    raw.filter { it.isDigit() || it == '.' }.toDoubleOrNull() ?: 0.0,
+                                )
+                            },
+                            label = "SGST %",
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
             Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {

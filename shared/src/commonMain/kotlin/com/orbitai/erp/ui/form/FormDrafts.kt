@@ -114,7 +114,7 @@ class InvoiceDraft {
     var applyGst by mutableStateOf(true)
     var cgstPercent by mutableStateOf(9.0)
     var sgstPercent by mutableStateOf(9.0)
-    var bank by mutableStateOf(defaultBankDetails().copy(qrAttachment = null))
+    var bank by mutableStateOf(defaultBankDetails())
     var notes by mutableStateOf("")
     var placeOfSupply by mutableStateOf("Karnataka")
     var attachedTaskIds by mutableStateOf(setOf<String>())
@@ -154,6 +154,7 @@ data class InvoiceLineDraft(
     val description: String = "",
     val quantity: Double = 1.0,
     val rate: Double = 0.0,
+    val unit: String = "Nos",
     val hsnSac: String = "",
 ) {
     fun toLineOrNull(): InvoiceLineItem? {
@@ -163,6 +164,7 @@ data class InvoiceLineDraft(
             description = description.trim(),
             quantity = quantity,
             rate = rate,
+            unit = unit.trim().ifBlank { "Nos" },
             hsnSac = hsnSac.trim().ifBlank { null },
         )
     }
@@ -185,10 +187,14 @@ fun InvoiceDraft.isReadyForPage(page: Int): Boolean = when (page) {
 fun InvoiceDraft.isReadyToCreate(): Boolean =
     isReadyForPage(0) && isReadyForPage(1) && isReadyForPage(2)
 
-fun InvoiceDraft.toRecord(projectType: ProjectType): InvoiceRecord = InvoiceRecord(
-    id = "inv${Random.nextLong()}",
+fun InvoiceDraft.toRecord(
+    projectType: ProjectType,
+    existingId: String? = null,
+    existingStatus: ApprovalStatus? = null,
+): InvoiceRecord = InvoiceRecord(
+    id = existingId ?: "inv${Random.nextLong()}",
     number = number.trim().ifBlank { nextInvoiceNumber() },
-    status = ApprovalStatus.Pending,
+    status = existingStatus ?: ApprovalStatus.Pending,
     projectType = projectType,
     issued = issued,
     due = due,
@@ -202,13 +208,51 @@ fun InvoiceDraft.toRecord(projectType: ProjectType): InvoiceRecord = InvoiceReco
     applyGst = applyGst,
     cgstPercent = cgstPercent,
     sgstPercent = sgstPercent,
-    bank = bank,
+    bank = bank.copy(qrAttachment = null),
     notes = notes.trim(),
     placeOfSupply = placeOfSupply.trim(),
     attachedTaskIds = attachedTaskIds.toList(),
     attachedIssueIds = attachedIssueIds.toList(),
-    uploads = uploads.toList(),
+    uploads = uploads.distinctBy { it.id },
 )
+
+/** Prefill create/edit form from an existing invoice. */
+fun InvoiceRecord.toDraft(): InvoiceDraft = InvoiceDraft().also { draft ->
+    draft.number = number
+    draft.issued = issued
+    draft.due = due
+    draft.projectName = projectName
+    draft.villa = villa
+    draft.tower = tower
+    draft.apartmentUnit = apartmentUnit
+    draft.from = from
+    draft.billTo = billTo
+    draft.lines.clear()
+    if (lines.isEmpty()) {
+        draft.lines += InvoiceLineDraft(id = "line-0")
+    } else {
+        lines.forEach { line ->
+            draft.lines += InvoiceLineDraft(
+                id = line.id,
+                description = line.description,
+                quantity = line.quantity,
+                rate = line.rate,
+                unit = line.unit,
+                hsnSac = line.hsnSac.orEmpty(),
+            )
+        }
+    }
+    draft.applyGst = applyGst
+    draft.cgstPercent = cgstPercent
+    draft.sgstPercent = sgstPercent
+    draft.bank = bank
+    draft.notes = notes
+    draft.placeOfSupply = placeOfSupply
+    draft.attachedTaskIds = attachedTaskIds.toSet()
+    draft.attachedIssueIds = attachedIssueIds.toSet()
+    draft.uploads.clear()
+    draft.uploads.addAll(uploads)
+}
 
 internal fun WorkItemDraft.replaceMaterialLine(
     id: String,

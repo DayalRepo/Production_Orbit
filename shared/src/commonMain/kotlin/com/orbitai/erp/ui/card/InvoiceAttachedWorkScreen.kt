@@ -25,7 +25,6 @@ import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.controlColors
 import com.orbitai.erp.platform.OrbitBackHandler
-import com.orbitai.erp.ui.component.attachment.FileAttachmentRow
 import com.orbitai.erp.ui.form.page.invoiceWorkCatalogue
 
 @Composable
@@ -44,9 +43,6 @@ fun InvoiceAttachedWorkScreen(
     }
     val issues = remember(invoice, catalogue) {
         catalogue.filter { it.id in invoice.attachedIssueIds }
-    }
-    val photos = remember(tasks, issues) {
-        (tasks + issues).flatMap { it.photos }
     }
 
     Column(
@@ -78,7 +74,7 @@ fun InvoiceAttachedWorkScreen(
                 )
                 Text(
                     text = invoice.number,
-                    style = OrbitTheme.typography.bodyMedium,
+                    style = OrbitTheme.extendedTypography.reference,
                     color = content.textSecondary,
                 )
             }
@@ -94,44 +90,30 @@ fun InvoiceAttachedWorkScreen(
                 ),
             verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
-            SectionHeading("Tasks")
+            Text(
+                text = "Tasks".uppercase(),
+                style = OrbitTheme.extendedTypography.sectionLabel,
+                color = content.textSecondary,
+            )
             if (tasks.isEmpty()) {
                 EmptyReviewNote("No tasks attached")
             } else {
                 tasks.forEach { item ->
-                    Text(
-                        text = item.number,
-                        style = OrbitTheme.extendedTypography.reference,
-                        color = content.textPrimary,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    InvoiceWorkItemCard(record = item)
                 }
             }
 
             OrbitDivider(color = OrbitTheme.controlColors.dividerElevated)
-            SectionHeading("Issues")
+            Text(
+                text = "Issues".uppercase(),
+                style = OrbitTheme.extendedTypography.sectionLabel,
+                color = content.textSecondary,
+            )
             if (issues.isEmpty()) {
                 EmptyReviewNote("No issues attached")
             } else {
                 issues.forEach { item ->
-                    Text(
-                        text = item.number,
-                        style = OrbitTheme.extendedTypography.reference,
-                        color = content.textPrimary,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
-
-            if (photos.isNotEmpty()) {
-                OrbitDivider(color = OrbitTheme.controlColors.dividerElevated)
-                SectionHeading("Photos")
-                photos.forEach { photo ->
-                    FileAttachmentRow(
-                        fileName = photo.fileName,
-                        fileSize = photo.fileSize,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    InvoiceWorkItemCard(record = item)
                 }
             }
         }

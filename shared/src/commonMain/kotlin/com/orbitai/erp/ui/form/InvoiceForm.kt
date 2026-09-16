@@ -28,6 +28,7 @@ import com.orbitai.erp.core.designsystem.component.progress.OrbitFormPageBar
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.model.ProjectType
 import com.orbitai.erp.platform.OrbitBackHandler
+import com.orbitai.erp.ui.card.InvoiceRecord
 import com.orbitai.erp.ui.component.button.ActionButtonRow
 import com.orbitai.erp.ui.component.button.ActionKind
 import com.orbitai.erp.ui.form.page.InvoiceAttachWorkPage
@@ -44,9 +45,13 @@ fun InvoiceForm(
     projectType: ProjectType,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    editing: InvoiceRecord? = null,
     onCreate: (InvoiceDraft) -> Unit = {},
 ) {
-    val draft = remember { InvoiceDraft() }
+    val draft = remember(editing?.id) {
+        editing?.toDraft() ?: InvoiceDraft()
+    }
+    val isEditing = editing != null
     var page by remember { mutableIntStateOf(0) }
     var confirmOpen by remember { mutableStateOf(false) }
     var zeroConfirmOpen by remember { mutableStateOf(false) }
@@ -92,7 +97,7 @@ fun InvoiceForm(
             ),
     ) {
         Text(
-            text = "Create invoice".uppercase(),
+            text = (if (isEditing) "Edit invoice" else "Create invoice").uppercase(),
             style = OrbitTheme.typography.headlineSmall.copy(
                 fontWeight = OrbitTheme.fontWeights.heading,
             ),
@@ -111,20 +116,6 @@ fun InvoiceForm(
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(spacing.lg))
-
-        val pageTitle = when (page) {
-            0 -> "Parties & meta"
-            1 -> "Line items"
-            2 -> "Payment"
-            3 -> "Attach work"
-            else -> "Uploads"
-        }
-        Text(
-            text = pageTitle.uppercase(),
-            style = OrbitTheme.extendedTypography.sectionLabel,
-            color = OrbitTheme.contentColors.textSecondary,
-        )
-        Spacer(modifier = Modifier.height(spacing.md))
 
         Column(
             modifier = Modifier
@@ -156,8 +147,6 @@ fun InvoiceForm(
                     onFromChange = { draft.from = it },
                     billTo = draft.billTo,
                     onBillToChange = { draft.billTo = it },
-                    placeOfSupply = draft.placeOfSupply,
-                    onPlaceOfSupplyChange = { draft.placeOfSupply = it },
                 )
                 1 -> InvoiceLinesPage(
                     lines = draft.lines.toList(),
@@ -193,7 +182,6 @@ fun InvoiceForm(
                 else -> InvoiceUploadsPage(
                     uploads = draft.uploads.toList(),
                     onAdd = { draft.uploads += it },
-                    onRemove = { id -> draft.uploads.removeAll { it.id == id } },
                 )
             }
         }
@@ -201,7 +189,11 @@ fun InvoiceForm(
         Spacer(modifier = Modifier.height(spacing.lg))
         ActionButtonRow(
             dismiss = if (page == 0) ActionKind.Cancel else ActionKind.Back,
-            confirm = if (page == InvoicePageCount - 1) ActionKind.Create else ActionKind.Next,
+            confirm = when {
+                page < InvoicePageCount - 1 -> ActionKind.Next
+                isEditing -> ActionKind.Edit
+                else -> ActionKind.Create
+            },
             onDismiss = ::goBack,
             onConfirm = ::goNext,
         )
@@ -209,8 +201,12 @@ fun InvoiceForm(
 
     if (confirmOpen) {
         OrbitConfirmDialog(
-            title = "Create invoice",
-            message = "Create invoice ${draft.number} for ${formatCreateMessage(draft)}?",
+            title = if (isEditing) "Save invoice" else "Create invoice",
+            message = if (isEditing) {
+                "Save changes to invoice ${draft.number}?"
+            } else {
+                "Create invoice ${draft.number} for ${formatCreateMessage(draft)}?"
+            },
             confirmLabel = "Yes",
             dismissLabel = "No",
             onConfirm = {
@@ -223,8 +219,12 @@ fun InvoiceForm(
     if (zeroConfirmOpen) {
         OrbitConfirmDialog(
             title = "Zero total",
-            message = "This invoice has no billable amount. Create it anyway?",
-            confirmLabel = "Create",
+            message = if (isEditing) {
+                "This invoice has no billable amount. Save it anyway?"
+            } else {
+                "This invoice has no billable amount. Create it anyway?"
+            },
+            confirmLabel = if (isEditing) "Save" else "Create",
             dismissLabel = "Back",
             onConfirm = {
                 zeroConfirmOpen = false
