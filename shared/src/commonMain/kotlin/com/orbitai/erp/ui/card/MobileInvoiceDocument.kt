@@ -195,8 +195,11 @@ private fun PartiesBlock(
             )
         }
         PartyFieldRow("Name", from.name, billTo.name)
+        OrbitDivider(color = OrbitTheme.controlColors.controlBorder)
         PartyFieldRow("Address", from.address, billTo.address)
+        OrbitDivider(color = OrbitTheme.controlColors.controlBorder)
         PartyFieldRow("GSTIN", from.gstin, billTo.gstin)
+        OrbitDivider(color = OrbitTheme.controlColors.controlBorder)
         PartyFieldRow("Phone", from.phone, billTo.phone)
     }
 }

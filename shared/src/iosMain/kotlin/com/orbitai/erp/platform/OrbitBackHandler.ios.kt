@@ -1,12 +1,19 @@
 package com.orbitai.erp.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.backhandler.BackHandler
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 
 @Composable
 actual fun OrbitBackHandler(
     enabled: Boolean,
     onBack: () -> Unit,
 ) {
-    BackHandler(enabled = enabled, onBack = onBack)
+    val state = rememberNavigationEventState(NavigationEventInfo.None)
+    NavigationBackHandler(
+        state = state,
+        isBackEnabled = enabled,
+        onBackCompleted = onBack,
+    )
 }

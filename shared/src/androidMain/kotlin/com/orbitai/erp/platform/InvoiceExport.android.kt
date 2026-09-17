@@ -395,7 +395,7 @@ private class InvoicePdfWriter(
         startY: Float,
     ): Float {
         var cursor = startY
-        fun field(heading: String, left: String, right: String) {
+        fun field(heading: String, left: String, right: String, drawRuleAfter: Boolean) {
             ensure(14f)
             canvas.drawText(heading.uppercase(), leftX, cursor, paints.caption)
             canvas.drawText(heading.uppercase(), rightX, cursor, paints.caption)
@@ -403,18 +403,23 @@ private class InvoicePdfWriter(
             val leftLines = wrap(left.ifBlank { "—" }, paints.body, colWidth).take(4)
             val rightLines = wrap(right.ifBlank { "—" }, paints.body, colWidth).take(4)
             val rows = maxOf(leftLines.size, rightLines.size)
-            ensure(rows * 13f + 6f)
+            ensure(rows * 13f + 10f)
             for (i in 0 until rows) {
                 leftLines.getOrNull(i)?.let { canvas.drawText(it, leftX, cursor, paints.body) }
                 rightLines.getOrNull(i)?.let { canvas.drawText(it, rightX, cursor, paints.body) }
                 cursor += 13f
             }
             cursor += 6f
+            if (drawRuleAfter) {
+                ensure(8f)
+                canvas.drawLine(Margin, cursor, PageWidth - Margin, cursor, paints.line)
+                cursor += 10f
+            }
         }
-        field("Name", from.name, billTo.name)
-        field("Address", from.address, billTo.address)
-        field("GSTIN", from.gstin, billTo.gstin)
-        field("Phone", from.phone, billTo.phone)
+        field("Name", from.name, billTo.name, drawRuleAfter = true)
+        field("Address", from.address, billTo.address, drawRuleAfter = true)
+        field("GSTIN", from.gstin, billTo.gstin, drawRuleAfter = true)
+        field("Phone", from.phone, billTo.phone, drawRuleAfter = false)
         return cursor
     }
 

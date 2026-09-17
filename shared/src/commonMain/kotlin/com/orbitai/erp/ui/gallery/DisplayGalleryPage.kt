@@ -4,16 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.orbitai.erp.core.designsystem.component.container.OrbitCard
-import com.orbitai.erp.core.designsystem.component.container.OrbitCardViewer
 import com.orbitai.erp.core.designsystem.component.container.OrbitDivider
 import com.orbitai.erp.core.designsystem.component.display.OrbitAvatarGroup
 import com.orbitai.erp.core.designsystem.component.display.OrbitAvatarGroupMember
@@ -67,28 +64,6 @@ internal fun DisplayGalleryPage() {
     // stack to expand it into a wrapped grid, tap a face for its details, tap the same face again
     // to close. The last two members have no photograph, so the monogram fallback is exercised at
     // the same time.
-    GallerySection("Card viewer") {
-        OrbitCardViewer(
-            itemCount = 5,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(280.dp),
-        ) { index ->
-            OrbitCard(modifier = Modifier.fillMaxWidth(), padding = spacing.md) {
-                Text(
-                    text = "CARD ${index + 1}",
-                    style = OrbitTheme.typography.titleMedium,
-                    color = OrbitTheme.contentColors.textPrimary,
-                )
-                Text(
-                    text = "Swipe, or tap the centre card to stack.",
-                    style = OrbitTheme.typography.bodyMedium,
-                    color = OrbitTheme.contentColors.textSecondary,
-                )
-            }
-        }
-    }
-
     GallerySection("Avatar group") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
             TeamAvatarGroup(members = crew)

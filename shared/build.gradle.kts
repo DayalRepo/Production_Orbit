@@ -63,6 +63,9 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
         }
+        iosMain.dependencies {
+            implementation(libs.navigationevent.compose)
+        }
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
