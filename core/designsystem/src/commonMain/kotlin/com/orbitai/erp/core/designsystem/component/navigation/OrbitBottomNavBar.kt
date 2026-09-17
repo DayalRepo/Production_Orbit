@@ -1,48 +1,55 @@
 package com.orbitai.erp.core.designsystem.component.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.orbitai.erp.core.designsystem.component.brand.OrbitNavBrandMark
 import com.orbitai.erp.core.designsystem.component.display.OrbitCountBadge
-import com.orbitai.erp.core.designsystem.foundation.WindowSize
-import com.orbitai.erp.core.designsystem.foundation.orbitCircularPressIndication
 import com.orbitai.erp.core.designsystem.foundation.orbitHandCursor
-import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.theme.OrbitSizing
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
+import com.orbitai.erp.core.designsystem.theme.controlColors
 
 /**
  * One destination on an [OrbitBottomNavBar].
  *
- * Icons only — [label] is spoken / semantic, not drawn. Selection is colour only.
- * Set [emphasized] on the center Orbit AI slot (nav brand mark).
+ * Solid icon + small uppercase [label]. Active slot draws a full circle behind icon+label.
+ * Set [emphasized] on the center AI slot (nav brand mark).
  */
 @Immutable
 data class OrbitNavItem(
@@ -59,15 +66,15 @@ data class OrbitNavItem(
 data class OrbitBottomNavMetrics(
     val height: Dp,
     val glyph: Dp,
-    val aiGlyph: Dp,
+    val activeCircle: Dp,
     val horizontalPadding: Dp,
-    val iconStroke: Dp,
+    val labelGap: Dp,
+    val slotPadding: Dp,
     val touchTarget: Dp,
 )
 
 /**
- * Scales icon size from full screen width so five equal columns fill the bar.
- * Glyphs take most of each column so spacing between icons stays even, not sparse.
+ * Full-width five-column metrics. Active circle nearly fills each column; glyphs sit inside it.
  */
 fun orbitBottomNavMetrics(
     availableWidth: Dp,
@@ -77,31 +84,24 @@ fun orbitBottomNavMetrics(
     val edge = sizing.bottomNavEdgeInset
     val usable = (availableWidth - edge * 2).coerceAtLeast(280.dp)
     val column = usable / 5f
-    // ~44% of column — slightly smaller glyphs, more even air between slots.
-    val glyph = (column.value * 0.44f).dp.coerceIn(24.dp, 30.dp)
-    val aiGlyph = (glyph.value + 2f).dp.coerceAtMost(32.dp)
-    val heightFloor = maxOf(minTouchTarget + 2.dp, glyph + 12.dp)
-    val height = heightFloor.coerceIn(52.dp, 68.dp)
-    val widthScale = when {
-        availableWidth < 340.dp -> 0.96f
-        availableWidth < 400.dp -> 1.00f
-        availableWidth < WindowSize.MediumWidthBreakpoint -> 1.04f
-        else -> 1.08f
-    }
-    val stroke = (sizing.bottomNavIconStroke.value * widthScale).dp.coerceIn(1.10.dp, 1.30.dp)
+    val activeCircle = (column.value * 0.90f).dp.coerceIn(56.dp, 72.dp)
+    val glyph = (activeCircle.value * 0.40f).dp.coerceIn(22.dp, 28.dp)
+    val labelGap = sizing.bottomNavLabelGap
+    val height = (activeCircle.value + 6f).dp.coerceIn(62.dp, 78.dp)
     return OrbitBottomNavMetrics(
         height = height,
         glyph = glyph,
-        aiGlyph = aiGlyph,
+        activeCircle = activeCircle,
         horizontalPadding = edge,
-        iconStroke = stroke,
+        labelGap = labelGap,
+        slotPadding = 2.dp,
         touchTarget = minTouchTarget,
     )
 }
 
 /**
- * Full-width role bottom navigation: five icon slots, Orbit AI centered.
- * No chrome container, no labels. Active state is colour only.
+ * Full-width role bottom navigation: five equal slots, AI centered.
+ * Active destination gets a full circle covering its icon and label.
  */
 @Composable
 fun OrbitBottomNavBar(
@@ -144,7 +144,7 @@ fun OrbitBottomNavBar(
                 .fillMaxWidth()
                 .height(metrics.height)
                 .padding(horizontal = metrics.horizontalPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             items.forEach { item ->
@@ -152,10 +152,14 @@ fun OrbitBottomNavBar(
                     item = item,
                     selected = item.id == selectedId,
                     onClick = { onSelect(item.id) },
-                    glyphSize = if (item.emphasized) metrics.aiGlyph else metrics.glyph,
-                    stroke = metrics.iconStroke,
-                    touchTarget = metrics.touchTarget,
-                    modifier = Modifier.weight(1f),
+                    glyphSize = metrics.glyph,
+                    activeCircle = metrics.activeCircle,
+                    labelGap = metrics.labelGap,
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = metrics.height)
+                        .fillMaxWidth()
+                        .padding(horizontal = metrics.slotPadding),
                 )
             }
         }
@@ -168,68 +172,99 @@ private fun NavSlot(
     selected: Boolean,
     onClick: () -> Unit,
     glyphSize: Dp,
-    stroke: Dp,
-    touchTarget: Dp,
+    activeCircle: Dp,
+    labelGap: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val icons = OrbitTheme.contentColors
+    val content = OrbitTheme.contentColors
+    val controls = OrbitTheme.controlColors
     val interaction = remember(item.id) { MutableInteractionSource() }
-    val tint = if (selected) icons.iconPrimary else icons.iconInactive
-    val hit = maxOf(touchTarget, glyphSize + 16.dp)
+
+    // Neutral light/dark ink — no brand blue. Active sits on a theme surface circle.
+    val tint = if (selected) content.iconPrimary else content.iconInactive
+
+    val labelStyle = OrbitTheme.typography.labelSmall.copy(
+        fontSize = 8.sp,
+        lineHeight = 10.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 0.5.sp,
+    )
 
     Box(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .orbitHandCursor()
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                role = Role.Tab,
+                onClick = onClick,
+            )
+            .semantics(mergeDescendants = true) {
+                contentDescription = item.contentDescription
+                this.selected = selected
+            },
         contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
-                .size(hit)
-                .clip(CircleShape)
-                .orbitHandCursor()
-                .clickable(
-                    interactionSource = interaction,
-                    indication = null,
-                    role = Role.Tab,
-                    onClick = onClick,
-                )
-                .indication(interaction, orbitCircularPressIndication())
-                .semantics(mergeDescendants = true) {
-                    contentDescription = item.contentDescription
-                    this.selected = selected
-                },
+                .size(activeCircle)
+                .then(
+                    if (selected) {
+                        Modifier.background(controls.interactiveContainer, CircleShape)
+                    } else {
+                        Modifier
+                    },
+                ),
             contentAlignment = Alignment.Center,
         ) {
-            val showBadge = item.badgeCount > 0
-            Box(
-                modifier = Modifier.size(glyphSize),
-                contentAlignment = Alignment.Center,
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
             ) {
-                if (item.emphasized) {
-                    OrbitNavBrandMark(
-                        size = glyphSize,
-                        color = tint,
-                        contentDescription = null,
-                    )
-                } else {
-                    OrbitGlyph(
-                        icon = item.icon,
-                        size = glyphSize,
-                        tint = tint,
-                        minimumStroke = stroke,
-                        maximumStroke = stroke,
-                        contentDescription = null,
-                    )
-                }
-                if (showBadge) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        OrbitCountBadge(
-                            count = item.badgeCount,
-                            label = item.badgeLabel,
-                            compact = true,
-                            modifier = Modifier.align(Alignment.TopEnd),
+                val showBadge = item.badgeCount > 0
+                Box(
+                    modifier = Modifier.size(glyphSize),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (item.emphasized) {
+                        OrbitNavBrandMark(
+                            size = glyphSize,
+                            color = tint,
+                            contentDescription = null,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = null,
+                            tint = tint,
+                            modifier = Modifier.size(glyphSize),
                         )
                     }
+                    if (showBadge) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            OrbitCountBadge(
+                                count = item.badgeCount,
+                                label = item.badgeLabel,
+                                compact = true,
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = 2.dp, y = (-2).dp),
+                            )
+                        }
+                    }
                 }
+                Spacer(modifier = Modifier.height(labelGap))
+                Text(
+                    text = item.label.uppercase(),
+                    style = labelStyle,
+                    color = tint,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Clip,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         }
     }

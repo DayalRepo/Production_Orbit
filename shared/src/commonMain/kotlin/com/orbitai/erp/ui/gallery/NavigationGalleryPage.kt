@@ -33,7 +33,7 @@ import com.orbitai.erp.core.designsystem.component.navigation.OrbitWarehouseMana
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 
 /**
- * Navigation samples: icons-only role bottom navs (colour-only selection), then underline pages bar.
+ * Navigation samples: role bottom navs (icons + labels, colour-only selection), then underline pages bar.
  */
 @Composable
 internal fun NavigationGalleryPage() {
@@ -176,7 +176,7 @@ private fun RoleNavSample(role: String, content: @Composable () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(72.dp),
+                .height(88.dp),
             contentAlignment = Alignment.BottomCenter,
         ) {
             content()

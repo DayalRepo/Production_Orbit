@@ -4,15 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.orbitai.erp.core.designsystem.icon.OrbitIcons
+import com.orbitai.erp.core.designsystem.icon.OrbitNavSolidIcons
 
 // ── Project Manager ──────────────────────────────────────────────────────────
 
 object OrbitProjectManagerNavIds {
     const val Dashboard = "pm.dashboard"
-    const val Work = "pm.work"
+    /** Ongoing tasks, issues, and material-order cards. */
+    const val Ongoing = "pm.ongoing"
     const val Assistant = "pm.assistant"
-    const val Issues = "pm.issues"
+    /** Scheduling, planning, assigning tasks, and raise-issue creation. */
+    const val Plan = "pm.plan"
     const val Messages = "pm.messages"
 }
 
@@ -20,34 +22,36 @@ object OrbitProjectManagerNavIds {
 object OrbitProjectManagerNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitProjectManagerNavIds.Dashboard,
-        icon = OrbitIcons.DashboardCircle,
-        label = "Dashboard",
+        icon = OrbitNavSolidIcons.DashboardCircle,
+        label = "Home",
+        contentDescription = "Home",
     )
-    /** Create tasks, raise issues, schedule, order materials — PM work hub. */
-    val Work = OrbitNavItem(
-        id = OrbitProjectManagerNavIds.Work,
-        icon = OrbitIcons.NoteAdd,
-        label = "Work",
+    val Ongoing = OrbitNavItem(
+        id = OrbitProjectManagerNavIds.Ongoing,
+        icon = OrbitNavSolidIcons.NotebookText,
+        label = "Ongoing",
+        contentDescription = "Ongoing work",
     )
     val Orbit = OrbitNavItem(
         id = OrbitProjectManagerNavIds.Assistant,
-        icon = OrbitIcons.BubbleChat,
-        label = "Orbit",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "AI",
         contentDescription = "Orbit AI",
         emphasized = true,
     )
-    /** Open issue queue / escalations (separate from creating work). */
-    val Issues = OrbitNavItem(
-        id = OrbitProjectManagerNavIds.Issues,
-        icon = OrbitIcons.BadgeAlert,
-        label = "Issues",
+    val Plan = OrbitNavItem(
+        id = OrbitProjectManagerNavIds.Plan,
+        icon = OrbitNavSolidIcons.Calendar01,
+        label = "Plan",
+        contentDescription = "Plan and assign",
     )
     val Inbox = OrbitNavItem(
         id = OrbitProjectManagerNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        label = "Inbox",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "Chat",
+        contentDescription = "Chat",
     )
-    val items = listOf(Dashboard, Work, Orbit, Issues, Inbox)
+    val items = listOf(Dashboard, Ongoing, Orbit, Plan, Inbox)
 }
 
 @Composable
@@ -71,9 +75,11 @@ fun OrbitProjectManagerNavBar(
 
 object OrbitSiteEngineerNavIds {
     const val Dashboard = "se.dashboard"
+    /** Assigned tasks and raise-issue cards. */
     const val Work = "se.work"
     const val Assistant = "se.assistant"
-    const val Issues = "se.issues"
+    /** Completed task cards and assigned issues. */
+    const val Done = "se.done"
     const val Messages = "se.messages"
 }
 
@@ -81,34 +87,36 @@ object OrbitSiteEngineerNavIds {
 object OrbitSiteEngineerNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Dashboard,
-        icon = OrbitIcons.DashboardCircle,
-        label = "Dashboard",
+        icon = OrbitNavSolidIcons.DashboardCircle,
+        label = "Home",
+        contentDescription = "Home",
     )
-    /** Assigned tasks and site work to execute. */
     val Work = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Work,
-        icon = OrbitIcons.NotepadText,
+        icon = OrbitNavSolidIcons.NotepadText,
         label = "Work",
+        contentDescription = "Assigned work",
     )
     val Orbit = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Assistant,
-        icon = OrbitIcons.BubbleChat,
-        label = "Orbit",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "AI",
         contentDescription = "Orbit AI",
         emphasized = true,
     )
-    /** Issues raised on site / assigned to resolve. */
-    val Issues = OrbitNavItem(
-        id = OrbitSiteEngineerNavIds.Issues,
-        icon = OrbitIcons.BadgeAlert,
-        label = "Issues",
+    val Done = OrbitNavItem(
+        id = OrbitSiteEngineerNavIds.Done,
+        icon = OrbitNavSolidIcons.CircleCheck,
+        label = "Done",
+        contentDescription = "Completed work",
     )
     val Inbox = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        label = "Inbox",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "Chat",
+        contentDescription = "Chat",
     )
-    val items = listOf(Dashboard, Work, Orbit, Issues, Inbox)
+    val items = listOf(Dashboard, Work, Orbit, Done, Inbox)
 }
 
 @Composable
@@ -132,8 +140,10 @@ fun OrbitSiteEngineerNavBar(
 
 object OrbitContractorNavIds {
     const val Dashboard = "contractor.dashboard"
+    /** Assigned tasks and issues. */
     const val Work = "contractor.work"
     const val Assistant = "contractor.assistant"
+    /** Invoices for done work and completed cards. */
     const val Invoices = "contractor.invoices"
     const val Messages = "contractor.messages"
 }
@@ -142,31 +152,34 @@ object OrbitContractorNavIds {
 object OrbitContractorNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitContractorNavIds.Dashboard,
-        icon = OrbitIcons.DashboardCircle,
-        label = "Dashboard",
+        icon = OrbitNavSolidIcons.DashboardCircle,
+        label = "Home",
+        contentDescription = "Home",
     )
-    /** Assigned tasks and issues to execute. */
     val Work = OrbitNavItem(
         id = OrbitContractorNavIds.Work,
-        icon = OrbitIcons.NotepadText,
+        icon = OrbitNavSolidIcons.NotepadText,
         label = "Work",
+        contentDescription = "Assigned work",
     )
     val Orbit = OrbitNavItem(
         id = OrbitContractorNavIds.Assistant,
-        icon = OrbitIcons.BubbleChat,
-        label = "Orbit",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "AI",
         contentDescription = "Orbit AI",
         emphasized = true,
     )
     val Invoices = OrbitNavItem(
         id = OrbitContractorNavIds.Invoices,
-        icon = OrbitIcons.ReceiptIndianRupee,
-        label = "Invoices",
+        icon = OrbitNavSolidIcons.ReceiptIndianRupee,
+        label = "Invoice",
+        contentDescription = "Invoice",
     )
     val Inbox = OrbitNavItem(
         id = OrbitContractorNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        label = "Inbox",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "Chat",
+        contentDescription = "Chat",
     )
     val items = listOf(Dashboard, Work, Orbit, Invoices, Inbox)
 }
@@ -202,30 +215,33 @@ object OrbitWarehouseManagerNavIds {
 object OrbitWarehouseManagerNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Dashboard,
-        icon = OrbitIcons.DashboardCircle,
-        label = "Dashboard",
+        icon = OrbitNavSolidIcons.DashboardCircle,
+        label = "Home",
+        contentDescription = "Home",
     )
     val Store = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Inventory,
-        icon = OrbitIcons.Warehouse,
+        icon = OrbitNavSolidIcons.Warehouse,
         label = "Store",
     )
     val Orbit = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Assistant,
-        icon = OrbitIcons.BubbleChat,
-        label = "Orbit",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "AI",
         contentDescription = "Orbit AI",
         emphasized = true,
     )
     val Requests = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Requests,
-        icon = OrbitIcons.ListBullet,
-        label = "Requests",
+        icon = OrbitNavSolidIcons.ListBullet,
+        label = "Audit",
+        contentDescription = "Audit",
     )
     val Inbox = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        label = "Inbox",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "Chat",
+        contentDescription = "Chat",
     )
     val items = listOf(Dashboard, Store, Orbit, Requests, Inbox)
 }
@@ -261,30 +277,33 @@ object OrbitProcurementManagerNavIds {
 object OrbitProcurementManagerNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Dashboard,
-        icon = OrbitIcons.DashboardCircle,
-        label = "Dashboard",
+        icon = OrbitNavSolidIcons.DashboardCircle,
+        label = "Home",
+        contentDescription = "Home",
     )
     val Orders = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Orders,
-        icon = OrbitIcons.ShoppingCart,
+        icon = OrbitNavSolidIcons.ShoppingCart,
         label = "Orders",
     )
     val Orbit = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Assistant,
-        icon = OrbitIcons.BubbleChat,
-        label = "Orbit",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "AI",
         contentDescription = "Orbit AI",
         emphasized = true,
     )
     val Approvals = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Approvals,
-        icon = OrbitIcons.ReceiptIndianRupee,
-        label = "Approvals",
+        icon = OrbitNavSolidIcons.ReceiptIndianRupee,
+        label = "Invoice",
+        contentDescription = "Invoice",
     )
     val Inbox = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        label = "Inbox",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "Chat",
+        contentDescription = "Chat",
     )
     val items = listOf(Dashboard, Orders, Orbit, Approvals, Inbox)
 }
@@ -310,9 +329,11 @@ fun OrbitProcurementManagerNavBar(
 
 object OrbitQaQcNavIds {
     const val Dashboard = "qaqc.dashboard"
-    const val Inspections = "qaqc.inspections"
+    /** Task and issue inspections in progress. */
+    const val Inspect = "qaqc.inspect"
     const val Assistant = "qaqc.assistant"
-    const val Issues = "qaqc.issues"
+    /** Completed inspected task and issue cards. */
+    const val Done = "qaqc.done"
     const val Messages = "qaqc.messages"
 }
 
@@ -320,32 +341,36 @@ object OrbitQaQcNavIds {
 object OrbitQaQcNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitQaQcNavIds.Dashboard,
-        icon = OrbitIcons.DashboardCircle,
-        label = "Dashboard",
+        icon = OrbitNavSolidIcons.DashboardCircle,
+        label = "Home",
+        contentDescription = "Home",
     )
-    val Checks = OrbitNavItem(
-        id = OrbitQaQcNavIds.Inspections,
-        icon = OrbitIcons.BadgeCheck,
-        label = "Checks",
+    val Inspect = OrbitNavItem(
+        id = OrbitQaQcNavIds.Inspect,
+        icon = OrbitNavSolidIcons.NotebookText,
+        label = "Inspect",
+        contentDescription = "Inspections",
     )
     val Orbit = OrbitNavItem(
         id = OrbitQaQcNavIds.Assistant,
-        icon = OrbitIcons.BubbleChat,
-        label = "Orbit",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "AI",
         contentDescription = "Orbit AI",
         emphasized = true,
     )
-    val Issues = OrbitNavItem(
-        id = OrbitQaQcNavIds.Issues,
-        icon = OrbitIcons.BadgeAlert,
-        label = "Issues",
+    val Done = OrbitNavItem(
+        id = OrbitQaQcNavIds.Done,
+        icon = OrbitNavSolidIcons.CircleCheck,
+        label = "Done",
+        contentDescription = "Completed inspections",
     )
     val Inbox = OrbitNavItem(
         id = OrbitQaQcNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        label = "Inbox",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "Chat",
+        contentDescription = "Chat",
     )
-    val items = listOf(Dashboard, Checks, Orbit, Issues, Inbox)
+    val items = listOf(Dashboard, Inspect, Orbit, Done, Inbox)
 }
 
 @Composable

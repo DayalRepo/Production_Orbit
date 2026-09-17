@@ -57,7 +57,7 @@ fun OrbitCountBadge(
         else -> spacing.xs
     }
     val digitStyle = if (compact) {
-        OrbitTheme.extendedTypography.metricCaption.copy(fontSize = 9.sp, lineHeight = 10.sp)
+        OrbitTheme.extendedTypography.metricCaption.copy(fontSize = 10.sp, lineHeight = 11.sp)
     } else {
         OrbitTheme.extendedTypography.metricCaption
     }

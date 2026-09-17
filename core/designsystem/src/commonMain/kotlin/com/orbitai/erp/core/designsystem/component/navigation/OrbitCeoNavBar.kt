@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.orbitai.erp.core.designsystem.icon.OrbitIcons
+import com.orbitai.erp.core.designsystem.icon.OrbitNavSolidIcons
 
 object OrbitCeoNavIds {
     const val Dashboard = "ceo.dashboard"
@@ -15,40 +15,39 @@ object OrbitCeoNavIds {
 }
 
 /**
- * CEO: Dashboard · Projects · Orbit · Approvals · Inbox.
- *
- * Approvals is the fifth slot — pending CEO decisions (budgets, change orders, hires).
- * Alternatives: Reports, Finance, Team.
+ * CEO: Home · Projects · AI · Invoice · Chat.
  */
 @Immutable
 object OrbitCeoNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitCeoNavIds.Dashboard,
-        icon = OrbitIcons.DashboardCircle,
-        label = "Dashboard",
+        icon = OrbitNavSolidIcons.DashboardCircle,
+        label = "Home",
+        contentDescription = "Home",
     )
     val Projects = OrbitNavItem(
         id = OrbitCeoNavIds.Projects,
-        icon = OrbitIcons.Archive04,
+        icon = OrbitNavSolidIcons.Archive04,
         label = "Projects",
     )
     val Orbit = OrbitNavItem(
         id = OrbitCeoNavIds.Assistant,
-        icon = OrbitIcons.BubbleChat,
-        label = "Orbit",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "AI",
         contentDescription = "Orbit AI",
         emphasized = true,
     )
     val Approvals = OrbitNavItem(
         id = OrbitCeoNavIds.Approvals,
-        icon = OrbitIcons.ReceiptIndianRupee,
-        label = "Approvals",
+        icon = OrbitNavSolidIcons.ReceiptIndianRupee,
+        label = "Invoice",
+        contentDescription = "Invoice",
     )
     val Inbox = OrbitNavItem(
         id = OrbitCeoNavIds.Messages,
-        icon = OrbitIcons.BubbleChat,
-        label = "Inbox",
-        contentDescription = "Inbox",
+        icon = OrbitNavSolidIcons.BubbleChat,
+        label = "Chat",
+        contentDescription = "Chat",
     )
 
     val items: List<OrbitNavItem> = listOf(Dashboard, Projects, Orbit, Approvals, Inbox)

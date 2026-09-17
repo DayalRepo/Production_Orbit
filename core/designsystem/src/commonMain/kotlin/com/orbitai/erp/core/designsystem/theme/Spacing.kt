@@ -370,7 +370,7 @@ data class OrbitSizing(
     val countBadgeMinSize: Dp = 16.dp,
 
     /** Compact count badge used on bottom-nav icons (scaled with nav glyphs). */
-    val countBadgeCompactSize: Dp = 13.dp,
+    val countBadgeCompactSize: Dp = 14.dp,
 
     /** The count badge with no number in it — presence only, for "there is something here". */
     val countBadgeDot: Dp = 8.dp,
@@ -641,24 +641,24 @@ data class OrbitSizing(
     val maxContentWidth: Dp = 1200.dp,
 
     /**
-     * Full-width icons-only bottom nav (no labels, no chrome container).
+     * Full-width bottom nav: solid icons + uppercase labels inside an active circle.
      *
-     * Height covers the touch target. Glyph size scales from column width via
+     * Height covers the active circle. Glyph size scales from column width via
      * [orbitBottomNavMetrics].
      */
-    val bottomNavHeight: Dp = 56.dp,
+    val bottomNavHeight: Dp = 72.dp,
     /** Base side-tab glyph (metrics scale from screen width). */
     val bottomNavGlyph: Dp = 26.dp,
-    /** Base center Orbit AI nav brand mark size. */
-    val bottomNavAiGlyph: Dp = 28.dp,
+    /** Base center Orbit AI nav brand mark size (same size as side glyphs). */
+    val bottomNavAiGlyph: Dp = 26.dp,
     /** Stroke for side-tab glyphs — light but readable at nav size. */
     val bottomNavIconStroke: Dp = 1.15.dp,
     /** Stroke for stroke-based AI glyphs (brand mark does not use stroke). */
     val bottomNavAiStroke: Dp = 1.15.dp,
-    /** Gap between icon and label (labels are not drawn on the bar). */
-    val bottomNavLabelGap: Dp = 0.dp,
+    /** Gap between icon and uppercase label inside the active circle. */
+    val bottomNavLabelGap: Dp = 2.dp,
     /**
-     * Outer horizontal inset. Minimal so five columns use the full screen width.
+     * Outer horizontal inset — minimal so five columns use the full screen width.
      */
     val bottomNavEdgeInset: Dp = 2.dp,
     /** Contact shadow token (shared with composer chrome; nav itself draws no container). */

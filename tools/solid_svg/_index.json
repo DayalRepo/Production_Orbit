@@ -1,0 +1,123 @@
+{
+  "DashboardCircle": {
+    "ok": true,
+    "n": 4,
+    "evenodd": false,
+    "d_len": [
+      167,
+      161,
+      173,
+      167
+    ],
+    "url": "https://cdn.hugeicons.com/icons/dashboard-circle-solid-rounded.svg"
+  },
+  "Archive04": {
+    "ok": true,
+    "n": 1,
+    "evenodd": true,
+    "d_len": [
+      2060
+    ],
+    "url": "https://cdn.hugeicons.com/icons/archive-04-solid-rounded.svg"
+  },
+  "BubbleChat": {
+    "ok": true,
+    "n": 1,
+    "evenodd": false,
+    "d_len": [
+      953
+    ],
+    "url": "https://cdn.hugeicons.com/icons/bubble-chat-solid-rounded.svg"
+  },
+  "ReceiptIndianRupee": {
+    "ok": true,
+    "n": 1,
+    "evenodd": true,
+    "d_len": [
+      3542
+    ],
+    "url": "https://cdn.hugeicons.com/icons/receipt-indian-rupee-solid-rounded.svg"
+  },
+  "NotepadText": {
+    "ok": false,
+    "err": "HTTP Error 404: Not Found"
+  },
+  "CalendarSchedule": {
+    "ok": true,
+    "n": 2,
+    "evenodd": true,
+    "d_len": [
+      1563,
+      1102
+    ],
+    "url": "https://cdn.hugeicons.com/icons/calendar-03-solid-rounded.svg"
+  },
+  "CircleCheck": {
+    "ok": true,
+    "n": 1,
+    "evenodd": true,
+    "d_len": [
+      515
+    ],
+    "url": "https://cdn.hugeicons.com/icons/checkmark-circle-02-solid-rounded.svg"
+  },
+  "Warehouse": {
+    "ok": true,
+    "n": 1,
+    "evenodd": false,
+    "d_len": [
+      2040
+    ],
+    "url": "https://cdn.hugeicons.com/icons/warehouse-solid-rounded.svg"
+  },
+  "ListBullet": {
+    "ok": true,
+    "n": 6,
+    "evenodd": false,
+    "d_len": [
+      115,
+      126,
+      126,
+      137,
+      146,
+      146
+    ],
+    "url": "https://cdn.hugeicons.com/icons/left-to-right-list-bullet-solid-rounded.svg"
+  },
+  "ShoppingCart": {
+    "ok": true,
+    "n": 1,
+    "evenodd": true,
+    "d_len": [
+      1060
+    ],
+    "url": "https://cdn.hugeicons.com/icons/shopping-cart-02-solid-rounded.svg"
+  },
+  "BadgeCheck": {
+    "ok": true,
+    "n": 1,
+    "evenodd": false,
+    "d_len": [
+      1344
+    ],
+    "url": "https://cdn.hugeicons.com/icons/badge-check-solid-rounded.svg"
+  },
+  "Comment01": {
+    "ok": true,
+    "n": 1,
+    "evenodd": true,
+    "d_len": [
+      1040
+    ],
+    "url": "https://cdn.hugeicons.com/icons/comment-01-solid-rounded.svg"
+  },
+  "Message01": {
+    "ok": true,
+    "n": 1,
+    "evenodd": true,
+    "d_len": [
+      1186
+    ],
+    "url": "https://cdn.hugeicons.com/icons/message-01-solid-rounded.svg"
+  }
+}
