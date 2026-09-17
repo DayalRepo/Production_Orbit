@@ -34,7 +34,7 @@ object OrbitCeoNavItems {
         id = OrbitCeoNavIds.Assistant,
         icon = OrbitNavSolidIcons.BubbleChat,
         label = "AI",
-        contentDescription = "Orbit AI",
+        contentDescription = "Orbit.ai",
         emphasized = true,
     )
     val Approvals = OrbitNavItem(

@@ -12,6 +12,7 @@ NAV = {
     "Calendar01": "calendar-01",
     "CalendarSchedule": "calendar-03",
     "CircleCheck": "checkmark-circle-02",
+    "ClipboardCheck": "clipboard-check",
     "Warehouse": "warehouse",
     "ListBullet": "left-to-right-list-bullet",
     "ShoppingCart": "shopping-cart-02",

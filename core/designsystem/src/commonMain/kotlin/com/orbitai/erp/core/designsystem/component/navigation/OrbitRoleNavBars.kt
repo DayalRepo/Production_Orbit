@@ -36,7 +36,7 @@ object OrbitProjectManagerNavItems {
         id = OrbitProjectManagerNavIds.Assistant,
         icon = OrbitNavSolidIcons.BubbleChat,
         label = "AI",
-        contentDescription = "Orbit AI",
+        contentDescription = "Orbit.ai",
         emphasized = true,
     )
     val Plan = OrbitNavItem(
@@ -101,12 +101,12 @@ object OrbitSiteEngineerNavItems {
         id = OrbitSiteEngineerNavIds.Assistant,
         icon = OrbitNavSolidIcons.BubbleChat,
         label = "AI",
-        contentDescription = "Orbit AI",
+        contentDescription = "Orbit.ai",
         emphasized = true,
     )
     val Done = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Done,
-        icon = OrbitNavSolidIcons.CircleCheck,
+        icon = OrbitNavSolidIcons.ClipboardCheck,
         label = "Done",
         contentDescription = "Completed work",
     )
@@ -166,7 +166,7 @@ object OrbitContractorNavItems {
         id = OrbitContractorNavIds.Assistant,
         icon = OrbitNavSolidIcons.BubbleChat,
         label = "AI",
-        contentDescription = "Orbit AI",
+        contentDescription = "Orbit.ai",
         emphasized = true,
     )
     val Invoices = OrbitNavItem(
@@ -228,7 +228,7 @@ object OrbitWarehouseManagerNavItems {
         id = OrbitWarehouseManagerNavIds.Assistant,
         icon = OrbitNavSolidIcons.BubbleChat,
         label = "AI",
-        contentDescription = "Orbit AI",
+        contentDescription = "Orbit.ai",
         emphasized = true,
     )
     val Requests = OrbitNavItem(
@@ -290,7 +290,7 @@ object OrbitProcurementManagerNavItems {
         id = OrbitProcurementManagerNavIds.Assistant,
         icon = OrbitNavSolidIcons.BubbleChat,
         label = "AI",
-        contentDescription = "Orbit AI",
+        contentDescription = "Orbit.ai",
         emphasized = true,
     )
     val Approvals = OrbitNavItem(
@@ -347,7 +347,7 @@ object OrbitQaQcNavItems {
     )
     val Inspect = OrbitNavItem(
         id = OrbitQaQcNavIds.Inspect,
-        icon = OrbitNavSolidIcons.NotebookText,
+        icon = OrbitNavSolidIcons.ClipboardCheck,
         label = "Inspect",
         contentDescription = "Inspections",
     )
@@ -355,12 +355,12 @@ object OrbitQaQcNavItems {
         id = OrbitQaQcNavIds.Assistant,
         icon = OrbitNavSolidIcons.BubbleChat,
         label = "AI",
-        contentDescription = "Orbit AI",
+        contentDescription = "Orbit.ai",
         emphasized = true,
     )
     val Done = OrbitNavItem(
         id = OrbitQaQcNavIds.Done,
-        icon = OrbitNavSolidIcons.CircleCheck,
+        icon = OrbitNavSolidIcons.NotebookText,
         label = "Done",
         contentDescription = "Completed inspections",
     )

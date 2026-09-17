@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 class OrbitBottomNavBarTest {
 
     @Test
-    fun `CEO bar has five icon slots with Orbit AI in the center`() {
+    fun `CEO bar has five icon slots with Orbit ai brand in the center`() {
         val items = OrbitCeoNavItems.items
         assertEquals(5, items.size)
         assertEquals(listOf("Home", "Projects", "AI", "Invoice", "Chat"), items.map { it.label })
@@ -32,7 +32,7 @@ class OrbitBottomNavBarTest {
             listOf("Home", "Work", "AI", "Done", "Chat"),
             OrbitSiteEngineerNavItems.items.map { it.label },
         )
-        assertEquals(OrbitIconsName(OrbitSiteEngineerNavItems.Done.icon), "CircleCheckSolid")
+        assertEquals(OrbitIconsName(OrbitSiteEngineerNavItems.Done.icon), "ClipboardCheckSolid")
 
         assertEquals(
             listOf("Home", "Work", "AI", "Invoice", "Chat"),
@@ -44,8 +44,8 @@ class OrbitBottomNavBarTest {
             listOf("Home", "Inspect", "AI", "Done", "Chat"),
             OrbitQaQcNavItems.items.map { it.label },
         )
-        assertEquals(OrbitIconsName(OrbitQaQcNavItems.Done.icon), "CircleCheckSolid")
-        assertEquals(OrbitIconsName(OrbitQaQcNavItems.Inspect.icon), "NotebookTextSolid")
+        assertEquals(OrbitIconsName(OrbitQaQcNavItems.Done.icon), "NotebookTextSolid")
+        assertEquals(OrbitIconsName(OrbitQaQcNavItems.Inspect.icon), "ClipboardCheckSolid")
 
         assertEquals(OrbitIconsName(OrbitProcurementManagerNavItems.Orders.icon), "ShoppingCartSolid")
         assertEquals(
@@ -59,7 +59,7 @@ class OrbitBottomNavBarTest {
     }
 
     @Test
-    fun `each role nav keeps five unique ids with center Orbit AI and Orbit inbox icon`() {
+    fun `each role nav keeps five unique ids with center Orbit ai and inbox icon`() {
         listOf(
             OrbitCeoNavItems.items,
             OrbitProjectManagerNavItems.items,
@@ -78,17 +78,14 @@ class OrbitBottomNavBarTest {
     }
 
     @Test
-    fun `bottom nav metrics scale with width and keep equal glyphs under active circle`() {
+    fun `bottom nav metrics scale with width and keep equal glyphs under bar height`() {
         val sizing = OrbitSizing()
         val phone = orbitBottomNavMetrics(360.dp, sizing)
         val tablet = orbitBottomNavMetrics(700.dp, sizing)
-        assertTrue(phone.glyph < phone.activeCircle)
-        assertTrue(phone.activeCircle <= phone.height)
-        assertTrue(phone.glyph >= 22.dp)
-        assertTrue(phone.glyph <= 28.dp)
-        assertTrue(phone.activeCircle >= 56.dp)
-        assertTrue(tablet.activeCircle >= phone.activeCircle)
-        assertEquals(2.dp, phone.labelGap)
+        assertTrue(phone.glyph < phone.height)
+        assertTrue(phone.glyph >= 28.dp)
+        assertTrue(phone.glyph <= 36.dp)
+        assertTrue(tablet.glyph >= phone.glyph)
     }
 }
 
