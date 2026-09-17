@@ -363,14 +363,14 @@ data class OrbitSizing(
     val chipHeight: Dp = 36.dp,
 
     /**
-     * The numeric count badge, as a diameter for a single digit.
+     * The numeric count badge diameter for a single digit (full circle).
      *
-     * It grows into a pill for two or more, so this is a minimum rather than a size. 16dp is the
-     * floor at which a digit set at the caption floor of 12sp still has optical room above and below
-     * the numeral — below that the badge crops the ascenders of a 4 and the descender of a 9 before
-     * the type itself becomes illegible.
+     * Two- and three-character counts grow into a pill; this is a minimum rather than a size.
      */
     val countBadgeMinSize: Dp = 16.dp,
+
+    /** Compact count badge used on bottom-nav icons (scaled with nav glyphs). */
+    val countBadgeCompactSize: Dp = 13.dp,
 
     /** The count badge with no number in it — presence only, for "there is something here". */
     val countBadgeDot: Dp = 8.dp,
@@ -641,62 +641,33 @@ data class OrbitSizing(
     val maxContentWidth: Dp = 1200.dp,
 
     /**
-     * Floating role bottom nav — the full pill plus the separate circular action.
+     * Full-width icons-only bottom nav (no labels, no chrome container).
      *
-     * Height is shared by both clusters so the row reads as one bar. The pill flexes; the circle
-     * stays square at the same diameter. Glyphs sit visually centred in both, with no labels.
+     * Height covers the touch target. Glyph size scales from column width via
+     * [orbitBottomNavMetrics].
      */
-    val bottomNavHeight: Dp = 64.dp,
-    /** Scaled with [bottomNavHeight] so the glyph stays about half the container. */
-    val bottomNavGlyph: Dp = 30.dp,
+    val bottomNavHeight: Dp = 56.dp,
+    /** Base side-tab glyph (metrics scale from screen width). */
+    val bottomNavGlyph: Dp = 26.dp,
+    /** Base center Orbit AI nav brand mark size. */
+    val bottomNavAiGlyph: Dp = 28.dp,
+    /** Stroke for side-tab glyphs — light but readable at nav size. */
+    val bottomNavIconStroke: Dp = 1.15.dp,
+    /** Stroke for stroke-based AI glyphs (brand mark does not use stroke). */
+    val bottomNavAiStroke: Dp = 1.15.dp,
+    /** Gap between icon and label (labels are not drawn on the bar). */
+    val bottomNavLabelGap: Dp = 0.dp,
     /**
-     * Stroke floor/ceiling for nav glyphs.
-     *
-     * Thinner than the natural Hugeicons scale at [bottomNavGlyph] — at this size the authored
-     * 1.8-unit stroke would land near 2dp and look heavy in a floating glass bar. Cap it here so
-     * size can grow without the line weight growing with it.
+     * Outer horizontal inset. Minimal so five columns use the full screen width.
      */
-    val bottomNavIconStroke: Dp = 1.25.dp,
-    /**
-     * Inset from the pill's curved ends to the outer icon slots.
-     *
-     * Keeps SpaceEvenly icons optically centred in the glass rather than riding into the radius.
-     */
-    val bottomNavPillInset: Dp = 14.dp,
-    /**
-     * Outer horizontal inset for the floating bar.
-     *
-     * Tighter than [OrbitSpacing.screenHorizontal] so the pill and circle read wider on phone
-     * widths without touching the screen edge.
-     */
-    val bottomNavEdgeInset: Dp = 10.dp,
-    /** Gap between the primary pill and the circular action. */
-    val bottomNavClusterGap: Dp = 10.dp,
-    /**
-     * Active-destination glass disc drawn behind the selected glyph.
-     *
-     * Sized to nearly fill [bottomNavHeight] so it reads clearly inside both the pill slots and the
-     * separate action circle, with a few dp of air so it does not collide with the outer rim.
-     */
-    val bottomNavActiveSize: Dp = 54.dp,
-    /**
-     * Contact shadow under the pill and circle.
-     *
-     * Softer than [shadowIconButton] / `elevation.bottomBar` — those were tuned for small rings, and
-     * at bar size a 3dp shadow reads as a drop rather than as glass resting on the page.
-     */
+    val bottomNavEdgeInset: Dp = 2.dp,
+    /** Contact shadow token (shared with composer chrome; nav itself draws no container). */
     val bottomNavShadow: Dp = 2.dp,
-    /**
-     * Air between the bar and the platform gesture / navigation bar.
-     *
-     * Small on purpose: enough to separate the glass from the system chrome without floating the
-     * bar halfway up the screen.
-     */
-    val bottomNavSystemGap: Dp = 8.dp,
+    /** Air between the bar and the platform gesture / navigation bar. */
+    val bottomNavSystemGap: Dp = 4.dp,
 
     /**
-     * Horizontal inset for [OrbitTabBar], kept equal to [bottomNavEdgeInset] so the pages bar and
-     * floating bottom nav share one column edge on phone widths.
+     * Horizontal inset for [OrbitTabBar], kept aligned with the bottom-nav chrome column.
      */
     val tabBarEdgeInset: Dp = 10.dp,
 

@@ -19,10 +19,10 @@ class PlatformTokensTest {
     }
 
     @Test
-    fun `tab bar and bottom nav share the same chrome edge inset`() {
-        assertEquals(android.sizing.bottomNavEdgeInset, android.sizing.tabBarEdgeInset)
-        assertEquals(ios.sizing.bottomNavEdgeInset, ios.sizing.tabBarEdgeInset)
+    fun `tab bar and bottom nav use platform chrome insets`() {
+        assertEquals(2.dp, android.sizing.bottomNavEdgeInset)
         assertEquals(10.dp, android.sizing.tabBarEdgeInset)
+        assertEquals(2.dp, ios.sizing.bottomNavEdgeInset)
         assertEquals(12.dp, ios.sizing.tabBarEdgeInset)
     }
 

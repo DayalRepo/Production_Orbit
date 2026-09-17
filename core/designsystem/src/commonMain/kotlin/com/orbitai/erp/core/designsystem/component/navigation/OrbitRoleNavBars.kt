@@ -10,45 +10,44 @@ import com.orbitai.erp.core.designsystem.icon.OrbitIcons
 
 object OrbitProjectManagerNavIds {
     const val Dashboard = "pm.dashboard"
-    const val Tasks = "pm.tasks"
-    const val Messages = "pm.messages"
+    const val Work = "pm.work"
     const val Assistant = "pm.assistant"
+    const val Issues = "pm.issues"
+    const val Messages = "pm.messages"
 }
 
-/**
- * Project Manager icon set.
- *
- * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
- * [note-add](https://hugeicons.com/icon/note-add?style=stroke-rounded),
- * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
- * Circle: Orbit pixel brand mark (AI assistant).
- */
 @Immutable
 object OrbitProjectManagerNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitProjectManagerNavIds.Dashboard,
         icon = OrbitIcons.DashboardCircle,
-        contentDescription = "Dashboard",
+        label = "Dashboard",
     )
-    val Tasks = OrbitNavItem(
-        id = OrbitProjectManagerNavIds.Tasks,
+    /** Create tasks, raise issues, schedule, order materials — PM work hub. */
+    val Work = OrbitNavItem(
+        id = OrbitProjectManagerNavIds.Work,
         icon = OrbitIcons.NoteAdd,
-        contentDescription = "Tasks",
+        label = "Work",
     )
-    val Messages = OrbitNavItem(
-        id = OrbitProjectManagerNavIds.Messages,
-        icon = OrbitIcons.BellDot,
-        contentDescription = "Notifications",
-    )
-    val Assistant = OrbitNavItem(
+    val Orbit = OrbitNavItem(
         id = OrbitProjectManagerNavIds.Assistant,
-        icon = OrbitIcons.Brain03,
-        contentDescription = "Assistant",
-        brandMark = true,
+        icon = OrbitIcons.BubbleChat,
+        label = "Orbit",
+        contentDescription = "Orbit AI",
+        emphasized = true,
     )
-
-    val primary: List<OrbitNavItem> = listOf(Dashboard, Tasks, Messages)
-    val action: OrbitNavItem = Assistant
+    /** Open issue queue / escalations (separate from creating work). */
+    val Issues = OrbitNavItem(
+        id = OrbitProjectManagerNavIds.Issues,
+        icon = OrbitIcons.BadgeAlert,
+        label = "Issues",
+    )
+    val Inbox = OrbitNavItem(
+        id = OrbitProjectManagerNavIds.Messages,
+        icon = OrbitIcons.BubbleChat,
+        label = "Inbox",
+    )
+    val items = listOf(Dashboard, Work, Orbit, Issues, Inbox)
 }
 
 @Composable
@@ -58,66 +57,58 @@ fun OrbitProjectManagerNavBar(
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
     notificationCount: Int = 0,
+    insightCount: Int = 0,
 ) {
-    val primary = remember(notificationCount) {
-        OrbitProjectManagerNavItems.primary.withNotificationBadge(
-            messageId = OrbitProjectManagerNavIds.Messages,
-            count = notificationCount,
-        )
+    val items = remember(notificationCount, insightCount) {
+        OrbitProjectManagerNavItems.items
+            .withNotificationBadge(OrbitProjectManagerNavIds.Messages, notificationCount)
+            .withInsightBadge(OrbitProjectManagerNavIds.Assistant, insightCount)
     }
-    OrbitBottomNavBar(
-        primaryItems = primary,
-        actionItem = OrbitProjectManagerNavItems.action,
-        selectedId = selectedId,
-        onSelect = onSelect,
-        modifier = modifier,
-        applyNavigationBarInset = applyNavigationBarInset,
-    )
+    OrbitBottomNavBar(items, selectedId, onSelect, modifier, applyNavigationBarInset)
 }
 
 // ── Site Engineer ────────────────────────────────────────────────────────────
 
 object OrbitSiteEngineerNavIds {
     const val Dashboard = "se.dashboard"
-    const val Notes = "se.notes"
-    const val Messages = "se.messages"
+    const val Work = "se.work"
     const val Assistant = "se.assistant"
+    const val Issues = "se.issues"
+    const val Messages = "se.messages"
 }
 
-/**
- * Site Engineer icon set.
- *
- * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
- * [notepad-text](https://hugeicons.com/icon/notepad-text?style=stroke-rounded),
- * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
- * Circle: Orbit pixel brand mark (AI assistant).
- */
 @Immutable
 object OrbitSiteEngineerNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Dashboard,
         icon = OrbitIcons.DashboardCircle,
-        contentDescription = "Dashboard",
+        label = "Dashboard",
     )
-    val Notes = OrbitNavItem(
-        id = OrbitSiteEngineerNavIds.Notes,
+    /** Assigned tasks and site work to execute. */
+    val Work = OrbitNavItem(
+        id = OrbitSiteEngineerNavIds.Work,
         icon = OrbitIcons.NotepadText,
-        contentDescription = "Notes",
+        label = "Work",
     )
-    val Messages = OrbitNavItem(
-        id = OrbitSiteEngineerNavIds.Messages,
-        icon = OrbitIcons.BellDot,
-        contentDescription = "Notifications",
-    )
-    val Assistant = OrbitNavItem(
+    val Orbit = OrbitNavItem(
         id = OrbitSiteEngineerNavIds.Assistant,
-        icon = OrbitIcons.Brain03,
-        contentDescription = "Assistant",
-        brandMark = true,
+        icon = OrbitIcons.BubbleChat,
+        label = "Orbit",
+        contentDescription = "Orbit AI",
+        emphasized = true,
     )
-
-    val primary: List<OrbitNavItem> = listOf(Dashboard, Notes, Messages)
-    val action: OrbitNavItem = Assistant
+    /** Issues raised on site / assigned to resolve. */
+    val Issues = OrbitNavItem(
+        id = OrbitSiteEngineerNavIds.Issues,
+        icon = OrbitIcons.BadgeAlert,
+        label = "Issues",
+    )
+    val Inbox = OrbitNavItem(
+        id = OrbitSiteEngineerNavIds.Messages,
+        icon = OrbitIcons.BubbleChat,
+        label = "Inbox",
+    )
+    val items = listOf(Dashboard, Work, Orbit, Issues, Inbox)
 }
 
 @Composable
@@ -127,66 +118,57 @@ fun OrbitSiteEngineerNavBar(
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
     notificationCount: Int = 0,
+    insightCount: Int = 0,
 ) {
-    val primary = remember(notificationCount) {
-        OrbitSiteEngineerNavItems.primary.withNotificationBadge(
-            messageId = OrbitSiteEngineerNavIds.Messages,
-            count = notificationCount,
-        )
+    val items = remember(notificationCount, insightCount) {
+        OrbitSiteEngineerNavItems.items
+            .withNotificationBadge(OrbitSiteEngineerNavIds.Messages, notificationCount)
+            .withInsightBadge(OrbitSiteEngineerNavIds.Assistant, insightCount)
     }
-    OrbitBottomNavBar(
-        primaryItems = primary,
-        actionItem = OrbitSiteEngineerNavItems.action,
-        selectedId = selectedId,
-        onSelect = onSelect,
-        modifier = modifier,
-        applyNavigationBarInset = applyNavigationBarInset,
-    )
+    OrbitBottomNavBar(items, selectedId, onSelect, modifier, applyNavigationBarInset)
 }
 
 // ── Contractor ───────────────────────────────────────────────────────────────
 
 object OrbitContractorNavIds {
     const val Dashboard = "contractor.dashboard"
-    const val Notes = "contractor.notes"
-    const val Messages = "contractor.messages"
+    const val Work = "contractor.work"
     const val Assistant = "contractor.assistant"
+    const val Invoices = "contractor.invoices"
+    const val Messages = "contractor.messages"
 }
 
-/**
- * Contractor icon set — same layout glyphs as Site Engineer, separate ids for routing.
- *
- * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
- * [notepad-text](https://hugeicons.com/icon/notepad-text?style=stroke-rounded),
- * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
- * Circle: Orbit pixel brand mark (AI assistant).
- */
 @Immutable
 object OrbitContractorNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitContractorNavIds.Dashboard,
         icon = OrbitIcons.DashboardCircle,
-        contentDescription = "Dashboard",
+        label = "Dashboard",
     )
-    val Notes = OrbitNavItem(
-        id = OrbitContractorNavIds.Notes,
+    /** Assigned tasks and issues to execute. */
+    val Work = OrbitNavItem(
+        id = OrbitContractorNavIds.Work,
         icon = OrbitIcons.NotepadText,
-        contentDescription = "Notes",
+        label = "Work",
     )
-    val Messages = OrbitNavItem(
-        id = OrbitContractorNavIds.Messages,
-        icon = OrbitIcons.BellDot,
-        contentDescription = "Notifications",
-    )
-    val Assistant = OrbitNavItem(
+    val Orbit = OrbitNavItem(
         id = OrbitContractorNavIds.Assistant,
-        icon = OrbitIcons.Brain03,
-        contentDescription = "Assistant",
-        brandMark = true,
+        icon = OrbitIcons.BubbleChat,
+        label = "Orbit",
+        contentDescription = "Orbit AI",
+        emphasized = true,
     )
-
-    val primary: List<OrbitNavItem> = listOf(Dashboard, Notes, Messages)
-    val action: OrbitNavItem = Assistant
+    val Invoices = OrbitNavItem(
+        id = OrbitContractorNavIds.Invoices,
+        icon = OrbitIcons.ReceiptIndianRupee,
+        label = "Invoices",
+    )
+    val Inbox = OrbitNavItem(
+        id = OrbitContractorNavIds.Messages,
+        icon = OrbitIcons.BubbleChat,
+        label = "Inbox",
+    )
+    val items = listOf(Dashboard, Work, Orbit, Invoices, Inbox)
 }
 
 @Composable
@@ -196,21 +178,14 @@ fun OrbitContractorNavBar(
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
     notificationCount: Int = 0,
+    insightCount: Int = 0,
 ) {
-    val primary = remember(notificationCount) {
-        OrbitContractorNavItems.primary.withNotificationBadge(
-            messageId = OrbitContractorNavIds.Messages,
-            count = notificationCount,
-        )
+    val items = remember(notificationCount, insightCount) {
+        OrbitContractorNavItems.items
+            .withNotificationBadge(OrbitContractorNavIds.Messages, notificationCount)
+            .withInsightBadge(OrbitContractorNavIds.Assistant, insightCount)
     }
-    OrbitBottomNavBar(
-        primaryItems = primary,
-        actionItem = OrbitContractorNavItems.action,
-        selectedId = selectedId,
-        onSelect = onSelect,
-        modifier = modifier,
-        applyNavigationBarInset = applyNavigationBarInset,
-    )
+    OrbitBottomNavBar(items, selectedId, onSelect, modifier, applyNavigationBarInset)
 }
 
 // ── Warehouse Manager ────────────────────────────────────────────────────────
@@ -218,44 +193,41 @@ fun OrbitContractorNavBar(
 object OrbitWarehouseManagerNavIds {
     const val Dashboard = "warehouse.dashboard"
     const val Inventory = "warehouse.inventory"
-    const val Messages = "warehouse.messages"
     const val Assistant = "warehouse.assistant"
+    const val Requests = "warehouse.requests"
+    const val Messages = "warehouse.messages"
 }
 
-/**
- * Warehouse Manager icon set.
- *
- * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
- * [warehouse](https://hugeicons.com/icon/warehouse?style=stroke-rounded),
- * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
- * Circle: Orbit pixel brand mark (AI assistant).
- */
 @Immutable
 object OrbitWarehouseManagerNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Dashboard,
         icon = OrbitIcons.DashboardCircle,
-        contentDescription = "Dashboard",
+        label = "Dashboard",
     )
-    val Inventory = OrbitNavItem(
+    val Store = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Inventory,
         icon = OrbitIcons.Warehouse,
-        contentDescription = "Warehouse",
+        label = "Store",
     )
-    val Messages = OrbitNavItem(
-        id = OrbitWarehouseManagerNavIds.Messages,
-        icon = OrbitIcons.BellDot,
-        contentDescription = "Notifications",
-    )
-    val Assistant = OrbitNavItem(
+    val Orbit = OrbitNavItem(
         id = OrbitWarehouseManagerNavIds.Assistant,
-        icon = OrbitIcons.Brain03,
-        contentDescription = "Assistant",
-        brandMark = true,
+        icon = OrbitIcons.BubbleChat,
+        label = "Orbit",
+        contentDescription = "Orbit AI",
+        emphasized = true,
     )
-
-    val primary: List<OrbitNavItem> = listOf(Dashboard, Inventory, Messages)
-    val action: OrbitNavItem = Assistant
+    val Requests = OrbitNavItem(
+        id = OrbitWarehouseManagerNavIds.Requests,
+        icon = OrbitIcons.ListBullet,
+        label = "Requests",
+    )
+    val Inbox = OrbitNavItem(
+        id = OrbitWarehouseManagerNavIds.Messages,
+        icon = OrbitIcons.BubbleChat,
+        label = "Inbox",
+    )
+    val items = listOf(Dashboard, Store, Orbit, Requests, Inbox)
 }
 
 @Composable
@@ -265,21 +237,14 @@ fun OrbitWarehouseManagerNavBar(
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
     notificationCount: Int = 0,
+    insightCount: Int = 0,
 ) {
-    val primary = remember(notificationCount) {
-        OrbitWarehouseManagerNavItems.primary.withNotificationBadge(
-            messageId = OrbitWarehouseManagerNavIds.Messages,
-            count = notificationCount,
-        )
+    val items = remember(notificationCount, insightCount) {
+        OrbitWarehouseManagerNavItems.items
+            .withNotificationBadge(OrbitWarehouseManagerNavIds.Messages, notificationCount)
+            .withInsightBadge(OrbitWarehouseManagerNavIds.Assistant, insightCount)
     }
-    OrbitBottomNavBar(
-        primaryItems = primary,
-        actionItem = OrbitWarehouseManagerNavItems.action,
-        selectedId = selectedId,
-        onSelect = onSelect,
-        modifier = modifier,
-        applyNavigationBarInset = applyNavigationBarInset,
-    )
+    OrbitBottomNavBar(items, selectedId, onSelect, modifier, applyNavigationBarInset)
 }
 
 // ── Procurement Manager ──────────────────────────────────────────────────────
@@ -287,44 +252,41 @@ fun OrbitWarehouseManagerNavBar(
 object OrbitProcurementManagerNavIds {
     const val Dashboard = "procurement.dashboard"
     const val Orders = "procurement.orders"
-    const val Messages = "procurement.messages"
     const val Assistant = "procurement.assistant"
+    const val Approvals = "procurement.approvals"
+    const val Messages = "procurement.messages"
 }
 
-/**
- * Procurement Manager icon set.
- *
- * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
- * [shopping-cart-add-01](https://hugeicons.com/icon/shopping-cart-add-01?style=stroke-rounded),
- * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
- * Circle: Orbit pixel brand mark (AI assistant).
- */
 @Immutable
 object OrbitProcurementManagerNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Dashboard,
         icon = OrbitIcons.DashboardCircle,
-        contentDescription = "Dashboard",
+        label = "Dashboard",
     )
     val Orders = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Orders,
-        icon = OrbitIcons.ShoppingCartAdd01,
-        contentDescription = "Orders",
+        icon = OrbitIcons.ShoppingCart,
+        label = "Orders",
     )
-    val Messages = OrbitNavItem(
-        id = OrbitProcurementManagerNavIds.Messages,
-        icon = OrbitIcons.BellDot,
-        contentDescription = "Notifications",
-    )
-    val Assistant = OrbitNavItem(
+    val Orbit = OrbitNavItem(
         id = OrbitProcurementManagerNavIds.Assistant,
-        icon = OrbitIcons.Brain03,
-        contentDescription = "Assistant",
-        brandMark = true,
+        icon = OrbitIcons.BubbleChat,
+        label = "Orbit",
+        contentDescription = "Orbit AI",
+        emphasized = true,
     )
-
-    val primary: List<OrbitNavItem> = listOf(Dashboard, Orders, Messages)
-    val action: OrbitNavItem = Assistant
+    val Approvals = OrbitNavItem(
+        id = OrbitProcurementManagerNavIds.Approvals,
+        icon = OrbitIcons.ReceiptIndianRupee,
+        label = "Approvals",
+    )
+    val Inbox = OrbitNavItem(
+        id = OrbitProcurementManagerNavIds.Messages,
+        icon = OrbitIcons.BubbleChat,
+        label = "Inbox",
+    )
+    val items = listOf(Dashboard, Orders, Orbit, Approvals, Inbox)
 }
 
 @Composable
@@ -334,21 +296,14 @@ fun OrbitProcurementManagerNavBar(
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
     notificationCount: Int = 0,
+    insightCount: Int = 0,
 ) {
-    val primary = remember(notificationCount) {
-        OrbitProcurementManagerNavItems.primary.withNotificationBadge(
-            messageId = OrbitProcurementManagerNavIds.Messages,
-            count = notificationCount,
-        )
+    val items = remember(notificationCount, insightCount) {
+        OrbitProcurementManagerNavItems.items
+            .withNotificationBadge(OrbitProcurementManagerNavIds.Messages, notificationCount)
+            .withInsightBadge(OrbitProcurementManagerNavIds.Assistant, insightCount)
     }
-    OrbitBottomNavBar(
-        primaryItems = primary,
-        actionItem = OrbitProcurementManagerNavItems.action,
-        selectedId = selectedId,
-        onSelect = onSelect,
-        modifier = modifier,
-        applyNavigationBarInset = applyNavigationBarInset,
-    )
+    OrbitBottomNavBar(items, selectedId, onSelect, modifier, applyNavigationBarInset)
 }
 
 // ── QA / QC ──────────────────────────────────────────────────────────────────
@@ -356,44 +311,41 @@ fun OrbitProcurementManagerNavBar(
 object OrbitQaQcNavIds {
     const val Dashboard = "qaqc.dashboard"
     const val Inspections = "qaqc.inspections"
-    const val Messages = "qaqc.messages"
     const val Assistant = "qaqc.assistant"
+    const val Issues = "qaqc.issues"
+    const val Messages = "qaqc.messages"
 }
 
-/**
- * QA/QC icon set.
- *
- * Primary: [dashboard-circle](https://hugeicons.com/icon/dashboard-circle?style=stroke-rounded),
- * [badge-check](https://hugeicons.com/icon/badge-check?style=stroke-rounded),
- * [bell-dot](https://hugeicons.com/icon/bell-dot?style=stroke-rounded).
- * Circle: Orbit pixel brand mark (AI assistant).
- */
 @Immutable
 object OrbitQaQcNavItems {
     val Dashboard = OrbitNavItem(
         id = OrbitQaQcNavIds.Dashboard,
         icon = OrbitIcons.DashboardCircle,
-        contentDescription = "Dashboard",
+        label = "Dashboard",
     )
-    val Inspections = OrbitNavItem(
+    val Checks = OrbitNavItem(
         id = OrbitQaQcNavIds.Inspections,
         icon = OrbitIcons.BadgeCheck,
-        contentDescription = "Quality",
+        label = "Checks",
     )
-    val Messages = OrbitNavItem(
-        id = OrbitQaQcNavIds.Messages,
-        icon = OrbitIcons.BellDot,
-        contentDescription = "Notifications",
-    )
-    val Assistant = OrbitNavItem(
+    val Orbit = OrbitNavItem(
         id = OrbitQaQcNavIds.Assistant,
-        icon = OrbitIcons.Brain03,
-        contentDescription = "Assistant",
-        brandMark = true,
+        icon = OrbitIcons.BubbleChat,
+        label = "Orbit",
+        contentDescription = "Orbit AI",
+        emphasized = true,
     )
-
-    val primary: List<OrbitNavItem> = listOf(Dashboard, Inspections, Messages)
-    val action: OrbitNavItem = Assistant
+    val Issues = OrbitNavItem(
+        id = OrbitQaQcNavIds.Issues,
+        icon = OrbitIcons.BadgeAlert,
+        label = "Issues",
+    )
+    val Inbox = OrbitNavItem(
+        id = OrbitQaQcNavIds.Messages,
+        icon = OrbitIcons.BubbleChat,
+        label = "Inbox",
+    )
+    val items = listOf(Dashboard, Checks, Orbit, Issues, Inbox)
 }
 
 @Composable
@@ -403,19 +355,12 @@ fun OrbitQaQcNavBar(
     modifier: Modifier = Modifier,
     applyNavigationBarInset: Boolean = true,
     notificationCount: Int = 0,
+    insightCount: Int = 0,
 ) {
-    val primary = remember(notificationCount) {
-        OrbitQaQcNavItems.primary.withNotificationBadge(
-            messageId = OrbitQaQcNavIds.Messages,
-            count = notificationCount,
-        )
+    val items = remember(notificationCount, insightCount) {
+        OrbitQaQcNavItems.items
+            .withNotificationBadge(OrbitQaQcNavIds.Messages, notificationCount)
+            .withInsightBadge(OrbitQaQcNavIds.Assistant, insightCount)
     }
-    OrbitBottomNavBar(
-        primaryItems = primary,
-        actionItem = OrbitQaQcNavItems.action,
-        selectedId = selectedId,
-        onSelect = onSelect,
-        modifier = modifier,
-        applyNavigationBarInset = applyNavigationBarInset,
-    )
+    OrbitBottomNavBar(items, selectedId, onSelect, modifier, applyNavigationBarInset)
 }

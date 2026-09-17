@@ -192,6 +192,12 @@ ICONS = {
     # Role bottom-nav glyphs (CEO first). Stroke-rounded free set.
     "DashboardCircle": "DashboardCircleIcon",
     "Layers01": "Layers01Icon",
+    # [archive-04](https://hugeicons.com/icon/archive-04?style=stroke-rounded) stroke-rounded —
+    # CEO projects / portfolio vault.
+    "Archive04": "Archive04Icon",
+    # [receipt-indian-rupee](https://hugeicons.com/icon/receipt-indian-rupee?style=stroke-rounded)
+    # stroke-rounded — finance / invoices / money approvals.
+    "ReceiptIndianRupee": "ReceiptIndianRupeeIcon",
     "BubbleChat": "BubbleChatIcon",
     "BellDot": "BellDotIcon",
     "Brain03": "Brain03Icon",

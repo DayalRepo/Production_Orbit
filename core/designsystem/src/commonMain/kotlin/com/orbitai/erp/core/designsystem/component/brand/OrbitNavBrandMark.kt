@@ -27,5 +27,5 @@ fun OrbitNavBrandMark(
 
 object OrbitNavBrandMarkDefaults {
     /** Fallback when a caller does not pass the live nav glyph size. */
-    val Size = 22.dp
+    val Size = 30.dp
 }

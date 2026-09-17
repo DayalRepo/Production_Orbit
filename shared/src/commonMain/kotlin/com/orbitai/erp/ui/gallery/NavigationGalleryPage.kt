@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,11 +33,7 @@ import com.orbitai.erp.core.designsystem.component.navigation.OrbitWarehouseMana
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 
 /**
- * Navigation samples: floating role bottom navs, then underline pages bar.
- *
- * Role bars are library chrome — icons only — reviewed here before screens wire them above the
- * platform gesture / navigation bar. Tab bar and bottom nav share the same chrome edge inset so
- * the column grid lines up on Android and iOS.
+ * Navigation samples: icons-only role bottom navs (colour-only selection), then underline pages bar.
  */
 @Composable
 internal fun NavigationGalleryPage() {
@@ -44,25 +41,27 @@ internal fun NavigationGalleryPage() {
 
     GallerySection("Bottom nav") {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.lg)) {
-            RoleNavSample {
+            RoleNavSample(role = "CEO") {
                 var selected by remember { mutableStateOf(OrbitCeoNavIds.Dashboard) }
                 OrbitCeoNavBar(
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
                     notificationCount = 3,
+                    insightCount = 2,
                 )
             }
-            RoleNavSample {
+            RoleNavSample(role = "Project Manager") {
                 var selected by remember { mutableStateOf(OrbitProjectManagerNavIds.Dashboard) }
                 OrbitProjectManagerNavBar(
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
                     notificationCount = 12,
+                    insightCount = 1,
                 )
             }
-            RoleNavSample {
+            RoleNavSample(role = "Site Engineer") {
                 var selected by remember { mutableStateOf(OrbitSiteEngineerNavIds.Dashboard) }
                 OrbitSiteEngineerNavBar(
                     selectedId = selected,
@@ -71,7 +70,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 1,
                 )
             }
-            RoleNavSample {
+            RoleNavSample(role = "Contractor") {
                 var selected by remember { mutableStateOf(OrbitContractorNavIds.Dashboard) }
                 OrbitContractorNavBar(
                     selectedId = selected,
@@ -80,7 +79,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 99,
                 )
             }
-            RoleNavSample {
+            RoleNavSample(role = "Warehouse Manager") {
                 var selected by remember { mutableStateOf(OrbitWarehouseManagerNavIds.Dashboard) }
                 OrbitWarehouseManagerNavBar(
                     selectedId = selected,
@@ -89,7 +88,7 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 5,
                 )
             }
-            RoleNavSample {
+            RoleNavSample(role = "Procurement Manager") {
                 var selected by remember {
                     mutableStateOf(OrbitProcurementManagerNavIds.Dashboard)
                 }
@@ -100,13 +99,12 @@ internal fun NavigationGalleryPage() {
                     notificationCount = 2,
                 )
             }
-            RoleNavSample {
+            RoleNavSample(role = "QA / QC") {
                 var selected by remember { mutableStateOf(OrbitQaQcNavIds.Dashboard) }
                 OrbitQaQcNavBar(
                     selectedId = selected,
                     onSelect = { selected = it },
                     applyNavigationBarInset = false,
-                    notificationCount = 0,
                 )
             }
         }
@@ -168,14 +166,21 @@ internal fun NavigationGalleryPage() {
 }
 
 @Composable
-private fun RoleNavSample(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(96.dp),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        content()
+private fun RoleNavSample(role: String, content: @Composable () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(OrbitTheme.spacing.sm)) {
+        Text(
+            text = role,
+            style = OrbitTheme.typography.labelLarge,
+            color = OrbitTheme.contentColors.textSecondary,
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            content()
+        }
     }
 }
 
