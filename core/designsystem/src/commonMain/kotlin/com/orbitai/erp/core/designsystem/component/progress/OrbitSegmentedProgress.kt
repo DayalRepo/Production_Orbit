@@ -58,6 +58,13 @@ object OrbitProgressDefaults {
             track = OrbitTheme.controlColors.controlContainer,
         )
 
+    /** Soft green for health / wellbeing bars — pairs with Health donut greens. */
+    val greenColors: OrbitProgressColors
+        @Composable @ReadOnlyComposable get() = OrbitProgressColors(
+            filled = if (OrbitTheme.isDark) OrbitPalette.Green70 else OrbitPalette.Green40,
+            track = OrbitTheme.controlColors.controlContainer,
+        )
+
     /**
      * How many slats a full-width bar is cut into.
      *

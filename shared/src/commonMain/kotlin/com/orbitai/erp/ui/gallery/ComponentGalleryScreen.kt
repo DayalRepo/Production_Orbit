@@ -327,6 +327,7 @@ private fun GalleryIndex(
         DateTimeGalleryPage()
         BrandGalleryPage()
         ProgressGalleryPage()
+        KpiGalleryPage()
         MessageBubbleGalleryPage()
         MarkdownGalleryPage()
         ChecklistGalleryPage()

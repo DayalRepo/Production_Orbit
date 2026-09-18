@@ -110,7 +110,7 @@ fun orbitChecklistRemainingLabel(items: List<OrbitChecklistItem>): String {
     if (items.isEmpty()) return "No items"
     val left = orbitChecklistRemainingCount(items)
     return when (left) {
-        0 -> "All complete"
+        0 -> "All tasks completed"
         1 -> "1 left"
         else -> "$left left"
     }
@@ -135,6 +135,8 @@ fun OrbitChecklist(
     expanded: Boolean? = null,
     onExpandedChange: ((Boolean) -> Unit)? = null,
     showProgress: Boolean = true,
+    /** When false, hides the trailing “All tasks completed” / “N left” beside the progress bar. */
+    showRemainingBesideBar: Boolean = true,
 ) {
     val sizing = OrbitTheme.sizing
     val spacing = OrbitTheme.spacing
@@ -227,12 +229,14 @@ fun OrbitChecklist(
                         contentDescription = orbitChecklistProgressLabel(items),
                     )
                 }
-                Text(
-                    text = orbitChecklistRemainingLabel(items),
-                    style = OrbitTheme.typography.labelMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
-                    color = content.textSecondary,
-                    maxLines = 1,
-                )
+                if (showRemainingBesideBar) {
+                    Text(
+                        text = orbitChecklistRemainingLabel(items),
+                        style = OrbitTheme.typography.labelMedium.copy(fontWeight = OrbitTheme.fontWeights.heading),
+                        color = content.textSecondary,
+                        maxLines = 1,
+                    )
+                }
             }
         }
 
@@ -568,7 +572,7 @@ private fun ChecklistAllCompleteRow() {
             .fillMaxWidth()
             .heightIn(min = sizing.minTouchTarget)
             .padding(horizontal = spacing.lg, vertical = spacing.sm)
-            .semantics { contentDescription = "All items complete" },
+            .semantics { contentDescription = "All tasks completed" },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -587,7 +591,7 @@ private fun ChecklistAllCompleteRow() {
         }
         Spacer(modifier = Modifier.width(spacing.md))
         Text(
-            text = "All items complete",
+            text = "All tasks completed",
             style = OrbitTheme.typography.bodyMedium.copy(fontWeight = OrbitTheme.fontWeights.title),
             color = content.textSecondary,
         )

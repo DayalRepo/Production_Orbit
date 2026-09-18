@@ -24,6 +24,7 @@ import com.orbitai.erp.core.designsystem.foundation.orbitGlass
 import com.orbitai.erp.core.designsystem.icon.OrbitGlyph
 import com.orbitai.erp.core.designsystem.theme.OrbitBadgeTone
 import com.orbitai.erp.core.designsystem.theme.OrbitGlass
+import com.orbitai.erp.core.designsystem.theme.OrbitShadow
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import com.orbitai.erp.core.designsystem.theme.colors
 
@@ -40,6 +41,7 @@ fun OrbitKpiTile(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     iconTone: OrbitBadgeTone = OrbitBadgeTone.Blue,
+    iconInChip: Boolean = true,
     supporting: String? = null,
     delta: Float? = null,
     deltaHigherIsBetter: Boolean = true,
@@ -47,9 +49,12 @@ fun OrbitKpiTile(
     comparisonLabel: String? = null,
     onClick: (() -> Unit)? = null,
     contentDescription: String? = null,
+    glassBoost: Boolean = false,
+    headerTrailing: (@Composable () -> Unit)? = null,
     footer: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val spacing = OrbitTheme.spacing
+    val sizing = OrbitTheme.sizing
     val content = OrbitTheme.contentColors
     val spoken = contentDescription ?: buildString {
         append(title)
@@ -70,6 +75,8 @@ fun OrbitKpiTile(
         padding = spacing.md,
         onClick = onClick,
         contentDescription = spoken,
+        glassBoost = glassBoost,
+        shadowLevel = if (glassBoost) OrbitShadow.Level2 else OrbitShadow.Level1,
     ) {
         Column(modifier = Modifier.clearAndSetSemantics {}) {
             Row(
@@ -78,7 +85,17 @@ fun OrbitKpiTile(
                 horizontalArrangement = Arrangement.spacedBy(spacing.sm),
             ) {
                 if (icon != null) {
-                    OrbitKpiIconChip(icon = icon, tone = iconTone)
+                    if (iconInChip) {
+                        OrbitKpiIconChip(icon = icon, tone = iconTone)
+                    } else {
+                        OrbitGlyph(
+                            icon = icon,
+                            size = sizing.iconSm,
+                            tint = iconTone.colors.icon,
+                            minimumStroke = sizing.iconStrokeLight,
+                            contentDescription = null,
+                        )
+                    }
                 }
                 Text(
                     text = title.uppercase(),
@@ -88,6 +105,9 @@ fun OrbitKpiTile(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
                 )
+                if (headerTrailing != null) {
+                    headerTrailing()
+                }
             }
 
             Spacer(Modifier.height(spacing.sm))
