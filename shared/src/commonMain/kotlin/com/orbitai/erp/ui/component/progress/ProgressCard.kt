@@ -14,8 +14,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import com.orbitai.erp.core.designsystem.component.container.OrbitCard
 import com.orbitai.erp.core.designsystem.component.display.OrbitDelta
-import com.orbitai.erp.core.designsystem.component.progress.OrbitProgressColors
-import com.orbitai.erp.core.designsystem.component.progress.OrbitProgressDefaults
 import com.orbitai.erp.core.designsystem.component.progress.OrbitSegmentedProgress
 import com.orbitai.erp.core.designsystem.theme.OrbitTheme
 import kotlin.math.abs
@@ -64,7 +62,6 @@ fun ProgressCard(
     delta: Float? = null,
     comparisonLabel: String = "vs last week",
     higherIsBetter: Boolean = true,
-    colors: OrbitProgressColors = OrbitProgressDefaults.colors,
     contentDescription: String? = null,
 ) {
     require(label != null || contentDescription != null) {
@@ -94,7 +91,6 @@ fun ProgressCard(
             delta = delta,
             comparisonLabel = comparisonLabel,
             higherIsBetter = higherIsBetter,
-            colors = colors,
         )
     }
 }
@@ -111,7 +107,6 @@ fun ProgressSection(
     delta: Float? = null,
     comparisonLabel: String = "vs last week",
     higherIsBetter: Boolean = true,
-    colors: OrbitProgressColors = OrbitProgressDefaults.colors,
 ) {
     val spacing = OrbitTheme.spacing
     val content = OrbitTheme.contentColors
@@ -181,7 +176,7 @@ fun ProgressSection(
 
         Spacer(Modifier.height(spacing.sm))
 
-        OrbitSegmentedProgress(progress = fraction, colors = colors)
+        OrbitSegmentedProgress(progress = fraction)
     }
 }
 

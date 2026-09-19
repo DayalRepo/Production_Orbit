@@ -308,13 +308,6 @@ object OrbitGlass {
     const val SurfaceHighlightDark = 0.05f
 
     /**
-     * Stronger specular for elevated dashboard KPI cards (CEO home). Still below badge peaks so
-     * label contrast on the card body stays safe.
-     */
-    const val KpiHighlightLight = 0.28f
-    const val KpiHighlightDark = 0.12f
-
-    /**
      * Alpha of the black contact shadow under a glass surface, per theme.
      *
      * Roughly triple on dark for the same visual weight. The dark surfaces start at `#121212` rather
